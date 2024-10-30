@@ -14,5 +14,10 @@ topaz_add_executable(
 	TARGET game
 	SOURCES
 		src/main.cpp
+		src/quad_renderer.hpp
+		src/quad_renderer.cpp
+	SHADERS
+		src/shaders/quad.vertex.tzsl
+		src/shaders/quad.fragment.tzsl
 )
 target_link_libraries(game PRIVATE topaz)
