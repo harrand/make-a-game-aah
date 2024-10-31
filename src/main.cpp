@@ -26,6 +26,7 @@ int tz_main()
 		float delta_seconds = (now - time) / 1000000000.0f;
 		time = now;
 
+		tz::ren::quad_renderer_update(ren);
 		tz::os::window_update();
 		tz::gpu::execute(tz::ren::quad_renderer_graph(ren));
 		tz::v2f pos = tz::ren::get_quad_position(ren, quad1);
