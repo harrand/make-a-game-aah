@@ -1,14 +1,14 @@
 #include "tz/topaz.hpp"
 #include "tz/os/window.hpp"
 #include "tz/gpu/hardware.hpp"
-
 #include "tz/os/input.hpp"
 #include "tz/ren/quad.hpp"
 
 tz::ren::quad_renderer_handle ren;
 void render_setup();
 
-int main()
+#include "tz/main.hpp"
+int tz_main()
 {
 	tz::initialise();
 	tz::os::open_window({.title = "My Amazing Game"});
