@@ -15,7 +15,7 @@ int tz_main()
 	tz::os::open_window({.title = "My Amazing Game"});
 	render_setup();
 
-	tz::ren::quad_handle quad1 = tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = tz::v2f::zero(), .scale = {0.2f, 0.2f}, .colour = {0.0f, 1.0f, 0.25f}}));
+	tz::ren::quad_handle quad1 = tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = tz::v2f::zero(), .scale = tz::v2f{0.1f, 0.1f} * 5.0f, .colour = {0.0f, 1.0f, 0.25f}}));
 
 	tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = {-0.5f, -0.5f}, .scale = {0.15f, 0.15f}, .colour = {0.5f, 0.1f, 0.85f}}));
 
