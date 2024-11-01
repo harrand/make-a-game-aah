@@ -33,11 +33,11 @@ int tz_main()
 		tz::v2f scale = tz::ren::get_quad_scale(ren, quad1);
 		if(tz::os::is_key_pressed(tz::os::key::a))
 		{
-			tz::ren::set_quad_position(ren, quad1, pos + tz::v2f{-1.0f, 0.0f} * delta_seconds);
+			tz::ren::set_quad_position(ren, quad1, pos += tz::v2f{-1.0f, 0.0f} * delta_seconds);
 		}
 		if(tz::os::is_key_pressed(tz::os::key::d))
 		{
-			tz::ren::set_quad_position(ren, quad1, pos + tz::v2f{1.0f, 0.0f} * delta_seconds);
+			tz::ren::set_quad_position(ren, quad1, pos += tz::v2f{1.0f, 0.0f} * delta_seconds);
 		}
 		if(tz::os::is_key_pressed(tz::os::key::w))
 		{
