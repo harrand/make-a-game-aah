@@ -84,5 +84,9 @@ int tz_main()
 void render_setup()
 {
 	tz_must(tz::gpu::use_hardware(tz::gpu::find_best_hardware()));
-	ren = tz_must(tz::ren::create_quad_renderer({}));
+	ren = tz_must(tz::ren::create_quad_renderer
+	({
+		.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
+		.flags = tz::ren::quad_renderer_flag::alpha_clipping,
+	}));
 }
