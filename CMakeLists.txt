@@ -17,6 +17,8 @@ topaz_add_executable(
 	SHADERS
 		src/shaders/quad.vertex.tzsl
 		src/shaders/quad.fragment.tzsl
+	BUNDLE_FILES
+		res/images/smile.png
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)

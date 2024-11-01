@@ -5,6 +5,9 @@
 #include "tz/os/input.hpp"
 #include "tz/ren/quad.hpp"
 
+#include "tz/os/file.hpp"
+#include "tz/io/image.hpp"
+
 tz::ren::quad_renderer_handle ren;
 void render_setup();
 
@@ -18,6 +21,24 @@ int tz_main()
 	tz::ren::quad_handle quad1 = tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = tz::v2f::zero(), .scale = tz::v2f{0.1f, 0.1f} * 5.0f, .colour = {0.0f, 1.0f, 0.25f}}));
 
 	tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = {-0.5f, -0.5f}, .scale = {0.15f, 0.15f}, .colour = {0.5f, 0.1f, 0.85f}}));
+
+	std::string smilefile = tz_must(tz::os::read_file("./res/images/smile.png"));
+	std::span<const std::byte> smiledata = std::as_bytes(std::span<const char>(smilefile.data(), smilefile.size()));
+	tz::io::image_header smilehdr = tz_must(tz::io::image_info(smiledata));
+	std::vector<std::byte> smile_imgdata(smilehdr.data_size_bytes);
+
+	tz_must(tz::io::parse_image(smiledata, smile_imgdata));
+
+	tz::gpu::resource_handle smile = tz_must(tz::gpu::create_image
+	({
+		.width = smilehdr.width,
+		.height = smilehdr.height,
+		.data = smile_imgdata,
+		.name = "Smile"
+	}));
+	std::uint32_t smiletex = tz_must(tz::ren::quad_renderer_add_texture(ren, smile));
+
+	tz::ren::set_quad_texture(ren, quad1, smiletex);
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
