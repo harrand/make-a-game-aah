@@ -5,10 +5,12 @@
 #include "tz/os/input.hpp"
 #include "tz/ren/quad.hpp"
 
+#include "tz/core/memory.hpp"
 #include "tz/os/file.hpp"
 #include "tz/io/image.hpp"
 
 tz::ren::quad_renderer_handle ren;
+std::uint32_t bgimg;
 void render_setup();
 
 #include "tz/main.hpp"
@@ -16,18 +18,20 @@ int tz_main()
 {
 	tz::initialise();
 	tz::os::open_window({.title = "My Amazing Game"});
+	tz::os::window_fullscreen();
 	render_setup();
+
+	tz::ren::quad_handle bgquad = tz_must(tz::ren::quad_renderer_create_quad(ren, {.scale = tz::v2f{2.0f, 1.0f}, .texture_id = bgimg}));
 
 	tz::ren::quad_handle quad1 = tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = tz::v2f::zero(), .scale = tz::v2f{0.1f, 0.1f} * 5.0f, .colour = {0.0f, 1.0f, 0.25f}}));
 
 	tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = {-0.5f, -0.5f}, .scale = {0.15f, 0.15f}, .colour = {0.5f, 0.1f, 0.85f}}));
 
 	std::string smilefile = tz_must(tz::os::read_file("./res/images/smile.png"));
-	std::span<const std::byte> smiledata = std::as_bytes(std::span<const char>(smilefile.data(), smilefile.size()));
-	tz::io::image_header smilehdr = tz_must(tz::io::image_info(smiledata));
+	tz::io::image_header smilehdr = tz_must(tz::io::image_info(tz::view_bytes(smilefile)));
 	std::vector<std::byte> smile_imgdata(smilehdr.data_size_bytes);
 
-	tz_must(tz::io::parse_image(smiledata, smile_imgdata));
+	tz_must(tz::io::parse_image(tz::view_bytes(smilefile), smile_imgdata));
 
 	tz::gpu::resource_handle smile = tz_must(tz::gpu::create_image
 	({
@@ -77,6 +81,10 @@ int tz_main()
 		{
 			tz::ren::set_quad_scale(ren, quad1, scale - tz::v2f::filled(delta_seconds * 0.5f));
 		}
+		if(tz::os::is_key_pressed(tz::os::key::escape))
+		{
+			break;
+		}
 	}
 	tz::terminate();
 }
@@ -89,4 +97,19 @@ void render_setup()
 		.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
 		.flags = tz::ren::quad_renderer_flag::alpha_clipping,
 	}));
+
+	std::string bgforestfile = tz_must(tz::os::read_file("./res/images/bgforest.png"));
+	tz::io::image_header bgforesthdr = tz_must(tz::io::image_info(tz::view_bytes(bgforestfile)));
+	std::vector<std::byte> bgforest_imgdata(bgforesthdr.data_size_bytes);
+
+	tz_must(tz::io::parse_image(tz::view_bytes(bgforestfile), bgforest_imgdata));
+
+	tz::gpu::resource_handle bgforest = tz_must(tz::gpu::create_image
+	({
+		.width = bgforesthdr.width,
+		.height = bgforesthdr.height,
+		.data = bgforest_imgdata,
+		.name = "bgforest"
+	}));
+	bgimg = tz_must(tz::ren::quad_renderer_add_texture(ren, bgforest));
 }
