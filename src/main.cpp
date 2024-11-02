@@ -13,6 +13,8 @@ tz::ren::quad_renderer_handle ren;
 std::uint32_t bgimg;
 void render_setup();
 
+tz::v2f screen_to_world(tz::v2u screenpos);
+
 #include "tz/main.hpp"
 int tz_main()
 {
@@ -22,6 +24,8 @@ int tz_main()
 	render_setup();
 
 	tz::ren::quad_handle bgquad = tz_must(tz::ren::quad_renderer_create_quad(ren, {.scale = tz::v2f{2.0f, 1.0f}, .texture_id = bgimg}));
+
+	tz::ren::quad_handle cursor = tz_must(tz::ren::quad_renderer_create_quad(ren, {.scale = tz::v2f{0.02f, 0.02f}, .colour = tz::v3f::zero()}));
 
 	tz::ren::quad_handle quad1 = tz_must(tz::ren::quad_renderer_create_quad(ren, {.position = tz::v2f::zero(), .scale = tz::v2f{0.1f, 0.1f} * 5.0f, .colour = {0.0f, 1.0f, 0.25f}}));
 
@@ -85,6 +89,10 @@ int tz_main()
 		{
 			break;
 		}
+		auto [mx, my] = tz::os::get_mouse_position();
+		tz::v2f mouse = screen_to_world(tz::v2u{mx, my});
+		std::printf("{%.2f, %.2f}                \r", mouse[0], mouse[1]);
+		tz::ren::set_quad_position(ren, cursor, mouse);
 	}
 	tz::terminate();
 }
@@ -112,4 +120,13 @@ void render_setup()
 		.name = "bgforest"
 	}));
 	bgimg = tz_must(tz::ren::quad_renderer_add_texture(ren, bgforest));
+}
+
+tz::v2f screen_to_world(tz::v2u screenpos)
+{
+	tz::v2f normalised = {static_cast<float>(screenpos[0]) / tz::os::window_get_width(), 1.0f - static_cast<float>(screenpos[1]) / tz::os::window_get_height()};
+	normalised *= 2.0f;
+	normalised -= tz::v2f::filled(1.0f);
+	normalised[0] *= (static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height());
+	return normalised;
 }
