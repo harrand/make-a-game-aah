@@ -8,6 +8,7 @@
 #include "tz/io/image.hpp"
 
 #include <vector>
+#include <unordered_map>
 
 namespace game::render
 {
@@ -30,6 +31,7 @@ namespace game::render
 		std::vector<texture_id> frames = {};
 	};
 	std::vector<flipbook_data> flipbooks = {};
+	std::unordered_map<std::filesystem::path, texture_id> texture_cache = {};
 
 	void setup()
 	{
@@ -127,12 +129,19 @@ namespace game::render
 
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile)
 	{
+		// if we already added this image file, don't dupe it, just return the id it was given earlier.
+		// this works so long as the GPU doesnt write to these files or bro has photoshop open editing the same file smh.
+		if(texture_cache.contains(imgfile))
+		{
+			return texture_cache.at(imgfile);
+		}
+
 		std::string filedata = tz_must(tz::os::read_file(imgfile));
 		tz::io::image_header imghdr = tz_must(tz::io::image_info(tz::view_bytes(filedata)));
 
 		std::vector<std::byte> imgdata(imghdr.data_size_bytes);
 		tz_must(tz::io::parse_image(tz::view_bytes(filedata), imgdata));
-		return tz_must(tz::ren::quad_renderer_add_texture(ren,
+		texture_id ret = tz_must(tz::ren::quad_renderer_add_texture(ren,
 			tz_must(tz::gpu::create_image
 			({
 				.width = imghdr.width,
@@ -141,6 +150,8 @@ namespace game::render
 				.name = imgfile.string().c_str()
 			}))
 		));
+		texture_cache[imgfile] = ret;
+		return ret;
 	}
 
 	tz::v2f screen_to_world(tz::v2u screenpos)
