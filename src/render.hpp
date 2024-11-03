@@ -13,6 +13,9 @@ namespace game::render
 
 	texture_id background_image();
 	handle create_quad(tz::ren::quad_info info);
+	void quad_set_position(handle q, tz::v2f pos);
+	void quad_set_scale(handle q, tz::v2f scale);
+	void quad_set_colour(handle q, tz::v3f colour);
 	void quad_set_texture(handle q, std::uint32_t texture);
 
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile);

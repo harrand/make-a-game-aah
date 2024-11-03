@@ -51,6 +51,21 @@ namespace game::render
 		return tz_must(tz::ren::quad_renderer_create_quad(ren, info));
 	}
 
+	void quad_set_position(handle q, tz::v2f pos)
+	{
+		tz::ren::set_quad_position(ren, q, pos);
+	}
+
+	void quad_set_scale(handle q, tz::v2f scale)
+	{
+		tz::ren::set_quad_scale(ren, q, scale);
+	}
+
+	void quad_set_colour(handle q, tz::v3f colour)
+	{
+		tz::ren::set_quad_colour(ren, q, colour);
+	}
+
 	void quad_set_texture(handle q, std::uint32_t texture)
 	{
 		tz::ren::set_quad_texture(ren, q, texture);

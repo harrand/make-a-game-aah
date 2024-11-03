@@ -20,6 +20,7 @@ int tz_main()
 	game::render::setup();
 
 	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}});
+	game::render::quad_set_colour(quad1, {1.0f, 0.0f, 0.0f});
 
 	std::uint32_t smiletex = game::render::create_image_from_file("./res/images/smile.png");
 
