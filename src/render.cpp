@@ -12,8 +12,8 @@
 namespace game::render
 {
 	tz::ren::quad_renderer_handle ren;
-	tz::ren::quad_handle background;
-	tz::ren::quad_handle cursor;
+	handle background;
+	handle cursor;
 	std::uint32_t bgimg;
 
 	void setup()
@@ -41,17 +41,17 @@ namespace game::render
 		tz::ren::set_quad_position(ren, cursor, mouse_world_pos);
 	}
 
-	std::uint32_t background_image()
+	texture_id background_image()
 	{
 		return bgimg;
 	}
 
-	tz::ren::quad_handle create_quad(tz::ren::quad_info info)
+	handle create_quad(tz::ren::quad_info info)
 	{
 		return tz_must(tz::ren::quad_renderer_create_quad(ren, info));
 	}
 
-	void quad_set_texture(tz::ren::quad_handle q, std::uint32_t texture)
+	void quad_set_texture(handle q, std::uint32_t texture)
 	{
 		tz::ren::set_quad_texture(ren, q, texture);
 	}

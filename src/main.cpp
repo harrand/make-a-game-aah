@@ -3,6 +3,7 @@
 #include "tz/os/window.hpp"
 #include "tz/os/input.hpp"
 #include "tz/gpu/hardware.hpp"
+#include "tz/gpu/settings.hpp"
 
 #include "render.hpp"
 
@@ -15,9 +16,10 @@ int tz_main()
 	tz::os::open_window({.title = "My Amazing Game"});
 	tz::os::window_fullscreen();
 	tz_must(tz::gpu::use_hardware(tz::gpu::find_best_hardware()));
+	tz::gpu::settings_set_vsync(true);
 	game::render::setup();
 
-	tz::ren::quad_handle quad1 = game::render::create_quad({.position = tz::v2f::zero(), .scale = tz::v2f{0.1f, 0.1f} * 5.0f, .colour = {0.0f, 1.0f, 0.25f}});
+	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}});
 
 	std::uint32_t smiletex = game::render::create_image_from_file("./res/images/smile.png");
 
