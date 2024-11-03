@@ -21,6 +21,8 @@ topaz_add_executable(
 	BUNDLE_FILES
 		res/images/smile.png
 		res/images/bgforest.png
+		res/images/hourglassh.png
+		res/images/hourglassv.png
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)

@@ -16,6 +16,21 @@ namespace game::render
 	handle cursor;
 	std::uint32_t bgimg;
 
+	struct quad_private_data
+	{
+		flipbook_handle flipbook = tz::nullhand;
+		float flipbook_timer = 0.0f;
+	};
+	std::vector<quad_private_data> quad_privates = {};
+
+	struct flipbook_data
+	{
+		unsigned int fps;
+		bool repeat;
+		std::vector<texture_id> frames = {};
+	};
+	std::vector<flipbook_data> flipbooks = {};
+
 	void setup()
 	{
 		ren = tz_must(tz::ren::create_quad_renderer
@@ -39,6 +54,24 @@ namespace game::render
 		tz::v2f mouse_world_pos = screen_to_world(tz::v2u{mx, my});
 
 		tz::ren::set_quad_position(ren, cursor, mouse_world_pos);
+
+		for(std::size_t i = 0; i < quad_privates.size(); i++)
+		{
+			auto& quadpriv = quad_privates[i];
+			if(quadpriv.flipbook != tz::nullhand)
+			{
+				quadpriv.flipbook_timer += delta_seconds;
+				const auto& flipbook = flipbooks[quadpriv.flipbook.peek()];
+
+				auto flipbook_time_secs = static_cast<float>(flipbook.frames.size()) / flipbook.fps;
+				if(flipbook.repeat && quadpriv.flipbook_timer > flipbook_time_secs)
+				{
+					quadpriv.flipbook_timer -= flipbook_time_secs;
+				}
+				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
+				quad_set_texture(static_cast<tz::hanval>(i), flipbook.frames[flipbook_cursor]);
+			}
+		}
 	}
 
 	texture_id background_image()
@@ -48,6 +81,7 @@ namespace game::render
 
 	handle create_quad(tz::ren::quad_info info)
 	{
+		quad_privates.push_back({});
 		return tz_must(tz::ren::quad_renderer_create_quad(ren, info));
 	}
 
@@ -69,6 +103,26 @@ namespace game::render
 	void quad_set_texture(handle q, std::uint32_t texture)
 	{
 		tz::ren::set_quad_texture(ren, q, texture);
+	}
+
+	void quad_set_flipbook(handle q, flipbook_handle flipbook)
+	{
+		quad_privates[q.peek()].flipbook = flipbook;
+	}
+
+	flipbook_handle create_flipbook(unsigned int fps, bool repeat)
+	{
+		auto id = flipbooks.size();
+		auto& flipbook = flipbooks.emplace_back();
+		flipbook.fps = fps;
+		flipbook.repeat = repeat;
+		return static_cast<tz::hanval>(id);
+	}
+
+	void flipbook_add_frame(flipbook_handle flipbookh, texture_id tex)
+	{
+		auto& flipbook = flipbooks[flipbookh.peek()];
+		flipbook.frames.push_back(tex);
 	}
 
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile)

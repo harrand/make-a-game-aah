@@ -24,6 +24,12 @@ int tz_main()
 
 	std::uint32_t smiletex = game::render::create_image_from_file("./res/images/smile.png");
 
+	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
+	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
+	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassh.png"));
+
+	game::render::quad_set_flipbook(quad1, hourglass);
+
 	game::render::quad_set_texture(quad1, smiletex);
 
 	std::uint64_t time = tz::system_nanos();
