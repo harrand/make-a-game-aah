@@ -14,6 +14,7 @@ topaz_add_executable(
 	TARGET game
 	SOURCES
 		src/main.cpp
+		src/render.cpp
 	SHADERS
 		src/shaders/quad.vertex.tzsl
 		src/shaders/quad.fragment.tzsl
