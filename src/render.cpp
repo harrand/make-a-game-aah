@@ -54,7 +54,7 @@ namespace game::render
 		}));
 
 		bgimg = create_image_from_file("./res/images/bgforest.png");
-		background = create_quad({.scale = tz::v2f{2.0f, 1.0f}, .texture_id = bgimg});
+		background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg}, quad_flag::match_image_ratio);
 
 		cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero()});
 	}
