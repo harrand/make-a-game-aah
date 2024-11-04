@@ -39,6 +39,10 @@ int tz_main()
 	{
 		game::render::handle cardsprite = game::create_card_sprite(game::card{});
 		game::render::quad_set_position(cardsprite, {i * 0.2f, -0.5f});
+		if(i == 3)
+		{
+			game::render::destroy_quad(cardsprite);
+		}
 	}
 
 	std::uint64_t time = tz::system_nanos();

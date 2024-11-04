@@ -26,6 +26,7 @@ namespace game::render
 		float flipbook_timer = 0.0f;
 		bool held = false;
 		tz::v2f held_offset = tz::v2f::filled(0.0f);
+		bool garbage = false;
 	};
 	std::vector<quad_private_data> quad_privates = {};
 
@@ -73,6 +74,10 @@ namespace game::render
 		{
 			handle q = static_cast<tz::hanval>(i);
 			auto& quadpriv = quad_privates[i];
+			if(quadpriv.garbage)
+			{
+				continue;
+			}
 			if(quadpriv.flipbook != tz::nullhand)
 			{
 				quadpriv.flipbook_timer += delta_seconds;
@@ -141,8 +146,25 @@ namespace game::render
 
 	handle create_quad(tz::ren::quad_info info, quad_flag flags)
 	{
-		quad_privates.push_back({.flags = flags});
-		return tz_must(tz::ren::quad_renderer_create_quad(ren, info));
+		tz::ren::quad_handle ret = tz_must(tz::ren::quad_renderer_create_quad(ren, info));
+		if(ret.peek() >= quad_privates.size())
+		{
+			// not recycled, its a new quad private.
+			quad_privates.push_back({.flags = flags});
+		}
+		else
+		{
+			quad_privates[ret.peek()] = {.flags = flags};
+		}
+		return ret;
+	}
+
+	void destroy_quad(handle q)
+	{
+		auto& priv = quad_privates[q.peek()];
+		priv = {};
+		priv.garbage = true;
+		return tz_must(tz::ren::quad_renderer_destroy_quad(ren, q));
 	}
 
 	void quad_set_position(handle q, tz::v2f pos)

@@ -31,6 +31,7 @@ namespace game::render
 	handle get_cursor();
 	handle get_background();
 	handle create_quad(tz::ren::quad_info info, quad_flag flags = static_cast<quad_flag>(0));
+	void destroy_quad(handle q);
 	void quad_set_position(handle q, tz::v2f pos);
 	void quad_set_scale(handle q, tz::v2f scale);
 	void quad_set_colour(handle q, tz::v3f colour);
