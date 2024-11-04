@@ -20,6 +20,7 @@ topaz_add_executable(
 		src/shaders/quad.fragment.tzsl
 	BUNDLE_FILES
 		res/images/smile.png
+		res/images/frown.png
 		res/images/bgforest.png
 		res/images/hourglassh.png
 		res/images/hourglassv.png

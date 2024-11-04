@@ -71,14 +71,20 @@ namespace game::render
 					quadpriv.flipbook_timer -= flipbook_time_secs;
 				}
 				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
+				flipbook_cursor = std::clamp(flipbook_cursor, 0, static_cast<int>(flipbook.frames.size()) - 1);
 				quad_set_texture(static_cast<tz::hanval>(i), flipbook.frames[flipbook_cursor]);
 			}
 		}
 	}
 
-	texture_id background_image()
+	handle get_cursor()
 	{
-		return bgimg;
+		return cursor;
+	}
+
+	handle get_background()
+	{
+		return background;
 	}
 
 	handle create_quad(tz::ren::quad_info info)

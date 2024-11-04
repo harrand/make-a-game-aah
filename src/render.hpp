@@ -13,7 +13,8 @@ namespace game::render
 	namespace detail{struct flipbook_t{};}
 	using flipbook_handle = tz::handle<detail::flipbook_t>;
 
-	texture_id background_image();
+	handle get_cursor();
+	handle get_background();
 	handle create_quad(tz::ren::quad_info info);
 	void quad_set_position(handle q, tz::v2f pos);
 	void quad_set_scale(handle q, tz::v2f scale);
