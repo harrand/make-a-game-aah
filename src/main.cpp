@@ -34,6 +34,13 @@ int tz_main()
 	game::render::quad_set_flipbook(quad1, face);
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
+	std::uint32_t cardtex = game::render::create_image_from_file("./res/images/cardbase.png");
+	for(std::size_t i = 0; i < 7; i++)
+	{
+		tz::ren::quad_handle card1 = game::render::create_quad({.position = {0.2f * i, -0.7f}, .scale = tz::v2f::filled(0.2f), .colour = {0.7f, 0.0f, 0.1f}}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
+		game::render::quad_set_texture(card1, cardtex);
+	}
+
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
 	{

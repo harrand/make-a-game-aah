@@ -15,7 +15,8 @@ namespace game::render
 
 	enum quad_flag
 	{
-		draggable = 0b0001
+		draggable = 0b0001,
+		match_image_ratio = 0b0010,
 	};
 	constexpr quad_flag operator|(quad_flag lhs, quad_flag rhs)
 	{

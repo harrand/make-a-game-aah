@@ -36,7 +36,13 @@ namespace game::render
 		std::vector<texture_id> frames = {};
 	};
 	std::vector<flipbook_data> flipbooks = {};
-	std::unordered_map<std::filesystem::path, texture_id> texture_cache = {};
+	struct texture_info
+	{
+		texture_id texid;
+		tz::io::image_header hdr;
+	};
+	std::unordered_map<std::filesystem::path, texture_info> texture_cache = {};
+	std::unordered_map<texture_id, std::filesystem::path> texture_infos = {};
 
 	void setup()
 	{
@@ -80,6 +86,15 @@ namespace game::render
 				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
 				flipbook_cursor = std::clamp(flipbook_cursor, 0, static_cast<int>(flipbook.frames.size()) - 1);
 				quad_set_texture(q, flipbook.frames[flipbook_cursor]);
+			}
+			if(quadpriv.flags & quad_flag::match_image_ratio)
+			{
+				std::uint32_t texid = tz::ren::get_quad_texture(ren, q);
+				const texture_info& tex = texture_cache[texture_infos[texid]];
+				float aspect_ratio = static_cast<float>(tex.hdr.width) / tex.hdr.height;
+				tz::v2f scale = tz::ren::get_quad_scale(ren, q);
+				scale[0] = scale[1] * aspect_ratio;
+				tz::ren::set_quad_scale(ren, q, scale);
 			}
 
 			if(quadpriv.flags & quad_flag::draggable)
@@ -178,7 +193,7 @@ namespace game::render
 		// this works so long as the GPU doesnt write to these files or bro has photoshop open editing the same file smh.
 		if(texture_cache.contains(imgfile))
 		{
-			return texture_cache.at(imgfile);
+			return texture_cache.at(imgfile).texid;
 		}
 
 		std::string filedata = tz_must(tz::os::read_file(imgfile));
@@ -195,7 +210,8 @@ namespace game::render
 				.name = imgfile.string().c_str()
 			}))
 		));
-		texture_cache[imgfile] = ret;
+		texture_cache[imgfile] = {.texid = ret, .hdr = imghdr};
+		texture_infos[ret] = imgfile;
 		return ret;
 	}
 
