@@ -6,6 +6,7 @@
 #include "tz/os/file.hpp"
 #include "tz/os/window.hpp"
 #include "tz/io/image.hpp"
+#include "tz/gpu/settings.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -16,11 +17,15 @@ namespace game::render
 	handle background;
 	handle cursor;
 	std::uint32_t bgimg;
+	bool clicked_last_frame = false;
 
 	struct quad_private_data
 	{
+		quad_flag flags = static_cast<quad_flag>(0);
 		flipbook_handle flipbook = tz::nullhand;
 		float flipbook_timer = 0.0f;
+		bool held = false;
+		tz::v2f held_offset = tz::v2f::filled(0.0f);
 	};
 	std::vector<quad_private_data> quad_privates = {};
 
@@ -35,6 +40,7 @@ namespace game::render
 
 	void setup()
 	{
+		tz::gpu::settings_set_vsync(true);
 		ren = tz_must(tz::ren::create_quad_renderer
 		({
 			.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
@@ -59,6 +65,7 @@ namespace game::render
 
 		for(std::size_t i = 0; i < quad_privates.size(); i++)
 		{
+			handle q = static_cast<tz::hanval>(i);
 			auto& quadpriv = quad_privates[i];
 			if(quadpriv.flipbook != tz::nullhand)
 			{
@@ -72,9 +79,39 @@ namespace game::render
 				}
 				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
 				flipbook_cursor = std::clamp(flipbook_cursor, 0, static_cast<int>(flipbook.frames.size()) - 1);
-				quad_set_texture(static_cast<tz::hanval>(i), flipbook.frames[flipbook_cursor]);
+				quad_set_texture(q, flipbook.frames[flipbook_cursor]);
+			}
+
+			if(quadpriv.flags & quad_flag::draggable)
+			{
+				tz::v2f pos = tz::ren::get_quad_position(ren, q);
+				tz::v2f scale = tz::ren::get_quad_scale(ren, q) * 0.95f;
+				tz::v2f min = pos - scale;
+				tz::v2f max = pos + scale;
+
+				bool in_region = 
+				   min[0] <= mouse_world_pos[0] && mouse_world_pos[0] <= max[0]
+				&& min[1] <= mouse_world_pos[1] && mouse_world_pos[1] <= max[1];
+
+				if(!clicked_last_frame && tz::os::is_mouse_clicked(tz::os::mouse_button::left) && in_region)
+				{
+					// we just started clicking this frame
+					// we're holding this now.
+					quadpriv.held = true;
+					quadpriv.held_offset = pos - mouse_world_pos;
+				}
+			}
+			
+			if(quadpriv.held)
+			{
+				quad_set_position(q, mouse_world_pos + quadpriv.held_offset);
+				if(!tz::os::is_mouse_clicked(tz::os::mouse_button::left))
+				{
+					quadpriv.held = false;
+				}
 			}
 		}
+		clicked_last_frame = tz::os::is_mouse_clicked(tz::os::mouse_button::left);
 	}
 
 	handle get_cursor()
@@ -87,9 +124,9 @@ namespace game::render
 		return background;
 	}
 
-	handle create_quad(tz::ren::quad_info info)
+	handle create_quad(tz::ren::quad_info info, quad_flag flags)
 	{
-		quad_privates.push_back({});
+		quad_privates.push_back({.flags = flags});
 		return tz_must(tz::ren::quad_renderer_create_quad(ren, info));
 	}
 
@@ -115,7 +152,9 @@ namespace game::render
 
 	void quad_set_flipbook(handle q, flipbook_handle flipbook)
 	{
-		quad_privates[q.peek()].flipbook = flipbook;
+		auto& priv = quad_privates[q.peek()];
+		priv.flipbook = flipbook;
+		priv.flipbook_timer = 0.0f;
 	}
 
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat)

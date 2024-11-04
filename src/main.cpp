@@ -3,7 +3,6 @@
 #include "tz/os/window.hpp"
 #include "tz/os/input.hpp"
 #include "tz/gpu/hardware.hpp"
-#include "tz/gpu/settings.hpp"
 
 #include "render.hpp"
 #include "script.hpp"
@@ -17,12 +16,11 @@ int tz_main()
 	tz::os::open_window({.title = "My Amazing Game"});
 	tz::os::window_fullscreen();
 	tz_must(tz::gpu::use_hardware(tz::gpu::find_best_hardware()));
-	tz::gpu::settings_set_vsync(true);
 	game::render::setup();
 
 	game::script_initialise();
 
-	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}});
+	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}}, game::render::quad_flag::draggable);
 	game::render::quad_set_colour(quad1, {1.0f, 0.0f, 0.0f});
 
 	game::render::flipbook_handle face = game::render::create_flipbook(2, true);

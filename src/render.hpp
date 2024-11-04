@@ -13,9 +13,23 @@ namespace game::render
 	namespace detail{struct flipbook_t{};}
 	using flipbook_handle = tz::handle<detail::flipbook_t>;
 
+	enum quad_flag
+	{
+		draggable = 0b0001
+	};
+	constexpr quad_flag operator|(quad_flag lhs, quad_flag rhs)
+	{
+		return static_cast<quad_flag>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	}
+
+	constexpr bool operator&(quad_flag lhs, quad_flag& rhs)
+	{
+		return static_cast<int>(lhs) & static_cast<int>(rhs);
+	}
+
 	handle get_cursor();
 	handle get_background();
-	handle create_quad(tz::ren::quad_info info);
+	handle create_quad(tz::ren::quad_info info, quad_flag flags = static_cast<quad_flag>(0));
 	void quad_set_position(handle q, tz::v2f pos);
 	void quad_set_scale(handle q, tz::v2f scale);
 	void quad_set_colour(handle q, tz::v3f colour);
