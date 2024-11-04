@@ -6,6 +6,7 @@
 #include "tz/gpu/settings.hpp"
 
 #include "render.hpp"
+#include "script.hpp"
 
 void render_setup();
 
@@ -18,6 +19,8 @@ int tz_main()
 	tz_must(tz::gpu::use_hardware(tz::gpu::find_best_hardware()));
 	tz::gpu::settings_set_vsync(true);
 	game::render::setup();
+
+	game::script_initialise();
 
 	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}});
 	game::render::quad_set_colour(quad1, {1.0f, 0.0f, 0.0f});

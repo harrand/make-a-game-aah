@@ -15,6 +15,7 @@ topaz_add_executable(
 	SOURCES
 		src/main.cpp
 		src/render.cpp
+		src/script.cpp
 	SHADERS
 		src/shaders/quad.vertex.tzsl
 		src/shaders/quad.fragment.tzsl
