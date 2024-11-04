@@ -14,6 +14,7 @@ topaz_add_executable(
 	TARGET game
 	SOURCES
 		src/main.cpp
+		src/card.cpp
 		src/render.cpp
 		src/script.cpp
 	SHADERS
