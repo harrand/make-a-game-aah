@@ -27,6 +27,7 @@ topaz_add_executable(
 		res/images/hourglassh.png
 		res/images/hourglassv.png
 		res/images/cardbase.png
+		script/creatures/peasant.lua
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)

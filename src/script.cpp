@@ -1,6 +1,7 @@
 #include "script.hpp"
 #include "tz/core/job.hpp"
 #include "tz/core/lua.hpp"
+#include <filesystem>
 
 namespace game
 {
@@ -23,6 +24,13 @@ namespace game
 
 	void impl_local_script_init()
 	{
-		tz_must(tz::lua_execute("x = 5"));
+		tz::lua_execute("creatures = {}");
+		for(const auto& entry : std::filesystem::directory_iterator("./script/creatures"))
+		{
+			if(entry.path().has_extension() && entry.path().extension() == ".lua")
+			{
+				tz_must(tz::lua_execute_file(entry.path()));
+			}
+		}
 	}
 }
