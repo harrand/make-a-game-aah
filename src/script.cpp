@@ -20,6 +20,7 @@ namespace game
 		{
 			tz::job_wait(jh);
 		}
+		impl_local_script_init();
 	}
 
 	void impl_local_script_init()

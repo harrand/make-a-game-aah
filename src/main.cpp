@@ -4,11 +4,17 @@
 #include "tz/os/input.hpp"
 #include "tz/gpu/hardware.hpp"
 
+#include "tz/core/lua.hpp"
+
 #include "card.hpp"
 #include "render.hpp"
 #include "script.hpp"
 
+#include <unordered_map>
+
 void render_setup();
+void collect_creature_data();
+game::render::handle test_spawn_creature(const char* creature_name);
 
 #include "tz/main.hpp"
 int tz_main()
@@ -45,6 +51,9 @@ int tz_main()
 		}
 	}
 
+	collect_creature_data();
+	test_spawn_creature("peasant");
+
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
 	{
@@ -60,4 +69,65 @@ int tz_main()
 		}
 	}
 	tz::terminate();
+}
+
+struct creature_data_t
+{
+	std::string name;
+	game::render::flipbook_handle idle = tz::nullhand;
+};
+std::unordered_map<std::string, creature_data_t> creature_data;
+
+int get_creature_data()
+{
+	auto [creature_name] = tz::lua_parse_args<std::string>();
+	creature_data_t& data = creature_data[creature_name];
+	tz::lua_execute(std::format(R"(
+		_internal_index = function(arr, idx) return arr[idx] end
+		c = creatures.{}
+		has_name = c.name ~= nil
+		has_idle = c.idle ~= nil
+		has_max_hp = c.max_hp ~= nil
+	)", creature_name));
+	auto has_name = tz_must(tz::lua_get_bool("has_name"));
+	auto has_idle = tz_must(tz::lua_get_bool("has_idle"));
+	if(has_idle)
+	{
+		tz::lua_execute("_count = #c.idle.frames");
+		int frame_count = tz_must(tz::lua_get_int("_count"));
+		int fps = tz_must(tz::lua_get_int("c.idle.fps"));
+		bool repeats = tz_must(tz::lua_get_bool("c.idle.repeats"));
+
+		data.idle = game::render::create_flipbook(fps, repeats);
+
+		for(std::size_t i = 0; i < frame_count; i++)
+		{
+			tz::lua_execute(std::format("_tmp = _internal_index(c.idle.frames, {})", i + 1));
+			std::string path = std::format("./res/images/{}", tz_must(tz::lua_get_string("_tmp")));
+			game::render::flipbook_add_frame(data.idle, game::render::create_image_from_file(path));
+		}
+	}
+	auto has_max_hp = tz_must(tz::lua_get_bool("has_max_hp"));
+	return 0;
+}
+
+void collect_creature_data()
+{
+	tz::lua_define_function("callback_creature", get_creature_data);
+	tz::lua_execute(R"(
+		for k, v in pairs(creatures) do
+			callback_creature(k)
+		end
+	)");
+}
+
+game::render::handle test_spawn_creature(const char* creature_name)
+{
+	game::render::handle ret = game::render::create_quad({.scale = tz::v2f::filled(0.2f)});
+	auto flipbook = creature_data[creature_name].idle;
+	if(flipbook != tz::nullhand)
+	{
+		game::render::quad_set_flipbook(ret, flipbook);
+	}
+	return ret;
 }

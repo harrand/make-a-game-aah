@@ -27,6 +27,9 @@ topaz_add_executable(
 		res/images/hourglassh.png
 		res/images/hourglassv.png
 		res/images/cardbase.png
+
+		res/images/creature/peasant/idle0.png
+		res/images/creature/peasant/idle1.png
 		script/creatures/peasant.lua
 	DEFINE_PACKAGE
 )

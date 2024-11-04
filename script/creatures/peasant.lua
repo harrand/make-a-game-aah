@@ -1,9 +1,9 @@
 creatures.peasant =
 {
-	name = "Peasant",
 	idle =
 	{
-		fps = 4,
+		fps = 2,
+		repeats = true,
 		frames =
 		{
 			"creature/peasant/idle0.png",
