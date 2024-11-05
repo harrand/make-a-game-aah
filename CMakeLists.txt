@@ -30,6 +30,8 @@ topaz_add_executable(
 
 		res/images/creature/peasant/idle0.png
 		res/images/creature/peasant/idle1.png
+		res/images/creature/peasant/side0.png
+		res/images/creature/peasant/side1.png
 		script/creatures/peasant.lua
 	DEFINE_PACKAGE
 )

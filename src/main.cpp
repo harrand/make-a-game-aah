@@ -73,10 +73,40 @@ int tz_main()
 
 struct creature_data_t
 {
-	std::string name;
 	game::render::flipbook_handle idle = tz::nullhand;
+	game::render::flipbook_handle move_horizontal = tz::nullhand;
+	game::render::flipbook_handle move_up = tz::nullhand;
+	game::render::flipbook_handle move_down = tz::nullhand;
 };
+
 std::unordered_map<std::string, creature_data_t> creature_data;
+
+void impl_collect_creature_animation(std::string_view creature_name, const char* animation_name, game::render::flipbook_handle& flipbook)
+{
+	tz::lua_execute(std::format(R"(
+	c = creatures.{}
+	has_anim = c.{} ~= nil
+	)", creature_name, animation_name));
+	auto has_anim = tz_must(tz::lua_get_bool("has_anim"));
+	if(has_anim)
+	{
+		tz::lua_execute(std::format(R"(
+		anim = c.{}
+		_count = #anim.frames
+		)", animation_name));
+		int frame_count = tz_must(tz::lua_get_int("_count"));
+		int fps = tz_must(tz::lua_get_int("anim.fps"));
+		bool loop = tz_must(tz::lua_get_bool("anim.loop"));
+
+		flipbook = game::render::create_flipbook(fps, loop);
+		for(std::size_t i = 0; i < frame_count; i++)
+		{
+			tz::lua_execute(std::format("_tmp = _internal_index(anim.frames, {})", i + 1));
+			std::string path = std::format("./res/images/{}", tz_must(tz::lua_get_string("_tmp")));
+			game::render::flipbook_add_frame(flipbook, game::render::create_image_from_file(path));
+		}
+	}
+}
 
 int get_creature_data()
 {
@@ -85,29 +115,11 @@ int get_creature_data()
 	tz::lua_execute(std::format(R"(
 		_internal_index = function(arr, idx) return arr[idx] end
 		c = creatures.{}
-		has_name = c.name ~= nil
-		has_idle = c.idle ~= nil
-		has_max_hp = c.max_hp ~= nil
 	)", creature_name));
-	auto has_name = tz_must(tz::lua_get_bool("has_name"));
-	auto has_idle = tz_must(tz::lua_get_bool("has_idle"));
-	if(has_idle)
-	{
-		tz::lua_execute("_count = #c.idle.frames");
-		int frame_count = tz_must(tz::lua_get_int("_count"));
-		int fps = tz_must(tz::lua_get_int("c.idle.fps"));
-		bool repeats = tz_must(tz::lua_get_bool("c.idle.repeats"));
-
-		data.idle = game::render::create_flipbook(fps, repeats);
-
-		for(std::size_t i = 0; i < frame_count; i++)
-		{
-			tz::lua_execute(std::format("_tmp = _internal_index(c.idle.frames, {})", i + 1));
-			std::string path = std::format("./res/images/{}", tz_must(tz::lua_get_string("_tmp")));
-			game::render::flipbook_add_frame(data.idle, game::render::create_image_from_file(path));
-		}
-	}
-	auto has_max_hp = tz_must(tz::lua_get_bool("has_max_hp"));
+	impl_collect_creature_animation(creature_name, "idle", data.idle);
+	impl_collect_creature_animation(creature_name, "move_horizontal", data.move_horizontal);
+	impl_collect_creature_animation(creature_name, "move_up", data.move_up);
+	impl_collect_creature_animation(creature_name, "move_down", data.move_down);
 	return 0;
 }
 
@@ -123,8 +135,8 @@ void collect_creature_data()
 
 game::render::handle test_spawn_creature(const char* creature_name)
 {
-	game::render::handle ret = game::render::create_quad({.scale = tz::v2f::filled(0.2f)});
-	auto flipbook = creature_data[creature_name].idle;
+	game::render::handle ret = game::render::create_quad({.scale = {0.2f, 0.2f}});
+	auto flipbook = creature_data[creature_name].move_horizontal;
 	if(flipbook != tz::nullhand)
 	{
 		game::render::quad_set_flipbook(ret, flipbook);
