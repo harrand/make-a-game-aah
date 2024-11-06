@@ -93,6 +93,7 @@ namespace game
 		impl_collect_creature_animation(creature_name, "move_up", data.move_up);
 		impl_collect_creature_animation(creature_name, "move_down", data.move_down);
 		impl_collect_creature_data(creature_name, "base_health", data.base_health);
+		impl_collect_creature_data(creature_name, "power", data.power);
 		return 0;
 	}
 }

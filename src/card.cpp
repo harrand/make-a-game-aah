@@ -13,7 +13,21 @@ namespace game
 	tz::io::image_header cardbase_img;
 	std::string cardbase_data;
 
+	std::array<tz::v3f, 6> card_colours
+	{
+		tz::v3f::filled(0.7f),
+		tz::v3f{0.4f, 0.7f, 0.1f},
+		tz::v3f{0.2f, 0.9f, 0.3f},
+		tz::v3f{0.1f, 0.2f, 0.9f},
+		tz::v3f{0.8f, 0.1f, 0.95f},
+		tz::v3f{1.0f, 0.1f, 0.15f}
+	};
+
 	void impl_cache_creature_sprite(std::string_view creature_name);
+	tz::v3f impl_card_colour(unsigned int power)
+	{
+		return card_colours[std::clamp(power, 0u, static_cast<unsigned int>(card_colours.size()) - 1)];
+	}
 
 	struct edited_img
 	{
@@ -46,7 +60,7 @@ namespace game
 			card_img = sprite_image_cache.at(c.name).texture_id;
 		}
 
-		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 0.05f, 0.1f}}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
 	}
 
 	void impl_cache_creature_sprite(std::string_view creature_name)
@@ -61,17 +75,52 @@ namespace game
 		// now get the sprite image itself.
 		std::uint32_t first_texture_id = game::render::flipbook_get_frames(prefab.idle).front();
 
+		tz::v3f card_colour = impl_card_colour(prefab.power);
+
+		for(std::size_t i = 0; i < data.size(); i += 4)
+		{
+			auto r = static_cast<float>(static_cast<unsigned char>(data[i + 0])) * card_colour[0];
+			auto g = static_cast<float>(static_cast<unsigned char>(data[i + 1])) * card_colour[1];
+			auto b = static_cast<float>(static_cast<unsigned char>(data[i + 2])) * card_colour[2];
+			data[i + 0] = static_cast<char>(r);
+			data[i + 1] = static_cast<char>(g);
+			data[i + 2] = static_cast<char>(b);
+		}
+
 		tz::io::image_header first_imghdr = game::render::get_image_info(first_texture_id);
 		std::span<const std::byte> first_imgdata = game::render::get_image_data(first_texture_id);
 		// edit 'data' to have the new image data.
-		// todo: superimpose the images in a meaningful way rather than whatever the fuck this is
-		for(std::size_t i = 0; i < data.size(); i++)
+		constexpr float creature_scale_factor = 4.0f;
+
+		// Calculate the top-left position to center the creature on the card base
+		int offset_x = (cardbase_img.width - (first_imghdr.width * creature_scale_factor)) / 2;
+		int offset_y = (cardbase_img.height - (first_imghdr.height * creature_scale_factor)) / 2;
+
+		// Copy creature image pixels onto the card base
+		for (unsigned int y = 0; y < creature_scale_factor * first_imghdr.height; ++y)
 		{
-			if(i % 8 == 0)
+			for (unsigned int x = 0; x < creature_scale_factor * first_imghdr.width; ++x)
 			{
-				data[i] += 128;
+				// Calculate indices in each image
+				int src_x = static_cast<int>(x / creature_scale_factor);
+				int src_y = static_cast<int>(y / creature_scale_factor);
+				int creature_idx = (src_y * first_imghdr.width + src_x) * 4;
+				int card_idx = ((offset_y + y) * cardbase_img.width + (offset_x + x)) * 4;
+
+				if(static_cast<unsigned char>(first_imgdata[creature_idx + 3]) == 0)
+				{
+					// this pixel is fully transparent. do not overwrite.
+					continue;
+				}
+
+				// Overwrite the card pixel data with creature data
+				for (int i = 0; i < 4; ++i)
+				{
+					data[card_idx + i] = static_cast<char>(first_imgdata[creature_idx + i]);
+				}
 			}
 		}
+
 
 		// finally create the new resultant image.
 		sprite_image_cache[creature_name_str].texture_id = game::render::create_image_from_data(cardbase_img, tz::view_bytes(data), std::format("cardsprite_{}", creature_name_str));

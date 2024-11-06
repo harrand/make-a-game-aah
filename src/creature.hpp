@@ -9,6 +9,7 @@ namespace game
 	{
 		std::string name;
 		unsigned int base_health = 1;
+		unsigned int power = 0;
 		game::render::flipbook_handle idle = tz::nullhand;
 		game::render::flipbook_handle move_horizontal = tz::nullhand;
 		game::render::flipbook_handle move_up = tz::nullhand;

@@ -1,6 +1,7 @@
 creatures.peasant =
 {
 	base_health = 10,
+	power = 99,
 	idle =
 	{
 		fps = 2,
