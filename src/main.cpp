@@ -24,6 +24,7 @@ int tz_main()
 
 	game::script_initialise();
 	game::creature_setup();
+	game::card_setup();
 
 	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}}, game::render::quad_flag::draggable);
 	game::render::quad_set_colour(quad1, {1.0f, 0.0f, 0.0f});
@@ -41,7 +42,7 @@ int tz_main()
 
 	for(std::size_t i = 0; i < 7; i++)
 	{
-		game::render::handle cardsprite = game::create_card_sprite(game::card{});
+		game::render::handle cardsprite = game::create_card_sprite(game::card{.type = game::card_type::creature, .name = "peasant"});
 		game::render::quad_set_position(cardsprite, {i * 0.2f, -0.5f});
 		if(i == 3)
 		{

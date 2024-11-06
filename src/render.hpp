@@ -1,6 +1,7 @@
 #ifndef GAME_RENDER_HPP
 #define GAME_RENDER_HPP
 #include "tz/ren/quad.hpp"
+#include "tz/io/image.hpp"
 #include <filesystem>
 
 namespace game::render
@@ -41,7 +42,12 @@ namespace game::render
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat);
 	void flipbook_add_frame(flipbook_handle flipbook, texture_id tex);
 
+	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook);
+
+	std::uint32_t create_image_from_data(tz::io::image_header hdr, std::span<const std::byte> imgdata, std::string name);
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile);
+	tz::io::image_header get_image_info(std::uint32_t texture_id);
+	std::span<const std::byte> get_image_data(std::uint32_t texture_id);
 
 	tz::v2f screen_to_world(tz::v2u screenpos);
 }

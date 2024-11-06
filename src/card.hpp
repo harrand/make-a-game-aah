@@ -12,9 +12,10 @@ namespace game
 	struct card
 	{
 		card_type type;
-		unsigned int id;
+		std::string name;
 	};
 
+	void card_setup();
 	render::handle create_card_sprite(card c);	
 }
 

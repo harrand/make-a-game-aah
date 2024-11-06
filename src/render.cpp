@@ -41,9 +41,10 @@ namespace game::render
 	{
 		texture_id texid;
 		tz::io::image_header hdr;
+		std::vector<std::byte> imgdata;
 	};
-	std::unordered_map<std::filesystem::path, texture_info> texture_cache = {};
-	std::unordered_map<texture_id, std::filesystem::path> texture_infos = {};
+	std::unordered_map<std::string, texture_info> texture_cache = {};
+	std::unordered_map<texture_id, std::string> texture_infos = {};
 
 	void setup()
 	{
@@ -51,7 +52,11 @@ namespace game::render
 		ren = tz_must(tz::ren::create_quad_renderer
 		({
 			.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
-			.flags = tz::ren::quad_renderer_flag::alpha_clipping
+			.flags =
+				tz::ren::quad_renderer_flag::graph_present_after
+			|	tz::ren::quad_renderer_flag::alpha_clipping
+			|	tz::ren::quad_renderer_flag::allow_negative_scale
+
 		}));
 
 		bgimg = create_image_from_file("./res/images/bgforest.png");
@@ -209,13 +214,37 @@ namespace game::render
 		flipbook.frames.push_back(tex);
 	}
 
+	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook)
+	{
+		return flipbooks[flipbook.peek()].frames;
+	}
+
+	std::uint32_t create_image_from_data(tz::io::image_header imghdr, std::span<const std::byte> imgdata, std::string name)
+	{
+		texture_id ret = tz_must(tz::ren::quad_renderer_add_texture(ren,
+			tz_must(tz::gpu::create_image
+			({
+				.width = imghdr.width,
+				.height = imghdr.height,
+				.data = imgdata,
+				.name = name.c_str()
+			}))
+		));
+		texture_cache[name] = texture_info{.texid = ret, .hdr = imghdr};
+		texture_cache[name].imgdata.resize(imgdata.size());
+		std::copy(imgdata.begin(), imgdata.end(), texture_cache[name].imgdata.begin());
+		texture_infos[ret] = name;
+		return ret;
+	}
+
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile)
 	{
 		// if we already added this image file, don't dupe it, just return the id it was given earlier.
 		// this works so long as the GPU doesnt write to these files or bro has photoshop open editing the same file smh.
-		if(texture_cache.contains(imgfile))
+		auto imgfile_str = imgfile.string();
+		if(texture_cache.contains(imgfile_str))
 		{
-			return texture_cache.at(imgfile).texid;
+			return texture_cache.at(imgfile_str).texid;
 		}
 
 		std::string filedata = tz_must(tz::os::read_file(imgfile));
@@ -223,18 +252,17 @@ namespace game::render
 
 		std::vector<std::byte> imgdata(imghdr.data_size_bytes);
 		tz_must(tz::io::parse_image(tz::view_bytes(filedata), imgdata));
-		texture_id ret = tz_must(tz::ren::quad_renderer_add_texture(ren,
-			tz_must(tz::gpu::create_image
-			({
-				.width = imghdr.width,
-				.height = imghdr.height,
-				.data = imgdata,
-				.name = imgfile.string().c_str()
-			}))
-		));
-		texture_cache[imgfile] = {.texid = ret, .hdr = imghdr};
-		texture_infos[ret] = imgfile;
-		return ret;
+		return create_image_from_data(imghdr, imgdata, imgfile.string());
+	}
+
+	tz::io::image_header get_image_info(std::uint32_t texture_id)
+	{
+		return texture_cache.at(texture_infos.at(texture_id)).hdr;
+	}
+
+	std::span<const std::byte> get_image_data(std::uint32_t texture_id)
+	{
+		return texture_cache.at(texture_infos.at(texture_id)).imgdata;
 	}
 
 	tz::v2f screen_to_world(tz::v2u screenpos)
