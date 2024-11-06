@@ -1,6 +1,7 @@
 #include "creature.hpp"
 #include "tz/core/lua.hpp"
 #include <unordered_map>
+#include <limits>
 
 namespace game
 {
@@ -51,6 +52,34 @@ namespace game
 		}
 	}
 
+	template<typename T>
+	void impl_collect_creature_data(std::string_view creature_name, const char* data_name, T& data)
+	{
+		tz::lua_execute(std::format(R"(
+			myval = creatures.{}.{}
+		)", creature_name, data_name));
+		if constexpr(std::is_same_v<T, bool>)
+		{
+			data = tz_must(tz::lua_get_bool("myval"));
+		}
+		else if constexpr(std::numeric_limits<T>::is_integer)
+		{
+			data = tz_must(tz::lua_get_int("myval"));
+		}
+		else if constexpr(std::is_same_v<T, double>)
+		{
+			data = tz_must(tz::lua_get_number("myval"));
+		}
+		else if constexpr(std::is_same_v<T, std::string>)
+		{
+			data = tz_must(tz::lua_get_string("myval"));
+		}
+		else
+		{
+			static_assert(false, "woops");
+		}
+	}
+
 	int impl_get_creature_data()
 	{
 		auto [creature_name] = tz::lua_parse_args<std::string>();
@@ -63,6 +92,7 @@ namespace game
 		impl_collect_creature_animation(creature_name, "move_horizontal", data.move_horizontal);
 		impl_collect_creature_animation(creature_name, "move_up", data.move_up);
 		impl_collect_creature_animation(creature_name, "move_down", data.move_down);
+		impl_collect_creature_data(creature_name, "base_health", data.base_health);
 		return 0;
 	}
 }
