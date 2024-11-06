@@ -15,6 +15,7 @@ topaz_add_executable(
 	SOURCES
 		src/main.cpp
 		src/card.cpp
+		src/creature.cpp
 		src/render.cpp
 		src/script.cpp
 	SHADERS
