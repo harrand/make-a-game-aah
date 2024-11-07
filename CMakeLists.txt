@@ -34,6 +34,12 @@ topaz_add_executable(
 		res/images/creature/peasant/side0.png
 		res/images/creature/peasant/side1.png
 		script/creatures/peasant.lua
+
+		res/images/creature/skeleton/idle0.png
+		res/images/creature/skeleton/idle1.png
+		res/images/creature/skeleton/side0.png
+		res/images/creature/skeleton/side1.png
+		script/creatures/skeleton.lua
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)

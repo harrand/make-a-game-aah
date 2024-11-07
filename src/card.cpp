@@ -89,11 +89,12 @@ namespace game
 		tz::io::image_header first_imghdr = game::render::get_image_info(first_texture_id);
 		std::span<const std::byte> first_imgdata = game::render::get_image_data(first_texture_id);
 		// edit 'data' to have the new image data.
-		constexpr float creature_scale_factor = 4.0f;
+		constexpr float creature_scale_factor = 6.0f;
 
 		// Calculate the top-left position to center the creature on the card base
 		int offset_x = (cardbase_img.width - (first_imghdr.width * creature_scale_factor)) / 2;
-		int offset_y = (cardbase_img.height - (first_imghdr.height * creature_scale_factor)) / 2;
+		constexpr int nudge_upwards_slightly = -20;
+		int offset_y = (cardbase_img.height + nudge_upwards_slightly - (first_imghdr.height * creature_scale_factor)) / 2;
 
 		// Copy creature image pixels onto the card base
 		for (unsigned int y = 0; y < creature_scale_factor * first_imghdr.height; ++y)
@@ -108,7 +109,38 @@ namespace game
 
 				if(static_cast<unsigned char>(first_imgdata[creature_idx + 3]) == 0)
 				{
-					// this pixel is fully transparent. do not overwrite.
+					// this pixel is fully transparent.
+					// check neighbours. if *any* neighbours are non-transparent, then we should be an outline colour
+					// otherwise, nothing
+					bool all_neighbours_transparent = true;
+					for(int dx = -1; all_neighbours_transparent && dx <= 1; dx++)
+					{
+						if(src_x + dx < 0 || src_x + dx >= first_imghdr.width)
+						{
+							break;
+						}
+						for(int dy = -1; dy <= 1; dy++)
+						{
+							if(src_y + dy < 0 || src_y + dy >= first_imghdr.height || (dx == 0 && dy == 0))
+							{
+								continue;
+							}
+							int neighbour_idx = ((src_y + dy) * first_imghdr.width + ((src_x + dx))) * 4;
+							if(static_cast<unsigned char>(first_imgdata[neighbour_idx + 3]) != 0)
+							{
+								all_neighbours_transparent = false;
+								break;
+							}
+						}
+					}
+					if(!all_neighbours_transparent)
+					{
+						for(int i = 0; i < 3; i++)
+						{
+							data[card_idx + i] = 57 * card_colour[i];
+						}
+						data[card_idx + 3] = std::numeric_limits<char>::max();
+					}
 					continue;
 				}
 

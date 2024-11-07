@@ -42,7 +42,12 @@ int tz_main()
 
 	for(std::size_t i = 0; i < 7; i++)
 	{
-		game::render::handle cardsprite = game::create_card_sprite(game::card{.type = game::card_type::creature, .name = "peasant"});
+		game::card card{.type = game::card_type::creature, .name = "peasant"};
+		if(i % 2 == 0)
+		{
+			card.name = "skeleton";
+		}
+		game::render::handle cardsprite = game::create_card_sprite(card);
 		game::render::quad_set_position(cardsprite, {i * 0.2f, -0.5f});
 		if(i == 3)
 		{
@@ -51,6 +56,8 @@ int tz_main()
 	}
 
 	test_spawn_creature("peasant");
+	auto skel = test_spawn_creature("skeleton");
+	game::render::quad_set_position(skel, {0.5f, 0.0f});
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())

@@ -91,7 +91,7 @@ namespace game::render
 				auto flipbook_time_secs = static_cast<float>(flipbook.frames.size()) / flipbook.fps;
 				if(flipbook.repeat && quadpriv.flipbook_timer > flipbook_time_secs)
 				{
-					quadpriv.flipbook_timer -= flipbook_time_secs;
+					quadpriv.flipbook_timer = delta_seconds;
 				}
 				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
 				flipbook_cursor = std::clamp(flipbook_cursor, 0, static_cast<int>(flipbook.frames.size()) - 1);
