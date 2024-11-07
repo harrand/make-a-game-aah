@@ -35,6 +35,12 @@ topaz_add_executable(
 		res/images/creature/peasant/side1.png
 		script/creatures/peasant.lua
 
+		res/images/creature/knight/idle0.png
+		res/images/creature/knight/idle1.png
+		res/images/creature/knight/side0.png
+		res/images/creature/knight/side1.png
+		script/creatures/knight.lua
+
 		res/images/creature/skeleton/idle0.png
 		res/images/creature/skeleton/idle1.png
 		res/images/creature/skeleton/side0.png

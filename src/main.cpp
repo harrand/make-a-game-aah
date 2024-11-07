@@ -51,15 +51,25 @@ int tz_main()
 		{
 			card.name = "banshee";
 		}
+		if(i == 1)
+		{
+			card.name = "knight";
+		}
 		game::render::handle cardsprite = game::create_card_sprite(card);
 		game::render::quad_set_position(cardsprite, {i * 0.3f, -0.5f});
 	}
 
 	test_spawn_creature("peasant");
+
 	auto skel = test_spawn_creature("skeleton");
 	game::render::quad_set_position(skel, {0.5f, 0.0f});
+
 	auto banshee = test_spawn_creature("banshee");
 	game::render::quad_set_position(banshee, {1.0f, 0.0f});
+
+	auto knight = test_spawn_creature("knight");
+	game::render::quad_set_position(knight, {-0.5f, 0.0f});
+
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
@@ -82,7 +92,7 @@ game::render::handle test_spawn_creature(const char* creature_name)
 {
 	game::creature_prefab prefab = game::get_creature_prefab(creature_name);
 	game::render::handle ret = game::render::create_quad({.scale = {0.2f, 0.2f}});
-	auto flipbook = prefab.idle;
+	auto flipbook = prefab.move_horizontal;
 	if(flipbook != tz::nullhand)
 	{
 		game::render::quad_set_flipbook(ret, flipbook);
