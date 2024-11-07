@@ -40,7 +40,7 @@ int tz_main()
 	game::render::quad_set_flipbook(quad1, face);
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
-	for(std::size_t i = 0; i < 4; i++)
+	for(std::size_t i = 0; i < 5; i++)
 	{
 		game::card card{.type = game::card_type::creature, .name = "peasant"};
 		if(i % 2 == 0)
@@ -54,6 +54,10 @@ int tz_main()
 		if(i == 1)
 		{
 			card.name = "knight";
+		}
+		if(i == 2)
+		{
+			card.name = "melistra";
 		}
 		game::render::handle cardsprite = game::create_card_sprite(card);
 		game::render::quad_set_position(cardsprite, {i * 0.3f, -0.5f});
@@ -69,6 +73,11 @@ int tz_main()
 
 	auto knight = test_spawn_creature("knight");
 	game::render::quad_set_position(knight, {-0.5f, 0.0f});
+
+	auto melistra = test_spawn_creature("melistra");
+	game::render::quad_set_position(melistra, {-1.2f, 0.0f});
+	game::render::quad_set_scale(melistra, {-0.3f, 0.3f});
+	game::render::quad_set_flipbook(melistra, game::get_creature_prefab("melistra").idle);
 
 
 	std::uint64_t time = tz::system_nanos();

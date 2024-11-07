@@ -47,6 +47,12 @@ topaz_add_executable(
 		res/images/creature/skeleton/side1.png
 		script/creatures/skeleton.lua
 
+		res/images/creature/melistra/idle0.png
+		res/images/creature/melistra/idle1.png
+		res/images/creature/melistra/side0.png
+		res/images/creature/melistra/side1.png
+		script/creatures/melistra.lua
+
 		res/images/creature/banshee/idle0.png
 		res/images/creature/banshee/idle1.png
 		script/creatures/banshee.lua
