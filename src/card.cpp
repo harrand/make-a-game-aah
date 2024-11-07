@@ -139,7 +139,7 @@ namespace game
 						{
 							data[card_idx + i] = 57 * card_colour[i];
 						}
-						data[card_idx + 3] = std::numeric_limits<char>::max();
+						data[card_idx + 3] = std::numeric_limits<unsigned char>::max();
 					}
 					continue;
 				}

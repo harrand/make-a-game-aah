@@ -40,6 +40,10 @@ topaz_add_executable(
 		res/images/creature/skeleton/side0.png
 		res/images/creature/skeleton/side1.png
 		script/creatures/skeleton.lua
+
+		res/images/creature/banshee/idle0.png
+		res/images/creature/banshee/idle1.png
+		script/creatures/banshee.lua
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)
