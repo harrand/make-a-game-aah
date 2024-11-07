@@ -13,20 +13,19 @@ namespace game
 	tz::io::image_header cardbase_img;
 	std::string cardbase_data;
 
-	std::array<tz::v3f, 6> card_colours
+	tz::v3f card_colours[] =
 	{
 		tz::v3f::filled(0.7f),
 		tz::v3f{0.4f, 0.7f, 0.1f},
-		tz::v3f{0.2f, 0.9f, 0.3f},
-		tz::v3f{0.1f, 0.2f, 0.9f},
+		tz::v3f{0.3f, 0.4f, 0.9f},
 		tz::v3f{0.8f, 0.1f, 0.95f},
-		tz::v3f{1.0f, 0.1f, 0.15f}
+		tz::v3f{0.7f, 0.1f, 0.15f},
 	};
 
 	void impl_cache_creature_sprite(std::string_view creature_name);
 	tz::v3f impl_card_colour(unsigned int power)
 	{
-		return card_colours[std::clamp(power, 0u, static_cast<unsigned int>(card_colours.size()) - 1)];
+		return card_colours[std::clamp(power, 1u, static_cast<unsigned int>(sizeof(card_colours) / sizeof(card_colours[0]))) - 1];
 	}
 
 	struct edited_img
