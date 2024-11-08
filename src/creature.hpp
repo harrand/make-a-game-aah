@@ -14,6 +14,7 @@ namespace game
 		game::render::flipbook_handle move_horizontal = tz::nullhand;
 		game::render::flipbook_handle move_up = tz::nullhand;
 		game::render::flipbook_handle move_down = tz::nullhand;
+		game::render::flipbook_handle cast = tz::nullhand;
 	};
 
 	void creature_setup();

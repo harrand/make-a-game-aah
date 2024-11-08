@@ -23,5 +23,20 @@ creatures.melistra =
 			"creature/melistra/idle0.png",
 			"creature/melistra/side1.png"
 		}
+	},
+	cast =
+	{
+		fps = 9,
+		loop = true,
+		frames =
+		{
+			"creature/melistra/cast0.png",
+			"creature/melistra/cast1.png",
+			"creature/melistra/cast2.png",
+			"creature/melistra/cast3.png",
+			"creature/melistra/cast4.png",
+			"creature/melistra/cast5.png",
+			"creature/melistra/cast6.png"
+		}
 	}
 }

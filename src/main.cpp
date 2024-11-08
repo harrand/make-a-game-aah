@@ -26,18 +26,10 @@ int tz_main()
 	game::creature_setup();
 	game::card_setup();
 
-	tz::ren::quad_handle quad1 = game::render::create_quad({.position = {-1.0f, 0.0f}, .scale = tz::v2f::filled(0.2f), .colour = {0.0f, 1.0f, 0.25f}}, game::render::quad_flag::draggable);
-	game::render::quad_set_colour(quad1, {1.0f, 0.0f, 0.0f});
-
-	game::render::flipbook_handle face = game::render::create_flipbook(2, true);
-	game::render::flipbook_add_frame(face, game::render::create_image_from_file("./res/images/smile.png"));
-	game::render::flipbook_add_frame(face, game::render::create_image_from_file("./res/images/frown.png"));
-
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassh.png"));
 
-	game::render::quad_set_flipbook(quad1, face);
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
 	for(std::size_t i = 0; i < 5; i++)
@@ -77,7 +69,7 @@ int tz_main()
 	auto melistra = test_spawn_creature("melistra");
 	game::render::quad_set_position(melistra, {-1.2f, 0.0f});
 	game::render::quad_set_scale(melistra, {-0.3f, 0.3f});
-	game::render::quad_set_flipbook(melistra, game::get_creature_prefab("melistra").idle);
+	game::render::quad_set_flipbook(melistra, game::get_creature_prefab("melistra").cast);
 
 
 	std::uint64_t time = tz::system_nanos();

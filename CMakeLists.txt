@@ -22,8 +22,6 @@ topaz_add_executable(
 		src/shaders/quad.vertex.tzsl
 		src/shaders/quad.fragment.tzsl
 	BUNDLE_FILES
-		res/images/smile.png
-		res/images/frown.png
 		res/images/bgforest.png
 		res/images/hourglassh.png
 		res/images/hourglassv.png
@@ -51,6 +49,13 @@ topaz_add_executable(
 		res/images/creature/melistra/idle1.png
 		res/images/creature/melistra/side0.png
 		res/images/creature/melistra/side1.png
+		res/images/creature/melistra/cast0.png
+		res/images/creature/melistra/cast1.png
+		res/images/creature/melistra/cast2.png
+		res/images/creature/melistra/cast3.png
+		res/images/creature/melistra/cast4.png
+		res/images/creature/melistra/cast5.png
+		res/images/creature/melistra/cast6.png
 		script/creatures/melistra.lua
 
 		res/images/creature/banshee/idle0.png
