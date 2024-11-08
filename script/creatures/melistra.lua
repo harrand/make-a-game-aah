@@ -26,7 +26,7 @@ creatures.melistra =
 	},
 	cast =
 	{
-		fps = 9,
+		fps = 7,
 		loop = true,
 		frames =
 		{

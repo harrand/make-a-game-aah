@@ -15,8 +15,8 @@ namespace game
 
 	tz::v3f card_colours[] =
 	{
-		tz::v3f::filled(0.7f),
-		tz::v3f{0.4f, 0.7f, 0.1f},
+		tz::v3f{0.2f, 0.45f, 0.1f},
+		tz::v3f{0.6f, 0.6f, 0.2f},
 		tz::v3f{0.3f, 0.4f, 0.9f},
 		tz::v3f{0.8f, 0.1f, 0.95f},
 		tz::v3f{0.7f, 0.1f, 0.15f},
