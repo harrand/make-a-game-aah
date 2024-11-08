@@ -5,14 +5,14 @@
 #include "tz/gpu/hardware.hpp"
 
 #include "card.hpp"
-#include "creature.hpp"
+#include "prefab.hpp"
 #include "entity.hpp"
 #include "render.hpp"
 #include "script.hpp"
 
 void render_setup();
-void collect_creature_data();
-game::render::handle test_spawn_creature(const char* creature_name);
+void collect_prefab_data();
+game::render::handle test_spawn_prefab(const char* prefab_name);
 
 #include "tz/main.hpp"
 int tz_main()
@@ -24,7 +24,7 @@ int tz_main()
 	game::render::setup();
 
 	game::script_initialise();
-	game::creature_setup();
+	game::prefab_setup();
 	game::card_setup();
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
@@ -56,8 +56,8 @@ int tz_main()
 		game::render::quad_set_position(cardsprite, {i * 0.3f, -0.5f});
 	}
 
-	game::entity_handle player = game::create_entity({.creature = "melistra", .position = {-1.2f, 0.0f}, .scale = {-1.5f, 1.5f}});
-	game::entity_handle skel = game::create_entity({.creature = "skeleton"});
+	game::entity_handle player = game::create_entity({.prefab_name = "melistra", .position = {-1.2f, 0.0f}, .scale = {-1.5f, 1.5f}});
+	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())

@@ -1,6 +1,6 @@
 #include "entity.hpp"
 #include "render.hpp"
-#include "creature.hpp"
+#include "prefab.hpp"
 #include <vector>
 
 namespace game
@@ -8,7 +8,7 @@ namespace game
 	// soa
 	// public
 	std::vector<unsigned int> hps = {};
-	std::vector<creature_prefab> creatures = {};
+	std::vector<prefab> creatures = {};
 	std::vector<tz::v2f> positions = {};
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
@@ -46,7 +46,7 @@ namespace game
 
 		// set new data
 		hps[ret.peek()] = info.hp;
-		creatures[ret.peek()] = game::get_creature_prefab(info.creature);
+		creatures[ret.peek()] = game::get_prefab(info.prefab_name);
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;

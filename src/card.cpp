@@ -1,5 +1,5 @@
 #include "card.hpp"
-#include "creature.hpp"
+#include "prefab.hpp"
 
 #include "tz/topaz.hpp"
 #include "tz/core/memory.hpp"
@@ -65,7 +65,7 @@ namespace game
 	void impl_cache_creature_sprite(std::string_view creature_name)
 	{
 		std::string creature_name_str{creature_name};
-		game::creature_prefab prefab = game::get_creature_prefab(creature_name_str);
+		game::prefab prefab = game::get_prefab(creature_name_str);
 
 		// get the first frame of the idle flipbook.
 		std::string& data = sprite_image_cache[creature_name_str].imgdata;

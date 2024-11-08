@@ -1,11 +1,11 @@
-#ifndef GAME_CREATURE_HPP
-#define GAME_CREATURE_HPP
+#ifndef GAME_PREFAB_HPP
+#define GAME_PREFAB_HPP
 #include "render.hpp"
 #include <string>
 
 namespace game
 {
-	struct creature_prefab
+	struct prefab
 	{
 		std::string name;
 		unsigned int base_health = 1;
@@ -17,8 +17,8 @@ namespace game
 		game::render::flipbook_handle cast = tz::nullhand;
 	};
 
-	void creature_setup();
-	const creature_prefab& get_creature_prefab(const std::string& name);
+	void prefab_setup();
+	const prefab& get_prefab(const std::string& name);
 }
 
-#endif // GAME_CREATURE_HPP
+#endif // GAME_PREFAB_HPP

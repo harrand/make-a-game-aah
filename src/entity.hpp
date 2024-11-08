@@ -9,7 +9,7 @@ namespace game
 	struct entity_info
 	{
 		unsigned int hp = 1;
-		std::string creature;
+		std::string prefab_name;
 
 		tz::v2f position;
 		float rotation;

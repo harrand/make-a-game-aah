@@ -1,4 +1,4 @@
-#include "creature.hpp"
+#include "prefab.hpp"
 #include "tz/core/lua.hpp"
 #include <unordered_map>
 #include <limits>
@@ -7,9 +7,9 @@ namespace game
 {
 	int impl_get_creature_data();
 
-	std::unordered_map<std::string, creature_prefab> creature_data;
+	std::unordered_map<std::string, prefab> creature_data;
 
-	void creature_setup()
+	void prefab_setup()
 	{
 		tz::lua_define_function("callback_creature", impl_get_creature_data);
 		tz::lua_execute(R"(
@@ -19,7 +19,7 @@ namespace game
 		)");
 	}
 
-	const creature_prefab& get_creature_prefab(const std::string& name)
+	const prefab& get_prefab(const std::string& name)
 	{
 		return creature_data[name];
 	}
@@ -83,7 +83,7 @@ namespace game
 	int impl_get_creature_data()
 	{
 		auto [creature_name] = tz::lua_parse_args<std::string>();
-		creature_prefab& data = creature_data[creature_name];
+		prefab& data = creature_data[creature_name];
 		tz::lua_execute(std::format(R"(
 			_internal_index = function(arr, idx) return arr[idx] end
 			c = creatures.{}
