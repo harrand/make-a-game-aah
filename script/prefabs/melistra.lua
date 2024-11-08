@@ -1,4 +1,4 @@
-creatures.melistra =
+prefabs.melistra =
 {
 	base_health = 10,
 	power = 5,

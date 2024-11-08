@@ -32,19 +32,19 @@ topaz_add_executable(
 		res/images/creature/peasant/idle1.png
 		res/images/creature/peasant/side0.png
 		res/images/creature/peasant/side1.png
-		script/creatures/peasant.lua
+		script/prefabs/peasant.lua
 
 		res/images/creature/knight/idle0.png
 		res/images/creature/knight/idle1.png
 		res/images/creature/knight/side0.png
 		res/images/creature/knight/side1.png
-		script/creatures/knight.lua
+		script/prefabs/knight.lua
 
 		res/images/creature/skeleton/idle0.png
 		res/images/creature/skeleton/idle1.png
 		res/images/creature/skeleton/side0.png
 		res/images/creature/skeleton/side1.png
-		script/creatures/skeleton.lua
+		script/prefabs/skeleton.lua
 
 		res/images/creature/melistra/idle0.png
 		res/images/creature/melistra/idle1.png
@@ -57,11 +57,11 @@ topaz_add_executable(
 		res/images/creature/melistra/cast4.png
 		res/images/creature/melistra/cast5.png
 		res/images/creature/melistra/cast6.png
-		script/creatures/melistra.lua
+		script/prefabs/melistra.lua
 
 		res/images/creature/banshee/idle0.png
 		res/images/creature/banshee/idle1.png
-		script/creatures/banshee.lua
+		script/prefabs/banshee.lua
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)

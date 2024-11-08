@@ -1,4 +1,4 @@
-creatures.skeleton =
+prefabs.skeleton =
 {
 	base_health = 10,
 	power = 2,

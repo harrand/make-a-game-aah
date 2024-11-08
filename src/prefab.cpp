@@ -5,32 +5,32 @@
 
 namespace game
 {
-	int impl_get_creature_data();
+	int impl_get_prefab_data();
 
-	std::unordered_map<std::string, prefab> creature_data;
+	std::unordered_map<std::string, prefab> prefab_data;
 
 	void prefab_setup()
 	{
-		tz::lua_define_function("callback_creature", impl_get_creature_data);
+		tz::lua_define_function("callback_prefab", impl_get_prefab_data);
 		tz::lua_execute(R"(
-			for k, v in pairs(creatures) do
-				callback_creature(k)
+			for k, v in pairs(prefabs) do
+				callback_prefab(k)
 			end
 		)");
 	}
 
 	const prefab& get_prefab(const std::string& name)
 	{
-		return creature_data[name];
+		return prefab_data[name];
 	}
 
 	// impl bits
-	void impl_collect_creature_animation(std::string_view creature_name, const char* animation_name, game::render::flipbook_handle& flipbook)
+	void impl_collect_prefab_animation(std::string_view prefab_name, const char* animation_name, game::render::flipbook_handle& flipbook)
 	{
 		tz::lua_execute(std::format(R"(
-		c = creatures.{}
+		c = prefabs.{}
 		has_anim = c.{} ~= nil
-		)", creature_name, animation_name));
+		)", prefab_name, animation_name));
 		auto has_anim = tz_must(tz::lua_get_bool("has_anim"));
 		if(has_anim)
 		{
@@ -53,11 +53,11 @@ namespace game
 	}
 
 	template<typename T>
-	void impl_collect_creature_data(std::string_view creature_name, const char* data_name, T& data)
+	void impl_collect_prefab_data(std::string_view prefab_name, const char* data_name, T& data)
 	{
 		tz::lua_execute(std::format(R"(
-			myval = creatures.{}.{}
-		)", creature_name, data_name));
+			myval = prefabs.{}.{}
+		)", prefab_name, data_name));
 		if constexpr(std::is_same_v<T, bool>)
 		{
 			data = tz_must(tz::lua_get_bool("myval"));
@@ -80,21 +80,21 @@ namespace game
 		}
 	}
 
-	int impl_get_creature_data()
+	int impl_get_prefab_data()
 	{
-		auto [creature_name] = tz::lua_parse_args<std::string>();
-		prefab& data = creature_data[creature_name];
+		auto [prefab_name] = tz::lua_parse_args<std::string>();
+		prefab& data = prefab_data[prefab_name];
 		tz::lua_execute(std::format(R"(
 			_internal_index = function(arr, idx) return arr[idx] end
-			c = creatures.{}
-		)", creature_name));
-		impl_collect_creature_animation(creature_name, "idle", data.idle);
-		impl_collect_creature_animation(creature_name, "move_horizontal", data.move_horizontal);
-		impl_collect_creature_animation(creature_name, "move_up", data.move_up);
-		impl_collect_creature_animation(creature_name, "move_down", data.move_down);
-		impl_collect_creature_animation(creature_name, "cast", data.cast);
-		impl_collect_creature_data(creature_name, "base_health", data.base_health);
-		impl_collect_creature_data(creature_name, "power", data.power);
+			c = prefabs.{}
+		)", prefab_name));
+		impl_collect_prefab_animation(prefab_name, "idle", data.idle);
+		impl_collect_prefab_animation(prefab_name, "move_horizontal", data.move_horizontal);
+		impl_collect_prefab_animation(prefab_name, "move_up", data.move_up);
+		impl_collect_prefab_animation(prefab_name, "move_down", data.move_down);
+		impl_collect_prefab_animation(prefab_name, "cast", data.cast);
+		impl_collect_prefab_data(prefab_name, "base_health", data.base_health);
+		impl_collect_prefab_data(prefab_name, "power", data.power);
 		return 0;
 	}
 }

@@ -1,4 +1,4 @@
-creatures.knight =
+prefabs.knight =
 {
 	base_health = 90,
 	power = 4,

@@ -25,8 +25,8 @@ namespace game
 
 	void impl_local_script_init()
 	{
-		tz::lua_execute("creatures = {}");
-		for(const auto& entry : std::filesystem::directory_iterator("./script/creatures"))
+		tz::lua_execute("prefabs = {}");
+		for(const auto& entry : std::filesystem::directory_iterator("./script/prefabs"))
 		{
 			if(entry.path().has_extension() && entry.path().extension() == ".lua")
 			{

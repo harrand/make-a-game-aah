@@ -1,4 +1,4 @@
-creatures.banshee =
+prefabs.banshee =
 {
 	base_health = 40,
 	power = 3,

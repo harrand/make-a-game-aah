@@ -1,4 +1,4 @@
-creatures.peasant =
+prefabs.peasant =
 {
 	base_health = 10,
 	power = 1,
