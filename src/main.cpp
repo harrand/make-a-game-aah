@@ -6,6 +6,7 @@
 
 #include "card.hpp"
 #include "creature.hpp"
+#include "entity.hpp"
 #include "render.hpp"
 #include "script.hpp"
 
@@ -55,22 +56,8 @@ int tz_main()
 		game::render::quad_set_position(cardsprite, {i * 0.3f, -0.5f});
 	}
 
-	test_spawn_creature("peasant");
-
-	auto skel = test_spawn_creature("skeleton");
-	game::render::quad_set_position(skel, {0.5f, 0.0f});
-
-	auto banshee = test_spawn_creature("banshee");
-	game::render::quad_set_position(banshee, {1.0f, 0.0f});
-
-	auto knight = test_spawn_creature("knight");
-	game::render::quad_set_position(knight, {-0.5f, 0.0f});
-
-	auto melistra = test_spawn_creature("melistra");
-	game::render::quad_set_position(melistra, {-1.2f, 0.0f});
-	game::render::quad_set_scale(melistra, {-0.3f, 0.3f});
-	game::render::quad_set_flipbook(melistra, game::get_creature_prefab("melistra").cast);
-
+	game::entity_handle player = game::create_entity({.creature = "melistra", .position = {-1.2f, 0.0f}, .scale = {-1.5f, 1.5f}});
+	game::entity_handle skel = game::create_entity({.creature = "skeleton"});
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
@@ -80,23 +67,20 @@ int tz_main()
 		time = now;
 
 		game::render::update(delta_seconds);
+		game::entity_update(delta_seconds);
 		tz::os::window_update();
+		if(tz::os::is_key_pressed(tz::os::key::w))
+		{
+			game::entity_start_casting(player);
+		}
+		if(tz::os::is_key_pressed(tz::os::key::s))
+		{
+			game::entity_stop_casting(player);
+		}
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
 			break;
 		}
 	}
 	tz::terminate();
-}
-
-game::render::handle test_spawn_creature(const char* creature_name)
-{
-	game::creature_prefab prefab = game::get_creature_prefab(creature_name);
-	game::render::handle ret = game::render::create_quad({.scale = {0.2f, 0.2f}});
-	auto flipbook = prefab.move_horizontal;
-	if(flipbook != tz::nullhand)
-	{
-		game::render::quad_set_flipbook(ret, flipbook);
-	}
-	return ret;
 }
