@@ -5,7 +5,8 @@
 
 namespace game
 {
-	constexpr float global_speed_multiplier = 0.2f;
+	constexpr float global_speed_multiplier = 0.35f;
+	constexpr float leeway_dist = 0.3f;
 	// soa
 	// public
 	std::vector<float> speeds = {};
@@ -20,6 +21,8 @@ namespace game
 	// private
 	std::vector<render::handle> quads = {};
 	std::vector<tz::v2f> move_dirs = {};
+	std::vector<std::optional<tz::v2f>> target_locations = {};
+	std::vector<entity_handle> targets = {};
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
@@ -48,6 +51,8 @@ namespace game
 
 			quads.push_back(tz::nullhand);
 			move_dirs.push_back(tz::v2f::zero());
+			target_locations.push_back(std::nullopt);
+			targets.push_back(tz::nullhand);
 		}
 
 		// set new data
@@ -79,6 +84,35 @@ namespace game
 			{
 				// in free list, do not update.
 				continue;
+			}
+
+			// handle target ent/loc
+			auto pos = game::render::quad_get_position(quads[i]);
+			auto maybe_tarloc = target_locations[i];
+			entity_handle tar = targets[i];
+			const float leeway = global_speed_multiplier * speeds[i] * leeway_dist;
+			if(!maybe_tarloc.has_value() && tar != tz::nullhand)
+			{
+				tz::v2f tar_pos = game::render::quad_get_position(quads[tar.peek()]);
+				if((tar_pos - pos).length() > leeway)
+				{
+					maybe_tarloc = tar_pos;
+				}
+				else
+				{
+					targets[i] = tz::nullhand;
+				}
+			}
+			if(maybe_tarloc.has_value())
+			{
+				if((maybe_tarloc.value() - pos).length() > leeway)
+				{
+					entity_move(ent, maybe_tarloc.value() - pos);	
+				}
+				else
+				{
+					target_locations[i] = std::nullopt;
+				}
 			}
 
 			// handle movement.
@@ -125,5 +159,17 @@ namespace game
 	void entity_move(entity_handle ent, tz::v2f dir)
 	{
 		move_dirs[ent.peek()] += dir;
+	}
+
+	void entity_set_target_location(entity_handle ent, tz::v2f location)
+	{
+		target_locations[ent.peek()] = location;
+		targets[ent.peek()] = tz::nullhand;
+	}
+
+	void entity_set_target(entity_handle ent, entity_handle tar)
+	{
+		target_locations[ent.peek()] = std::nullopt;
+		targets[ent.peek()] = tar;
 	}
 }

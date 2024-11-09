@@ -59,6 +59,9 @@ int tz_main()
 	game::entity_handle player = game::create_entity({.prefab_name = "melistra", .position = {-1.2f, 0.0f}, .scale = {-1.5f, 1.5f}});
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 
+	game::entity_set_target(player, skel);
+	game::entity_set_target(skel, player);
+
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
 	{
@@ -88,6 +91,12 @@ int tz_main()
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
 			break;
+		}
+		if(tz::os::is_mouse_clicked(tz::os::mouse_button::right))
+		{
+			auto [mx, my] = tz::os::get_mouse_click_position(tz::os::mouse_button::right);
+			
+			game::entity_set_target_location(player, game::render::screen_to_world({mx, my}));
 		}
 	}
 	tz::terminate();
