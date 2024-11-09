@@ -55,9 +55,10 @@ namespace game
 	template<typename T>
 	void impl_collect_prefab_data(std::string_view prefab_name, const char* data_name, T& data)
 	{
-		tz::lua_execute(std::format(R"(
+		tz_must(tz::lua_execute(std::format(R"(
 			myval = prefabs.{}.{}
-		)", prefab_name, data_name));
+			if myval == nil then error("\"prefabs.{}.{}\" expected to be non-nil, but it's nil") end
+		)", prefab_name, data_name, prefab_name, data_name)));
 		if constexpr(std::is_same_v<T, bool>)
 		{
 			data = tz_must(tz::lua_get_bool("myval"));
@@ -66,7 +67,7 @@ namespace game
 		{
 			data = tz_must(tz::lua_get_int("myval"));
 		}
-		else if constexpr(std::is_same_v<T, double>)
+		else if constexpr(std::is_floating_point_v<T>)
 		{
 			data = tz_must(tz::lua_get_number("myval"));
 		}
@@ -94,6 +95,7 @@ namespace game
 		impl_collect_prefab_animation(prefab_name, "move_down", data.move_down);
 		impl_collect_prefab_animation(prefab_name, "cast", data.cast);
 		impl_collect_prefab_data(prefab_name, "base_health", data.base_health);
+		impl_collect_prefab_data(prefab_name, "movement_speed", data.movement_speed);
 		impl_collect_prefab_data(prefab_name, "power", data.power);
 		return 0;
 	}

@@ -1,6 +1,7 @@
 prefabs.banshee =
 {
 	base_health = 40,
+	movement_speed = 0.4,
 	power = 3,
 	idle =
 	{

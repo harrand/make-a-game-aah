@@ -23,6 +23,7 @@ namespace game
 
 	void entity_start_casting(entity_handle ent);
 	void entity_stop_casting(entity_handle ent);
+	void entity_move(entity_handle ent, tz::v2f dir);
 }
 
 #endif // GAME_ENTITY_HPP

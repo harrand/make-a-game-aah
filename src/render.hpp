@@ -33,7 +33,9 @@ namespace game::render
 	handle get_background();
 	handle create_quad(tz::ren::quad_info info, quad_flag flags = static_cast<quad_flag>(0));
 	void destroy_quad(handle q);
+	tz::v2f quad_get_position(handle q);
 	void quad_set_position(handle q, tz::v2f pos);
+	tz::v2f quad_get_scale(handle q);
 	void quad_set_scale(handle q, tz::v2f scale);
 	void quad_set_colour(handle q, tz::v3f colour);
 	void quad_set_texture(handle q, std::uint32_t texture);

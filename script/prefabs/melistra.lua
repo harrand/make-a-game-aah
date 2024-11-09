@@ -1,6 +1,7 @@
 prefabs.melistra =
 {
 	base_health = 10,
+	movement_speed = 1.0,
 	power = 5,
 	idle =
 	{

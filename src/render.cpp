@@ -172,9 +172,19 @@ namespace game::render
 		return tz_must(tz::ren::quad_renderer_destroy_quad(ren, q));
 	}
 
+	tz::v2f quad_get_position(handle q)
+	{
+		return tz::ren::get_quad_position(ren, q);
+	}
+
 	void quad_set_position(handle q, tz::v2f pos)
 	{
 		tz::ren::set_quad_position(ren, q, pos);
+	}
+
+	tz::v2f quad_get_scale(handle q)
+	{
+		return tz::ren::get_quad_scale(ren, q);
 	}
 
 	void quad_set_scale(handle q, tz::v2f scale)
@@ -195,6 +205,10 @@ namespace game::render
 	void quad_set_flipbook(handle q, flipbook_handle flipbook)
 	{
 		auto& priv = quad_privates[q.peek()];
+		if(priv.flipbook == flipbook)
+		{
+			return;
+		}
 		priv.flipbook = flipbook;
 		priv.flipbook_timer = 0.0f;
 	}

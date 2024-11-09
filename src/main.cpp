@@ -71,11 +71,19 @@ int tz_main()
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::w))
 		{
-			game::entity_start_casting(player);
+			game::entity_move(player, {0.0f, 1.0f});
 		}
 		if(tz::os::is_key_pressed(tz::os::key::s))
 		{
-			game::entity_stop_casting(player);
+			game::entity_move(player, {0.0f, -1.0f});
+		}
+		if(tz::os::is_key_pressed(tz::os::key::d))
+		{
+			game::entity_move(player, {1.0f, 0.0f});
+		}
+		if(tz::os::is_key_pressed(tz::os::key::a))
+		{
+			game::entity_move(player, {-1.0f, 0.0f});
 		}
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{

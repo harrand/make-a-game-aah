@@ -1,6 +1,7 @@
 prefabs.peasant =
 {
 	base_health = 10,
+	movement_speed = 1.2,
 	power = 1,
 	idle =
 	{

@@ -1,6 +1,7 @@
 prefabs.skeleton =
 {
 	base_health = 10,
+	movement_speed = 1.0,
 	power = 2,
 	idle =
 	{
