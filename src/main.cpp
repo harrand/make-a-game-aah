@@ -5,6 +5,7 @@
 #include "tz/gpu/hardware.hpp"
 
 #include "card.hpp"
+#include "player.hpp"
 #include "prefab.hpp"
 #include "entity.hpp"
 #include "render.hpp"
@@ -26,6 +27,7 @@ int tz_main()
 	game::script_initialise();
 	game::prefab_setup();
 	game::card_setup();
+	game::player_setup();
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -33,6 +35,10 @@ int tz_main()
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
+	game::deck_add_card(game::player_deck(), {.name = "banshee"});
+	game::deck_add_card(game::player_deck(), {.name = "peasant"});
+	game::deck_add_card(game::player_deck(), {.name = "knight"});
+	/*
 	for(std::size_t i = 0; i < 5; i++)
 	{
 		game::card card{.type = game::card_type::creature, .name = "peasant"};
@@ -55,12 +61,14 @@ int tz_main()
 		game::render::handle cardsprite = game::create_card_sprite(card);
 		game::render::quad_set_position(cardsprite, {i * 0.3f, -0.5f});
 	}
+	*/
 
 	game::entity_handle player = game::create_entity({.prefab_name = "melistra", .position = {-1.2f, 0.0f}, .scale = {-1.5f, 1.5f}});
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 
 	game::entity_set_target(player, skel);
 	game::entity_set_target(skel, player);
+	game::player_set_mana(1);
 
 	std::uint64_t time = tz::system_nanos();
 	while(tz::os::window_is_open())
@@ -71,6 +79,7 @@ int tz_main()
 
 		game::render::update(delta_seconds);
 		game::entity_update(delta_seconds);
+		game::player_update(delta_seconds);
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::w))
 		{
