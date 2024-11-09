@@ -21,6 +21,8 @@ namespace game
 	void destroy_entity(entity_handle ent);
 	void entity_update(float delta_seconds);
 
+	void entity_face_left(entity_handle ent);
+	void entity_face_right(entity_handle ent);
 	void entity_start_casting(entity_handle ent);
 	void entity_stop_casting(entity_handle ent);
 	void entity_move(entity_handle ent, tz::v2f dir);

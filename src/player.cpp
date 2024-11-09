@@ -78,8 +78,11 @@ namespace game
 			game::destroy_entity(player.avatar);
 		}
 		player.avatar = game::create_entity({.prefab_name = prefab.name, .position = {-1.0f, 0.0f}});
-		// face right
-		game::entity_move(player.avatar, {1.0f, 0.0f});
+		game::entity_face_right(player.avatar);
+		if(prefab.cast != tz::nullhand)
+		{
+			game::entity_start_casting(player.avatar);
+		}
 	}
 
 	deck_handle player_deck()

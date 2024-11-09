@@ -139,11 +139,25 @@ namespace game
 			else
 			{
 				// not moving. idle.
-				game::render::quad_set_flipbook(quads[i], creatures[i].idle);
+				//game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 			}
 
 			move_dirs[i] = tz::v2f::zero();
 		}
+	}
+
+	void entity_face_left(entity_handle ent)
+	{
+		auto sc = game::render::quad_get_scale(quads[ent.peek()]);
+		sc[0] = -std::abs(sc[0]);
+		game::render::quad_set_scale(quads[ent.peek()], sc);
+	}
+
+	void entity_face_right(entity_handle ent)
+	{
+		auto sc = game::render::quad_get_scale(quads[ent.peek()]);
+		sc[0] = std::abs(sc[0]);
+		game::render::quad_set_scale(quads[ent.peek()], sc);
 	}
 
 	void entity_start_casting(entity_handle ent)
