@@ -1,4 +1,5 @@
 #include "deck.hpp"
+#include "entity.hpp"
 
 namespace game
 {
@@ -74,7 +75,13 @@ namespace game
 
 	void deck_destroy_card(deck_handle deck, std::size_t id)
 	{
-		decks.erase(decks.begin() + id);
+		auto& d = decks[deck.peek()];
+		if(d.render.has_value())
+		{
+			game::render::destroy_quad(d.card_quads[id]);
+		}
+		d.card_quads.erase(d.card_quads.begin() + id);
+		d.cards.erase(d.cards.begin() + id);
 	}
 
 	void deck_swap_cards(deck_handle deckh, std::size_t id1, std::size_t id2)
@@ -94,5 +101,39 @@ namespace game
 	std::size_t deck_size(deck_handle deck)
 	{
 		return decks[deck.peek()].cards.size();
+	}
+
+	card deck_get_card(deck_handle deck, std::size_t id)
+	{
+		return decks[deck.peek()].cards[id];
+	}
+
+	bool deck_card_is_held(deck_handle deck, std::size_t id)
+	{
+		const auto& d = decks[deck.peek()];
+		if(!d.render.has_value())
+		{
+			return false;
+		}
+		return game::render::quad_is_held(d.card_quads[id]);
+	}
+
+	void deck_play_card(deck_handle deck, std::size_t id)
+	{
+		const auto& d = decks[deck.peek()];
+		tz::v2f pos;
+		if(d.render.has_value())
+		{
+			pos = game::render::quad_get_position(d.card_quads[id]);
+		}
+		else
+		{
+			// use hardcoded "enemy" position, as deck has no render component im assuming its an enemy card.
+			pos = {1.2f, 0.0f};
+		}
+
+		card c = deck_get_card(deck, id);
+		game::create_entity({.prefab_name = c.name, .position = pos});
+		deck_destroy_card(deck, id);
 	}
 }

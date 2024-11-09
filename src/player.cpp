@@ -16,6 +16,7 @@ namespace game
 		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
+		std::vector<bool> deck_hold_array = {};
 	} player;
 
 	void player_setup(game::prefab prefab)
@@ -42,6 +43,31 @@ namespace game
 		if(std::floor(player.mana) > last_whole_mana)
 		{
 			player_set_mana(player.mana);
+		}
+
+		auto deck_size = game::deck_size(player.deck);
+		if(player.deck_hold_array.size() != deck_size)
+		{
+			player.deck_hold_array.resize(deck_size, false);
+		}
+		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
+		{
+			if(deck_card_is_held(player.deck, i))
+			{
+				player.deck_hold_array[i] = true;
+			}
+			else
+			{
+				// not held anymore
+				if(player.deck_hold_array[i])
+				{
+					// but was last frame. i.e we've just let go of it.
+					// play it
+					game::deck_play_card(player.deck, i);
+					// this will destroy the card, so fix up our deck hold array
+					player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+				}
+			}
 		}
 	}
 

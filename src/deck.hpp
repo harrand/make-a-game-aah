@@ -26,6 +26,10 @@ namespace game
 	void deck_destroy_card(deck_handle deck, std::size_t id);
 	void deck_swap_cards(deck_handle deck, std::size_t id1, std::size_t id2);
 	std::size_t deck_size(deck_handle deck);
+	card deck_get_card(deck_handle deck, std::size_t id);
+	bool deck_card_is_held(deck_handle deck, std::size_t id);
+
+	void deck_play_card(deck_handle deck, std::size_t id);
 }
 
 #endif // GAME_DECK_HPP
