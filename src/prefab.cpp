@@ -89,6 +89,7 @@ namespace game
 			_internal_index = function(arr, idx) return arr[idx] end
 			c = prefabs.{}
 		)", prefab_name));
+		data.name = prefab_name;
 		impl_collect_prefab_animation(prefab_name, "idle", data.idle);
 		impl_collect_prefab_animation(prefab_name, "move_horizontal", data.move_horizontal);
 		impl_collect_prefab_animation(prefab_name, "move_up", data.move_up);

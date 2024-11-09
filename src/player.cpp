@@ -1,11 +1,12 @@
 #include "player.hpp"
-#include "card.hpp"
+#include "entity.hpp"
 
 namespace game
 {
 	constexpr float mana_bar_margin = 0.2f;
 	struct player_data
 	{
+		entity_handle avatar = tz::nullhand;
 		deck_handle deck;
 		unsigned int max_mana = 10;
 		float mana = 0;
@@ -17,7 +18,7 @@ namespace game
 		game::render::handle mana_bar_background = tz::nullhand;
 	} player;
 
-	void player_setup()
+	void player_setup(game::prefab prefab)
 	{
 		player.deck = game::create_deck({.sprite = game::deck_render_info
 		{
@@ -30,6 +31,8 @@ namespace game
 		mana_bar_background_dimensions[0] += (mana_bar_background_dimensions[1] - player.mana_bar_dimensions[1]);
 		player.mana_bar_background = game::render::create_quad({.position = player.mana_bar_pos, .scale = mana_bar_background_dimensions});
 		player.mana_bar = game::render::create_quad({.position = player.mana_bar_pos, .scale = player.mana_bar_dimensions, .colour = {0.1f, 0.2f, 0.8f}});
+
+		player_set_creature(prefab);
 	}
 
 	void player_update(float delta_seconds)
@@ -40,6 +43,17 @@ namespace game
 		{
 			player_set_mana(player.mana);
 		}
+	}
+
+	void player_set_creature(game::prefab prefab)
+	{
+		if(player.avatar != tz::nullhand)
+		{
+			game::destroy_entity(player.avatar);
+		}
+		player.avatar = game::create_entity({.prefab_name = prefab.name, .position = {-1.0f, 0.0f}});
+		// face right
+		game::entity_move(player.avatar, {1.0f, 0.0f});
 	}
 
 	deck_handle player_deck()

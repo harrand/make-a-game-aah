@@ -1,11 +1,13 @@
 #ifndef GAME_PLAYER_HPP
 #define GAME_PLAYER_HPP
 #include "deck.hpp"
+#include "prefab.hpp"
 
 namespace game
 {
-	void player_setup();
+	void player_setup(game::prefab prefab);
 	void player_update(float delta_seconds);
+	void player_set_creature(game::prefab prefab);
 
 	deck_handle player_deck();
 
