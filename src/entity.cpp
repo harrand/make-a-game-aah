@@ -90,7 +90,14 @@ namespace game
 				move_dir *= speeds[i] * delta_seconds * global_speed_multiplier;
 				game::render::quad_set_flipbook(quads[i], creatures[i].move_horizontal);
 				auto scale = game::render::quad_get_scale(quads[i]);
-				scale[0] = std::abs(scale[0]) * (move_dir[0] < 0.0f ? 1.0f : -1.0f);
+				if(move_dir[0] < 0.0f)
+				{
+					scale[0] = std::abs(scale[0]);
+				}
+				else if(move_dir[0] > 0.0f)
+				{
+					scale[0] = -std::abs(scale[0]);
+				}
 				game::render::quad_set_scale(quads[i], scale);
 				auto pos = game::render::quad_get_position(quads[i]);
 				game::render::quad_set_position(quads[i], pos + move_dir);
