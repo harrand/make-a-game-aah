@@ -41,6 +41,8 @@ namespace game::render
 	void quad_set_texture(handle q, std::uint32_t texture);
 	void quad_set_flipbook(handle q, flipbook_handle flipbook);
 
+	bool quad_is_held(handle q);
+
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat);
 	void flipbook_add_frame(flipbook_handle flipbook, texture_id tex);
 

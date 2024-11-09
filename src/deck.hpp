@@ -23,6 +23,9 @@ namespace game
 	void destroy_deck(deck_handle deck);
 
 	void deck_add_card(deck_handle deck, card c);
+	void deck_destroy_card(deck_handle deck, std::size_t id);
+	void deck_swap_cards(deck_handle deck, std::size_t id1, std::size_t id2);
+	std::size_t deck_size(deck_handle deck);
 }
 
 #endif // GAME_DECK_HPP

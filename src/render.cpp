@@ -213,6 +213,11 @@ namespace game::render
 		priv.flipbook_timer = 0.0f;
 	}
 
+	bool quad_is_held(handle q)
+	{
+		return quad_privates[q.peek()].held;
+	}
+
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat)
 	{
 		auto id = flipbooks.size();

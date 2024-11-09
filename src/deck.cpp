@@ -71,4 +71,28 @@ namespace game
 			render::quad_set_scale(quad, sc);
 		}
 	}
+
+	void deck_destroy_card(deck_handle deck, std::size_t id)
+	{
+		decks.erase(decks.begin() + id);
+	}
+
+	void deck_swap_cards(deck_handle deckh, std::size_t id1, std::size_t id2)
+	{
+		auto& deck = decks[deckh.peek()];
+		if(deck.render.has_value())
+		{
+			auto pos1 = render::quad_get_position(deck.card_quads[id1]);
+			auto pos2 = render::quad_get_position(deck.card_quads[id2]);
+			render::quad_set_position(deck.card_quads[id1], pos2);
+			render::quad_set_position(deck.card_quads[id2], pos1);
+		}
+		std::swap(deck.cards[id1], deck.cards[id2]);
+		std::swap(deck.card_quads[id1], deck.card_quads[id2]);
+	}
+
+	std::size_t deck_size(deck_handle deck)
+	{
+		return decks[deck.peek()].cards.size();
+	}
 }
