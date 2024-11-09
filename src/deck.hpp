@@ -25,6 +25,7 @@ namespace game
 	void deck_add_card(deck_handle deck, card c);
 	void deck_destroy_card(deck_handle deck, std::size_t id);
 	void deck_swap_cards(deck_handle deck, std::size_t id1, std::size_t id2);
+	void deck_reset_card_position(deck_handle deck, std::size_t id);
 	std::size_t deck_size(deck_handle deck);
 	card deck_get_card(deck_handle deck, std::size_t id);
 	bool deck_card_is_held(deck_handle deck, std::size_t id);

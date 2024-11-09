@@ -16,6 +16,8 @@ namespace game
 
 	unsigned int player_get_mana();
 	void player_set_mana(unsigned int mana);
+
+	bool player_try_spend_mana(unsigned int cost);
 }
 
 #endif // GAME_PLAYER_HPP

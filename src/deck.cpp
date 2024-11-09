@@ -79,6 +79,14 @@ namespace game
 		if(d.render.has_value())
 		{
 			game::render::destroy_quad(d.card_quads[id]);
+			// move next cards backwards a bit.
+			for(std::size_t i = id+1; i < d.cards.size(); i++)
+			{
+				float deck_spacing = d.render.value().scale[0] * deck_card_spacing;
+				auto pos = game::render::quad_get_position(d.card_quads[i]);
+				pos[0] -= deck_spacing;
+				game::render::quad_set_position(d.card_quads[i], pos);
+			}
 		}
 		d.card_quads.erase(d.card_quads.begin() + id);
 		d.cards.erase(d.cards.begin() + id);
@@ -96,6 +104,19 @@ namespace game
 		}
 		std::swap(deck.cards[id1], deck.cards[id2]);
 		std::swap(deck.card_quads[id1], deck.card_quads[id2]);
+	}
+
+	void deck_reset_card_position(deck_handle deck, std::size_t id)
+	{
+		const auto& d = decks[deck.peek()];
+		if(!d.render.has_value())
+		{
+			return;
+		}
+		float deck_spacing = d.render.value().scale[0] * deck_card_spacing;
+		auto pos = d.render.value().position;
+		pos[0] += (deck_spacing * (id + 1));
+		render::quad_set_position(d.card_quads[id], pos);
 	}
 
 	std::size_t deck_size(deck_handle deck)

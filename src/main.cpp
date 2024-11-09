@@ -35,9 +35,12 @@ int tz_main()
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
-	game::deck_add_card(game::player_deck(), {.name = "banshee"});
-	game::deck_add_card(game::player_deck(), {.name = "peasant"});
-	game::deck_add_card(game::player_deck(), {.name = "knight"});
+	for(std::size_t i = 0; i < 3; i++)
+	{
+		game::deck_add_card(game::player_deck(), {.name = "banshee"});
+		game::deck_add_card(game::player_deck(), {.name = "peasant"});
+		game::deck_add_card(game::player_deck(), {.name = "knight"});
+	}
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::player_set_mana(1);

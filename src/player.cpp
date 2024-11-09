@@ -45,13 +45,13 @@ namespace game
 			player_set_mana(player.mana);
 		}
 
-		auto deck_size = game::deck_size(player.deck);
-		if(player.deck_hold_array.size() != deck_size)
-		{
-			player.deck_hold_array.resize(deck_size, false);
-		}
 		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
 		{
+			auto deck_size = game::deck_size(player.deck);
+			if(player.deck_hold_array.size() != deck_size)
+			{
+				player.deck_hold_array.resize(deck_size, false);
+			}
 			if(deck_card_is_held(player.deck, i))
 			{
 				player.deck_hold_array[i] = true;
@@ -59,13 +59,25 @@ namespace game
 			else
 			{
 				// not held anymore
+				card c = game::deck_get_card(player.deck, i);
 				if(player.deck_hold_array[i])
 				{
-					// but was last frame. i.e we've just let go of it.
-					// play it
-					game::deck_play_card(player.deck, i);
-					// this will destroy the card, so fix up our deck hold array
-					player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+					unsigned int cost = game::get_prefab(c.name).power;
+					if(player_try_spend_mana(cost))
+					{
+						// but was last frame. i.e we've just let go of it.
+						// play it
+						game::deck_play_card(player.deck, i);
+						// this will destroy the card, so fix up our deck hold array
+						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+					}
+					else
+					{
+						// couldnt afford it.
+						player.deck_hold_array[i] = false;
+						// destroy and re-add.
+						game::deck_reset_card_position(player.deck, i);
+					}
 				}
 			}
 		}
@@ -121,5 +133,15 @@ namespace game
 		tz::v2f pos = player.mana_bar_pos;
 		pos[0] += (manapct * player.mana_bar_dimensions[0]) - bg_scale[0] + yoffset;
 		game::render::quad_set_position(player.mana_bar, pos);
+	}
+
+	bool player_try_spend_mana(unsigned int cost)
+	{
+		if(player.mana < cost)
+		{
+			return false;
+		}
+		player_set_mana(player.mana - cost);
+		return true;
 	}
 }

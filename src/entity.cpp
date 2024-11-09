@@ -126,11 +126,11 @@ namespace game
 				auto scale = game::render::quad_get_scale(quads[i]);
 				if(move_dir[0] < 0.0f)
 				{
-					scale[0] = std::abs(scale[0]);
+					scale[0] = -std::abs(scale[0]);
 				}
 				else if(move_dir[0] > 0.0f)
 				{
-					scale[0] = -std::abs(scale[0]);
+					scale[0] = std::abs(scale[0]);
 				}
 				game::render::quad_set_scale(quads[i], scale);
 				auto pos = game::render::quad_get_position(quads[i]);
