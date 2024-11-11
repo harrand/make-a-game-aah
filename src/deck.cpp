@@ -139,7 +139,7 @@ namespace game
 		return game::render::quad_is_held(d.card_quads[id]);
 	}
 
-	void deck_play_card(deck_handle deck, std::size_t id)
+	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned)
 	{
 		const auto& d = decks[deck.peek()];
 		tz::v2f pos;
@@ -154,7 +154,7 @@ namespace game
 		}
 
 		card c = deck_get_card(deck, id);
-		game::create_entity({.prefab_name = c.name, .position = pos});
+		game::create_entity({.prefab_name = c.name, .player_aligned = player_aligned, .position = pos, .scale = {player_aligned ? 1.0f : -1.0f, 1.0f}});
 		deck_destroy_card(deck, id);
 	}
 }

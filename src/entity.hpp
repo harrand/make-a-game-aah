@@ -10,6 +10,7 @@ namespace game
 	{
 		unsigned int hp = 1;
 		std::string prefab_name;
+		bool player_aligned = false;
 
 		tz::v2f position;
 		float rotation;

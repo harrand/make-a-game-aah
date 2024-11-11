@@ -30,7 +30,7 @@ namespace game
 	card deck_get_card(deck_handle deck, std::size_t id);
 	bool deck_card_is_held(deck_handle deck, std::size_t id);
 
-	void deck_play_card(deck_handle deck, std::size_t id);
+	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned);
 }
 
 #endif // GAME_DECK_HPP

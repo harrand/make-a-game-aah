@@ -67,7 +67,7 @@ namespace game
 					{
 						// but was last frame. i.e we've just let go of it.
 						// play it
-						game::deck_play_card(player.deck, i);
+						game::deck_play_card(player.deck, i, true);
 						// this will destroy the card, so fix up our deck hold array
 						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
 					}
@@ -89,7 +89,7 @@ namespace game
 		{
 			game::destroy_entity(player.avatar);
 		}
-		player.avatar = game::create_entity({.prefab_name = prefab.name, .position = {-1.0f, 0.0f}});
+		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = true, .position = {-1.0f, 0.0f}});
 		game::entity_face_right(player.avatar);
 		if(prefab.cast != tz::nullhand)
 		{
