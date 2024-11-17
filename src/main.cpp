@@ -45,10 +45,10 @@ int tz_main()
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::player_set_mana(1);
 
-	std::uint64_t time = tz::system_nanos();
+	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())
 	{
-		std::uint64_t now = tz::system_nanos();
+		std::uint64_t now = tz::time_nanos();
 		float delta_seconds = (now - time) / 1000000000.0f;
 		time = now;
 
