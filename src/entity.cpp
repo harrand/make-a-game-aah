@@ -94,7 +94,7 @@ namespace game
 			}
 
 			auto prefab = creatures[ent.peek()];
-			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_update; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_update; if fn ~= nil then fn({}, {}) end", prefab.name, ent.peek(), delta_seconds)));
 
 			// handle target ent/loc
 			auto pos = game::render::quad_get_position(quads[i]);

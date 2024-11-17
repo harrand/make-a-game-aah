@@ -1,4 +1,7 @@
 #include "script.hpp"
+
+#include "entity.hpp"
+
 #include "tz/core/job.hpp"
 #include "tz/core/lua.hpp"
 #include <filesystem>
@@ -6,6 +9,7 @@
 namespace game
 {
 	void impl_local_script_init();
+	void impl_create_game_api();
 	void script_initialise()
 	{
 		std::vector<tz::job_handle> lua_init_jobs(tz::job_worker_count());
@@ -33,5 +37,26 @@ namespace game
 				tz_must(tz::lua_execute_file(entry.path()));
 			}
 		}
+		impl_create_game_api();
+	}
+
+	void impl_create_game_api()
+	{
+		tz::lua_define_function("debuglog", []()
+		{
+			auto [msg] = tz::lua_parse_args<std::string>();
+			std::string full_msg = std::format("[DEBUG] {}", msg);
+			std::printf("%s", full_msg.c_str());
+			return 0;
+		});
+		tz::lua_define_function("create_entity", []()
+		{
+			auto [prefab_name] = tz::lua_parse_args<std::string>();
+
+			entity_handle ret = game::create_entity({.prefab_name = prefab_name});
+
+			tz::lua_push_int(ret.peek());
+			return 1;
+		});
 	}
 }
