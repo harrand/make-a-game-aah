@@ -52,11 +52,40 @@ namespace game
 		tz::lua_define_function("create_entity", []()
 		{
 			auto [prefab_name] = tz::lua_parse_args<std::string>();
+			tz::v2f pos = tz::v2f::zero();
+			if(tz::lua_stack_size() >= 3)
+			{
+				pos[0] = tz_must(tz::lua_stack_get_number(2));
+				pos[1] = tz_must(tz::lua_stack_get_number(3));
+			}
 
-			entity_handle ret = game::create_entity({.prefab_name = prefab_name});
+			entity_handle ret = game::create_entity({.prefab_name = prefab_name, .position = pos});
 
 			tz::lua_push_int(ret.peek());
 			return 1;
+		});
+		tz::lua_define_function("destroy_entity", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			game::destroy_entity(static_cast<tz::hanval>(ent));
+			return 0;
+		});
+
+		tz::lua_define_function("entity_get_position", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			auto pos = game::entity_get_position(static_cast<tz::hanval>(ent));
+			tz::lua_push_number(pos[0]);
+			tz::lua_push_number(pos[1]);
+			return 2;
+		});
+
+		tz::lua_define_function("entity_set_position", []()
+		{
+			auto [ent, x, y] = tz::lua_parse_args<std::int64_t, float, float>();
+
+			game::entity_set_position(static_cast<tz::hanval>(ent), tz::v2f{x, y});
+			return 0;
 		});
 	}
 }

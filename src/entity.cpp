@@ -156,6 +156,17 @@ namespace game
 		}
 	}
 
+	tz::v2f entity_get_position(entity_handle ent)
+	{
+		return positions[ent.peek()];
+	}
+
+	void entity_set_position(entity_handle ent, tz::v2f pos)
+	{
+		positions[ent.peek()] = pos;
+		game::render::quad_set_position(quads[ent.peek()], pos);
+	}
+
 	void entity_face_left(entity_handle ent)
 	{
 		auto sc = game::render::quad_get_scale(quads[ent.peek()]);
