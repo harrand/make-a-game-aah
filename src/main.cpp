@@ -18,8 +18,8 @@ game::render::handle test_spawn_prefab(const char* prefab_name);
 #include "tz/main.hpp"
 int tz_main()
 {
-	tz::initialise();
-	tz::os::open_window({.title = "My Amazing Game"});
+	tz::initialise({.name = "Super Fun Card Game"});
+	tz::os::open_window();
 	tz::os::window_fullscreen();
 	tz_must(tz::gpu::use_hardware(tz::gpu::find_best_hardware()));
 	game::render::setup();
