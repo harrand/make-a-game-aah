@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 topaz_add_executable(
 	TARGET game
+	FAVICON game.ico
 	SOURCES
 		src/main.cpp
 		src/card.cpp
