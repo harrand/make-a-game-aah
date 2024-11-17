@@ -1,6 +1,7 @@
 #include "entity.hpp"
 #include "render.hpp"
 #include "prefab.hpp"
+#include "tz/core/lua.hpp"
 #include <vector>
 
 namespace game
@@ -57,20 +58,26 @@ namespace game
 
 		// set new data
 		hps[ret.peek()] = info.hp;
-		creatures[ret.peek()] = game::get_prefab(info.prefab_name);
+		auto& prefab = creatures[ret.peek()];
+		prefab = game::get_prefab(info.prefab_name);
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
 
-		speeds[ret.peek()] = creatures[ret.peek()].movement_speed;
+		speeds[ret.peek()] = prefab.movement_speed;
 
 		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale});
-		game::render::quad_set_flipbook(quads[ret.peek()], creatures[ret.peek()].idle);
+		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
+
+		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_create; if fn ~= nil then fn({}) end", prefab.name, ret.peek())));
 		return ret;
 	}
 
 	void destroy_entity(entity_handle ent)
 	{
+		auto prefab = creatures[ent.peek()];
+		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_destroy; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+
 		entity_free_list.push_back(ent);
 		game::render::destroy_quad(quads[ent.peek()]);
 	}
@@ -85,6 +92,9 @@ namespace game
 				// in free list, do not update.
 				continue;
 			}
+
+			auto prefab = creatures[ent.peek()];
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_update; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
 
 			// handle target ent/loc
 			auto pos = game::render::quad_get_position(quads[i]);
