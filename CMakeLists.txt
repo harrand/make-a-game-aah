@@ -25,46 +25,9 @@ topaz_add_executable(
 	SHADERS
 		src/shaders/quad.vertex.tzsl
 		src/shaders/quad.fragment.tzsl
-	BUNDLE_FILES
-		res/images/bgforest.png
-		res/images/hourglassh.png
-		res/images/hourglassv.png
-		res/images/cardbase.png
-
-		res/images/creature/peasant/idle0.png
-		res/images/creature/peasant/idle1.png
-		res/images/creature/peasant/side0.png
-		res/images/creature/peasant/side1.png
-		script/prefabs/peasant.lua
-
-		res/images/creature/knight/idle0.png
-		res/images/creature/knight/idle1.png
-		res/images/creature/knight/side0.png
-		res/images/creature/knight/side1.png
-		script/prefabs/knight.lua
-
-		res/images/creature/skeleton/idle0.png
-		res/images/creature/skeleton/idle1.png
-		res/images/creature/skeleton/side0.png
-		res/images/creature/skeleton/side1.png
-		script/prefabs/skeleton.lua
-
-		res/images/creature/melistra/idle0.png
-		res/images/creature/melistra/idle1.png
-		res/images/creature/melistra/side0.png
-		res/images/creature/melistra/side1.png
-		res/images/creature/melistra/cast0.png
-		res/images/creature/melistra/cast1.png
-		res/images/creature/melistra/cast2.png
-		res/images/creature/melistra/cast3.png
-		res/images/creature/melistra/cast4.png
-		res/images/creature/melistra/cast5.png
-		res/images/creature/melistra/cast6.png
-		script/prefabs/melistra.lua
-
-		res/images/creature/banshee/idle0.png
-		res/images/creature/banshee/idle1.png
-		script/prefabs/banshee.lua
+	BUNDLE_DIRECTORIES
+		res/
+		script/
 	DEFINE_PACKAGE
 )
 target_link_libraries(game PRIVATE topaz)
