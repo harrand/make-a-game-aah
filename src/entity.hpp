@@ -36,6 +36,9 @@ namespace game
 	tz::v3f entity_get_colour_tint(entity_handle ent);
 	void entity_set_colour_tint(entity_handle ent, tz::v3f colour);
 
+	unsigned int entity_get_hp(entity_handle ent);
+	unsigned int entity_get_max_hp(entity_handle ent);
+
 	void entity_face_left(entity_handle ent);
 	void entity_face_right(entity_handle ent);
 	void entity_start_casting(entity_handle ent);

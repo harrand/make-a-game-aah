@@ -229,6 +229,16 @@ namespace game
 		game::render::quad_set_colour(quads[ent.peek()], colour);
 	}
 
+	unsigned int entity_get_hp(entity_handle ent)
+	{
+		return hps[ent.peek()];
+	}
+
+	unsigned int entity_get_max_hp(entity_handle ent)
+	{
+		return creatures[ent.peek()].base_health;
+	}
+
 	void entity_face_left(entity_handle ent)
 	{
 		auto sc = game::render::quad_get_scale(quads[ent.peek()]);

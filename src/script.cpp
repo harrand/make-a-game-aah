@@ -139,6 +139,20 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_get_hp", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			tz::lua_push_int(game::entity_get_hp(static_cast<tz::hanval>(ent)));
+			return 1;
+		});
+
+		tz::lua_define_function("entity_get_max_hp", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			tz::lua_push_int(game::entity_get_max_hp(static_cast<tz::hanval>(ent)));
+			return 1;
+		});
+
 		tz::lua_define_function("entity_face_left", []()
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();

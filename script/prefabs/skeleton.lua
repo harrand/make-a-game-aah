@@ -1,7 +1,7 @@
 prefabs.skeleton =
 {
 	on_create = function(ent)
-		local healthbar = create_entity("bar")
+		local healthbar = create_entity("healthbar")
 		entity_set_parent(healthbar, ent)
 	end,
 	base_health = 10,
