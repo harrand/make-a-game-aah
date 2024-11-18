@@ -87,5 +87,59 @@ namespace game
 			game::entity_set_position(static_cast<tz::hanval>(ent), tz::v2f{x, y});
 			return 0;
 		});
+
+		tz::lua_define_function("entity_get_scale", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			auto sc = game::entity_get_scale(static_cast<tz::hanval>(ent));
+			tz::lua_push_number(sc[0]);
+			tz::lua_push_number(sc[1]);
+			return 2;
+		});
+
+		tz::lua_define_function("entity_set_scale", []()
+		{
+			auto [ent, x, y] = tz::lua_parse_args<std::int64_t, float, float>();
+
+			game::entity_set_scale(static_cast<tz::hanval>(ent), tz::v2f{x, y});
+			return 0;
+		});
+
+
+		tz::lua_define_function("entity_get_parent", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+
+			tz::lua_push_int(game::entity_get_parent(static_cast<tz::hanval>(ent)).peek());
+			return 1;
+		});
+
+		tz::lua_define_function("entity_set_parent", []()
+		{
+			auto [ent, parent] = tz::lua_parse_args<std::int64_t, std::int64_t>();
+			game::entity_set_parent(static_cast<tz::hanval>(ent), static_cast<tz::hanval>(parent));
+			return 0;
+		});
+
+		tz::lua_define_function("entity_face_left", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			game::entity_face_left(static_cast<tz::hanval>(ent));
+			return 0;
+		});
+
+		tz::lua_define_function("entity_face_right", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			game::entity_face_right(static_cast<tz::hanval>(ent));
+			return 0;
+		});
+
+		tz::lua_define_function("entity_move", []()
+		{
+			auto [ent, dirx, diry] = tz::lua_parse_args<std::int64_t, float, float>();
+			game::entity_move(static_cast<tz::hanval>(ent), {dirx, diry});
+			return 0;
+		});
 	}
 }

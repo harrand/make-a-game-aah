@@ -16,6 +16,7 @@ namespace game
 	std::vector<tz::v2f> positions = {};
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
+	std::vector<entity_handle> parents = {};
 	std::size_t entity_count = 0;
 
 	struct boolproxy{bool b;};
@@ -24,6 +25,7 @@ namespace game
 	std::vector<tz::v2f> move_dirs = {};
 	std::vector<std::optional<tz::v2f>> target_locations = {};
 	std::vector<entity_handle> targets = {};
+	std::vector<std::vector<entity_handle>> childrens = {};
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
@@ -49,11 +51,13 @@ namespace game
 			positions.push_back({});
 			rotations.push_back({});
 			scales.push_back({});
+			parents.push_back({});
 
 			quads.push_back(tz::nullhand);
 			move_dirs.push_back(tz::v2f::zero());
 			target_locations.push_back(std::nullopt);
 			targets.push_back(tz::nullhand);
+			childrens.push_back({});
 		}
 
 		// set new data
@@ -63,6 +67,11 @@ namespace game
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
+		parents[ret.peek()] = info.parent;
+		if(info.parent != tz::nullhand)
+		{
+			childrens[info.parent.peek()].push_back(ret);
+		}
 
 		speeds[ret.peek()] = prefab.movement_speed;
 
@@ -77,6 +86,8 @@ namespace game
 	{
 		auto prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_destroy; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+
+		entity_set_parent(ent, tz::nullhand);
 
 		entity_free_list.push_back(ent);
 		game::render::destroy_quad(quads[ent.peek()]);
@@ -144,7 +155,7 @@ namespace game
 				}
 				game::render::quad_set_scale(quads[i], scale);
 				auto pos = game::render::quad_get_position(quads[i]);
-				game::render::quad_set_position(quads[i], pos + move_dir);
+				entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
 			}
 			else
 			{
@@ -158,13 +169,52 @@ namespace game
 
 	tz::v2f entity_get_position(entity_handle ent)
 	{
-		return positions[ent.peek()];
+		auto pos = positions[ent.peek()];
+		if(parents[ent.peek()] != tz::nullhand)
+		{
+			pos += entity_get_position(parents[ent.peek()]);
+		}
+		return pos;
 	}
 
 	void entity_set_position(entity_handle ent, tz::v2f pos)
 	{
 		positions[ent.peek()] = pos;
-		game::render::quad_set_position(quads[ent.peek()], pos);
+		game::render::quad_set_position(quads[ent.peek()], entity_get_position(ent));
+
+		for(entity_handle child : childrens[ent.peek()])
+		{
+			game::render::quad_set_position(quads[child.peek()], entity_get_position(child));
+		}
+	}
+
+	tz::v2f entity_get_scale(entity_handle ent)
+	{
+		return scales[ent.peek()];
+	}
+
+	void entity_set_scale(entity_handle ent, tz::v2f scale)
+	{
+		scale *= global_uniform_scale;
+		scales[ent.peek()] = scale;
+		game::render::quad_set_scale(quads[ent.peek()], scale);
+	}
+
+	entity_handle entity_get_parent(entity_handle ent)
+	{
+		return parents[ent.peek()];
+	}
+
+	void entity_set_parent(entity_handle ent, entity_handle parent)
+	{
+		auto old_parent = parents[ent.peek()];
+		if(old_parent != tz::nullhand)
+		{
+			std::erase(childrens[old_parent.peek()], ent);
+		}
+		parents[ent.peek()] = parent;
+		// local position is unchanged.
+		childrens[parent.peek()].push_back(ent);
 	}
 
 	void entity_face_left(entity_handle ent)

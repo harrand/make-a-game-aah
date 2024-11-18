@@ -1,5 +1,10 @@
 prefabs.skeleton =
 {
+	on_create = function(ent)
+		local child = create_entity("peasant")
+		entity_set_parent(child, ent)
+		entity_set_scale(child, 0.5, 0.5)
+	end,
 	base_health = 10,
 	movement_speed = 1.0,
 	power = 2,

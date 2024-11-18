@@ -6,6 +6,8 @@
 
 namespace game
 {
+	namespace detail{struct entity_t{};}
+	using entity_handle = tz::handle<detail::entity_t>;
 	struct entity_info
 	{
 		unsigned int hp = 1;
@@ -15,15 +17,21 @@ namespace game
 		tz::v2f position;
 		float rotation;
 		tz::v2f scale = tz::v2f::filled(1.0f);
+		entity_handle parent = tz::nullhand;
 	};
 
-	using entity_handle = tz::handle<entity_info>;
 	entity_handle create_entity(entity_info info);
 	void destroy_entity(entity_handle ent);
 	void entity_update(float delta_seconds);
 
 	tz::v2f entity_get_position(entity_handle ent);
 	void entity_set_position(entity_handle ent, tz::v2f pos);
+
+	tz::v2f entity_get_scale(entity_handle ent);
+	void entity_set_scale(entity_handle ent, tz::v2f scale);
+
+	entity_handle entity_get_parent(entity_handle ent);
+	void entity_set_parent(entity_handle ent, entity_handle parent);
 
 	void entity_face_left(entity_handle ent);
 	void entity_face_right(entity_handle ent);
