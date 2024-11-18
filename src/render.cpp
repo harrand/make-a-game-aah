@@ -192,6 +192,11 @@ namespace game::render
 		tz::ren::set_quad_scale(ren, q, scale);
 	}
 
+	tz::v3f quad_get_colour(handle q)
+	{
+		return tz::ren::get_quad_colour(ren, q);
+	}
+
 	void quad_set_colour(handle q, tz::v3f colour)
 	{
 		tz::ren::set_quad_colour(ren, q, colour);

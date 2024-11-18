@@ -33,6 +33,9 @@ namespace game
 	entity_handle entity_get_parent(entity_handle ent);
 	void entity_set_parent(entity_handle ent, entity_handle parent);
 
+	tz::v3f entity_get_colour_tint(entity_handle ent);
+	void entity_set_colour_tint(entity_handle ent, tz::v3f colour);
+
 	void entity_face_left(entity_handle ent);
 	void entity_face_right(entity_handle ent);
 	void entity_start_casting(entity_handle ent);

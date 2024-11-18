@@ -29,7 +29,7 @@ namespace game
 
 	void impl_local_script_init()
 	{
-		tz::lua_execute("prefabs = {}");
+		tz::lua_execute("prefabs = {}; prefabs.empty = {base_health = 0, movement_speed = 0, power = 1}");
 		for(const auto& entry : std::filesystem::directory_iterator("./script/prefabs"))
 		{
 			if(entry.path().has_extension() && entry.path().extension() == ".lua")
@@ -118,6 +118,24 @@ namespace game
 		{
 			auto [ent, parent] = tz::lua_parse_args<std::int64_t, std::int64_t>();
 			game::entity_set_parent(static_cast<tz::hanval>(ent), static_cast<tz::hanval>(parent));
+			return 0;
+		});
+
+		tz::lua_define_function("entity_get_colour_tint", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+
+			tz::v3f col = game::entity_get_colour_tint(static_cast<tz::hanval>(ent));	
+			tz::lua_push_number(col[0]);
+			tz::lua_push_number(col[1]);
+			tz::lua_push_number(col[2]);
+			return 3;
+		});
+
+		tz::lua_define_function("entity_set_colour_tint", []()
+		{
+			auto [ent, r, g, b] = tz::lua_parse_args<std::int64_t, float, float, float>();
+			game::entity_set_colour_tint(static_cast<tz::hanval>(ent), {r, g, b});
 			return 0;
 		});
 

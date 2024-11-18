@@ -184,7 +184,7 @@ namespace game
 
 		for(entity_handle child : childrens[ent.peek()])
 		{
-			game::render::quad_set_position(quads[child.peek()], entity_get_position(child));
+			entity_set_position(child, positions[child.peek()]);
 		}
 	}
 
@@ -215,6 +215,18 @@ namespace game
 		parents[ent.peek()] = parent;
 		// local position is unchanged.
 		childrens[parent.peek()].push_back(ent);
+		// however need to update our position now we have a parent, we do that by setting our local position to itself.
+		entity_set_position(ent, positions[ent.peek()]);
+	}
+
+	tz::v3f entity_get_colour_tint(entity_handle ent)
+	{
+		return game::render::quad_get_colour(quads[ent.peek()]);
+	}
+
+	void entity_set_colour_tint(entity_handle ent, tz::v3f colour)
+	{
+		game::render::quad_set_colour(quads[ent.peek()], colour);
 	}
 
 	void entity_face_left(entity_handle ent)

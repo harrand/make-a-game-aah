@@ -37,6 +37,7 @@ namespace game::render
 	void quad_set_position(handle q, tz::v2f pos);
 	tz::v2f quad_get_scale(handle q);
 	void quad_set_scale(handle q, tz::v2f scale);
+	tz::v3f quad_get_colour(handle q);
 	void quad_set_colour(handle q, tz::v3f colour);
 	void quad_set_texture(handle q, std::uint32_t texture);
 	void quad_set_flipbook(handle q, flipbook_handle flipbook);
