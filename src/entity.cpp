@@ -72,6 +72,7 @@ namespace game
 		{
 			childrens[info.parent.peek()].push_back(ret);
 		}
+		childrens[ret.peek()] = {};
 
 		speeds[ret.peek()] = prefab.movement_speed;
 
