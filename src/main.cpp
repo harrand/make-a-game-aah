@@ -43,6 +43,8 @@ int tz_main()
 	}
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
+	game::entity_handle skel2 = game::create_entity({.prefab_name = "skeleton"});
+	game::entity_set_scale(skel2, tz::v2f::filled(2.0f));
 	game::player_set_mana(1);
 
 	std::uint64_t time = tz::time_nanos();
