@@ -125,6 +125,7 @@ namespace game::render
 					// we're holding this now.
 					quadpriv.held = true;
 					quadpriv.held_offset = pos - mouse_world_pos;
+					quad_set_layer(q, quad_get_layer(q) + 1);
 				}
 			}
 			

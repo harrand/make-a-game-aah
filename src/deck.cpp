@@ -117,6 +117,7 @@ namespace game
 		auto pos = d.render.value().position;
 		pos[0] += (deck_spacing * (id + 1));
 		render::quad_set_position(d.card_quads[id], pos);
+		render::quad_set_layer(d.card_quads[id], card_layer);
 	}
 
 	std::size_t deck_size(deck_handle deck)

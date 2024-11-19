@@ -4,6 +4,7 @@
 
 namespace game
 {
+	constexpr short card_layer = 5;
 	enum class card_type
 	{
 		creature
