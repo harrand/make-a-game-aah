@@ -5,12 +5,14 @@ prefabs.healthbar =
 	on_create = function(ent)
 		entity_set_scale(ent, prefabs.healthbar.impl_scale[1], prefabs.healthbar.impl_scale[2])
 		entity_set_colour_tint(ent, 1.0, 1.0, 1.0)
+		entity_set_layer(ent, 1)
 
 		local child = create_entity("empty")
 		entity_set_colour_tint(child, 0.0, 0.5, 0.0)
 		entity_set_parent(child, ent)
 		entity_set_userdata(ent, child)
-		entity_set_layer(child, 1)
+		entity_set_layer(child, 2)
+		-- set the layers so healthbars tend to always display above other sprites (as its technically UI)
 	end,
 	on_update = function(ent, delta_seconds)
 		-- remember: userdata is the child bar
