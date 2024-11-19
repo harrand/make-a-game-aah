@@ -3,6 +3,8 @@ prefabs.skeleton =
 	on_create = function(ent)
 		local healthbar = create_entity("healthbar")
 		entity_set_parent(healthbar, ent)
+
+		entity_set_hp(ent, 9)
 	end,
 	base_health = 10,
 	movement_speed = 1.0,

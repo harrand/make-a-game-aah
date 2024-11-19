@@ -17,6 +17,7 @@ namespace game
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
 	std::vector<entity_handle> parents = {};
+	std::vector<void*> userdatas = {};
 	std::size_t entity_count = 0;
 
 	struct boolproxy{bool b;};
@@ -29,8 +30,6 @@ namespace game
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
-
-	constexpr float global_uniform_scale = 0.2f;
 
 	entity_handle create_entity(entity_info info)
 	{
@@ -52,6 +51,7 @@ namespace game
 			rotations.push_back({});
 			scales.push_back({});
 			parents.push_back({});
+			userdatas.push_back(nullptr);
 
 			quads.push_back(tz::nullhand);
 			move_dirs.push_back(tz::v2f::zero());
@@ -61,13 +61,16 @@ namespace game
 		}
 
 		// set new data
-		hps[ret.peek()] = info.hp;
 		auto& prefab = creatures[ret.peek()];
 		prefab = game::get_prefab(info.prefab_name);
+
+		hps[ret.peek()] = info.hp == -1u ? prefab.base_health : info.hp;
+
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
 		parents[ret.peek()] = info.parent;
+		userdatas[ret.peek()] = info.userdata;
 		if(info.parent != tz::nullhand)
 		{
 			childrens[info.parent.peek()].push_back(ret);
@@ -106,7 +109,7 @@ namespace game
 			}
 
 			auto prefab = creatures[ent.peek()];
-			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_update; if fn ~= nil then fn({}, {}) end", prefab.name, ent.peek(), delta_seconds)));
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_update; if fn ~= nil then fn({}, 0.0 + {}) end", prefab.name, ent.peek(), delta_seconds)));
 
 			// handle target ent/loc
 			auto pos = game::render::quad_get_position(quads[i]);
@@ -235,6 +238,11 @@ namespace game
 		return hps[ent.peek()];
 	}
 
+	void entity_set_hp(entity_handle ent, unsigned int hp)
+	{
+		hps[ent.peek()] = std::clamp(hp, 0u, entity_get_max_hp(ent));
+	}
+
 	unsigned int entity_get_max_hp(entity_handle ent)
 	{
 		return creatures[ent.peek()].base_health;
@@ -279,5 +287,15 @@ namespace game
 	{
 		target_locations[ent.peek()] = std::nullopt;
 		targets[ent.peek()] = tar;
+	}
+
+	void* entity_get_userdata(entity_handle ent)
+	{
+		return userdatas[ent.peek()];
+	}
+
+	void entity_set_userdata(entity_handle ent, void* userdata)
+	{
+		userdatas[ent.peek()] = userdata;
 	}
 }

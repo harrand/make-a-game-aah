@@ -42,6 +42,7 @@ namespace game
 
 	void impl_create_game_api()
 	{
+		tz::lua_set_number("GLOBAL_UNIFORM_SCALE", global_uniform_scale);
 		tz::lua_define_function("debuglog", []()
 		{
 			auto [msg] = tz::lua_parse_args<std::string>();
@@ -146,6 +147,13 @@ namespace game
 			return 1;
 		});
 
+		tz::lua_define_function("entity_set_hp", []()
+		{
+			auto [ent, hp] = tz::lua_parse_args<std::int64_t, std::int64_t>();
+			game::entity_set_hp(static_cast<tz::hanval>(ent), hp);
+			return 0;
+		});
+
 		tz::lua_define_function("entity_get_max_hp", []()
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();
@@ -171,6 +179,20 @@ namespace game
 		{
 			auto [ent, dirx, diry] = tz::lua_parse_args<std::int64_t, float, float>();
 			game::entity_move(static_cast<tz::hanval>(ent), {dirx, diry});
+			return 0;
+		});
+
+		tz::lua_define_function("entity_get_userdata", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			tz::lua_push_int(reinterpret_cast<std::uintptr_t>(game::entity_get_userdata(static_cast<tz::hanval>(ent))));
+			return 1;
+		});
+
+		tz::lua_define_function("entity_set_userdata", []()
+		{
+			auto [ent, userdata] = tz::lua_parse_args<std::int64_t, std::int64_t>();
+			game::entity_set_userdata(static_cast<tz::hanval>(ent), reinterpret_cast<void*>(static_cast<std::uintptr_t>(userdata)));
 			return 0;
 		});
 	}

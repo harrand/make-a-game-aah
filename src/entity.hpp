@@ -6,11 +6,13 @@
 
 namespace game
 {
+	constexpr float global_uniform_scale = 0.15f;
+
 	namespace detail{struct entity_t{};}
 	using entity_handle = tz::handle<detail::entity_t>;
 	struct entity_info
 	{
-		unsigned int hp = 1;
+		unsigned int hp = -1u;
 		std::string prefab_name;
 		bool player_aligned = false;
 
@@ -18,6 +20,7 @@ namespace game
 		float rotation;
 		tz::v2f scale = tz::v2f::filled(1.0f);
 		entity_handle parent = tz::nullhand;
+		void* userdata = nullptr;
 	};
 
 	entity_handle create_entity(entity_info info);
@@ -37,6 +40,7 @@ namespace game
 	void entity_set_colour_tint(entity_handle ent, tz::v3f colour);
 
 	unsigned int entity_get_hp(entity_handle ent);
+	void entity_set_hp(entity_handle ent, unsigned int hp);
 	unsigned int entity_get_max_hp(entity_handle ent);
 
 	void entity_face_left(entity_handle ent);
@@ -47,6 +51,9 @@ namespace game
 
 	void entity_set_target_location(entity_handle ent, tz::v2f location);
 	void entity_set_target(entity_handle ent, entity_handle tar);
+
+	void* entity_get_userdata(entity_handle ent);
+	void entity_set_userdata(entity_handle ent, void* userdata);
 }
 
 #endif // GAME_ENTITY_HPP
