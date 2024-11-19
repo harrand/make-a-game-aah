@@ -59,7 +59,7 @@ namespace game
 			card_img = sprite_image_cache.at(c.name).texture_id;
 		}
 
-		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = 50}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
 	}
 
 	void impl_cache_creature_sprite(std::string_view creature_name)

@@ -227,6 +227,12 @@ namespace game::render
 		}
 		priv.flipbook = flipbook;
 		priv.flipbook_timer = 0.0f;
+		// instantly set the texture to the first frame of the flipbook, otherwise there will be a frame delay.
+		const auto& flipbook_data = flipbooks[flipbook.peek()];
+		if(flipbook_data.frames.size())
+		{
+			quad_set_texture(q, flipbook_data.frames.front());
+		}
 	}
 
 	bool quad_is_held(handle q)
