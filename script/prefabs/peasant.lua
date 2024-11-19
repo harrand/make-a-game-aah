@@ -1,5 +1,8 @@
 prefabs.peasant =
 {
+	on_update = function(ent, delta_seconds)
+		ai.wander(ent)
+	end,
 	base_health = 10,
 	movement_speed = 1.2,
 	power = 1,

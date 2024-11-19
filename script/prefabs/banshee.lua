@@ -1,5 +1,8 @@
 prefabs.banshee =
 {
+	on_update = function(ent, delta_seconds)
+		ai.wander(ent)
+	end,
 	base_health = 40,
 	movement_speed = 0.4,
 	power = 3,

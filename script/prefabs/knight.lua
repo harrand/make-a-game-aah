@@ -1,5 +1,8 @@
 prefabs.knight =
 {
+	on_update = function(ent, delta_seconds)
+		ai.wander(ent)
+	end,
 	base_health = 90,
 	movement_speed = 0.6,
 	power = 4,

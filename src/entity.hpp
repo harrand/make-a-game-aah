@@ -52,7 +52,9 @@ namespace game
 	void entity_stop_casting(entity_handle ent);
 	void entity_move(entity_handle ent, tz::v2f dir);
 
+	std::optional<tz::v2f> entity_get_target_location(entity_handle ent);
 	void entity_set_target_location(entity_handle ent, tz::v2f location);
+	entity_handle entity_get_target(entity_handle ent);
 	void entity_set_target(entity_handle ent, entity_handle tar);
 
 	void* entity_get_userdata(entity_handle ent);

@@ -287,10 +287,20 @@ namespace game
 		move_dirs[ent.peek()] += dir;
 	}
 
+	std::optional<tz::v2f> entity_get_target_location(entity_handle ent)
+	{
+		return target_locations[ent.peek()];
+	}
+
 	void entity_set_target_location(entity_handle ent, tz::v2f location)
 	{
 		target_locations[ent.peek()] = location;
 		targets[ent.peek()] = tz::nullhand;
+	}
+
+	entity_handle entity_get_target(entity_handle ent)
+	{
+		return targets[ent.peek()];
 	}
 
 	void entity_set_target(entity_handle ent, entity_handle tar)

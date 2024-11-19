@@ -30,7 +30,7 @@ namespace game
 	void impl_local_script_init()
 	{
 		tz::lua_execute("prefabs = {}; prefabs.empty = {base_health = 0, movement_speed = 0, power = 1}");
-		for(const auto& entry : std::filesystem::directory_iterator("./script/prefabs"))
+		for(const auto& entry : std::filesystem::recursive_directory_iterator("./script"))
 		{
 			if(entry.path().has_extension() && entry.path().extension() == ".lua")
 			{
@@ -193,6 +193,57 @@ namespace game
 		{
 			auto [ent, dirx, diry] = tz::lua_parse_args<std::int64_t, float, float>();
 			game::entity_move(static_cast<tz::hanval>(ent), {dirx, diry});
+			return 0;
+		});
+
+		tz::lua_define_function("entity_get_target_location", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			auto maybe_loc = game::entity_get_target_location(static_cast<tz::hanval>(ent));
+			if(maybe_loc.has_value())
+			{
+				tz::lua_push_number(maybe_loc.value()[0]);
+				tz::lua_push_number(maybe_loc.value()[1]);
+			}
+			else
+			{
+				tz::lua_push_nil();
+				tz::lua_push_nil();
+			}
+			return 2;
+		});
+
+		tz::lua_define_function("entity_set_target_location", []()
+		{
+			auto [ent, locx, locy] = tz::lua_parse_args<std::int64_t, float, float>();
+			game::entity_set_target_location(static_cast<tz::hanval>(ent), {locx, locy});
+			return 0;
+		});
+
+		tz::lua_define_function("entity_get_target", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			entity_handle tar = game::entity_get_target(static_cast<tz::hanval>(ent));
+			if(tar == tz::nullhand)
+			{
+				tz::lua_push_nil();
+			}
+			else
+			{
+				tz::lua_push_int(tar.peek());
+			}
+			return 1;
+		});
+
+		tz::lua_define_function("entity_set_target", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			entity_handle tar = tz::nullhand;
+			if(tz::lua_stack_size() >= 2)
+			{
+				tar = static_cast<tz::hanval>(tz_must(tz::lua_stack_get_int(2)));
+			}
+			game::entity_set_target(static_cast<tz::hanval>(ent), tar);
 			return 0;
 		});
 
