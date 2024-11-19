@@ -30,6 +30,9 @@ namespace game
 	tz::v2f entity_get_position(entity_handle ent);
 	void entity_set_position(entity_handle ent, tz::v2f pos);
 
+	short entity_get_layer(entity_handle ent);
+	void entity_set_layer(entity_handle ent, short layer);
+
 	tz::v2f entity_get_scale(entity_handle ent);
 	void entity_set_scale(entity_handle ent, tz::v2f scale);
 

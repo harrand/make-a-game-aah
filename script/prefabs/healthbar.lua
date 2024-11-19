@@ -10,6 +10,7 @@ prefabs.healthbar =
 		entity_set_colour_tint(child, 0.0, 0.5, 0.0)
 		entity_set_parent(child, ent)
 		entity_set_userdata(ent, child)
+		entity_set_layer(child, 1)
 	end,
 	on_update = function(ent, delta_seconds)
 		-- remember: userdata is the child bar

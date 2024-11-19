@@ -56,13 +56,14 @@ namespace game::render
 				tz::ren::quad_renderer_flag::graph_present_after
 			|	tz::ren::quad_renderer_flag::alpha_clipping
 			|	tz::ren::quad_renderer_flag::allow_negative_scale
+			|	tz::ren::quad_renderer_flag::enable_layering
 
 		}));
 
 		bgimg = create_image_from_file("./res/images/bgforest.png");
-		background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg}, quad_flag::match_image_ratio);
+		background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg, .layer = -90}, quad_flag::match_image_ratio);
 
-		cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero()});
+		cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
 	}
 
 	void update(float delta_seconds)
@@ -180,6 +181,16 @@ namespace game::render
 	void quad_set_position(handle q, tz::v2f pos)
 	{
 		tz::ren::set_quad_position(ren, q, pos);
+	}
+
+	short quad_get_layer(handle q)
+	{
+		return tz::ren::get_quad_layer(ren, q);
+	}
+
+	void quad_set_layer(handle q, short layer)
+	{
+		tz::ren::set_quad_layer(ren, q, layer);
 	}
 
 	tz::v2f quad_get_scale(handle q)

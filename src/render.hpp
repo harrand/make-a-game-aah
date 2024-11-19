@@ -35,6 +35,8 @@ namespace game::render
 	void destroy_quad(handle q);
 	tz::v2f quad_get_position(handle q);
 	void quad_set_position(handle q, tz::v2f pos);
+	short quad_get_layer(handle q);
+	void quad_set_layer(handle q, short layer);
 	tz::v2f quad_get_scale(handle q);
 	void quad_set_scale(handle q, tz::v2f scale);
 	tz::v3f quad_get_colour(handle q);

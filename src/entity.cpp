@@ -192,6 +192,16 @@ namespace game
 		}
 	}
 
+	short entity_get_layer(entity_handle ent)
+	{
+		return game::render::quad_get_layer(quads[ent.peek()]);
+	}
+
+	void entity_set_layer(entity_handle ent, short layer)
+	{
+		game::render::quad_set_layer(quads[ent.peek()], layer);
+	}
+
 	tz::v2f entity_get_scale(entity_handle ent)
 	{
 		return scales[ent.peek()];
