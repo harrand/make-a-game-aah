@@ -18,6 +18,8 @@ namespace game
 	std::vector<tz::v2f> scales = {};
 	std::vector<entity_handle> parents = {};
 	std::vector<void*> userdatas = {};
+	std::vector<std::vector<tz::v2f>> patrols = {};
+	std::vector<std::size_t> patrol_cursors = {};
 	std::size_t entity_count = 0;
 
 	struct boolproxy{bool b;};
@@ -52,6 +54,8 @@ namespace game
 			scales.push_back({});
 			parents.push_back({});
 			userdatas.push_back(nullptr);
+			patrols.push_back({});
+			patrol_cursors.push_back(0);
 
 			quads.push_back(tz::nullhand);
 			move_dirs.push_back(tz::v2f::zero());
@@ -71,6 +75,8 @@ namespace game
 		scales[ret.peek()] = info.scale;
 		parents[ret.peek()] = info.parent;
 		userdatas[ret.peek()] = info.userdata;
+		patrols[ret.peek()] = {};
+		patrol_cursors[ret.peek()] = 0;
 		if(info.parent != tz::nullhand)
 		{
 			childrens[info.parent.peek()].push_back(ret);
@@ -136,7 +142,15 @@ namespace game
 				}
 				else
 				{
-					target_locations[i] = std::nullopt;
+					if(patrols[i].size())
+					{
+						patrol_cursors[i] = (patrol_cursors[i] + 1) % patrols[i].size();
+						target_locations[i] = patrols[i][patrol_cursors[i]];
+					}
+					else
+					{
+						target_locations[i] = std::nullopt;
+					}
 				}
 			}
 
@@ -285,6 +299,24 @@ namespace game
 	void entity_move(entity_handle ent, tz::v2f dir)
 	{
 		move_dirs[ent.peek()] += dir;
+	}
+
+	std::span<const tz::v2f> entity_get_patrol(entity_handle ent)
+	{
+		return patrols[ent.peek()];
+	}
+
+	void entity_set_patrol(entity_handle ent, std::span<const tz::v2f> points)
+	{
+		auto& list = patrols[ent.peek()];
+		list.clear();
+		list.resize(points.size());	
+		std::copy(points.begin(), points.end(), list.begin());
+		patrol_cursors[ent.peek()] = 0;
+		if(!entity_get_target_location(ent).has_value())
+		{
+			entity_set_target_location(ent, points.front());
+		}
 	}
 
 	std::optional<tz::v2f> entity_get_target_location(entity_handle ent)

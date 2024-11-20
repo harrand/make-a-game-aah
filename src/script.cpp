@@ -196,6 +196,30 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_get_patrol", []()->int
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			auto patrol = game::entity_get_patrol(static_cast<tz::hanval>(ent));
+			for(tz::v2f point : patrol)
+			{
+				tz::lua_push_number(point[0]);
+				tz::lua_push_number(point[1]);
+			}
+			return patrol.size() * 2;
+		});
+
+		tz::lua_define_function("entity_set_patrol", []()
+		{
+			auto ent = tz_must(tz::lua_stack_get_int(1));
+			std::vector<tz::v2f> patrol;
+			for(std::size_t i = 2; i < tz::lua_stack_size(); i+=2)
+			{
+				patrol.push_back(tz::v2d{tz_must(tz::lua_stack_get_number(i)), tz_must(tz::lua_stack_get_number(i + 1))});
+			}
+			game::entity_set_patrol(static_cast<tz::hanval>(ent), patrol);
+			return 0;
+		});
+
 		tz::lua_define_function("entity_get_target_location", []()
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();

@@ -3,6 +3,7 @@
 #include "tz/core/vector.hpp"
 #include "tz/core/handle.hpp"
 #include <string>
+#include <span>
 
 namespace game
 {
@@ -51,6 +52,9 @@ namespace game
 	void entity_start_casting(entity_handle ent);
 	void entity_stop_casting(entity_handle ent);
 	void entity_move(entity_handle ent, tz::v2f dir);
+
+	std::span<const tz::v2f> entity_get_patrol(entity_handle ent);
+	void entity_set_patrol(entity_handle ent, std::span<const tz::v2f> points);
 
 	std::optional<tz::v2f> entity_get_target_location(entity_handle ent);
 	void entity_set_target_location(entity_handle ent, tz::v2f location);
