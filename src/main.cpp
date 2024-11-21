@@ -6,6 +6,7 @@
 
 #include "card.hpp"
 #include "player.hpp"
+#include "enemy.hpp"
 #include "prefab.hpp"
 #include "entity.hpp"
 #include "render.hpp"
@@ -28,6 +29,7 @@ int tz_main()
 	game::prefab_setup();
 	game::card_setup();
 	game::player_setup(game::get_prefab("melistra"));
+	game::enemy_setup(game::get_prefab("banshee"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -41,6 +43,8 @@ int tz_main()
 		game::deck_add_card(game::player_deck(), {.name = "peasant"});
 		game::deck_add_card(game::player_deck(), {.name = "knight"});
 	}
+
+	game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::entity_handle skel2 = game::create_entity({.prefab_name = "skeleton", .position = {0.0f, 0.5f}});
@@ -57,6 +61,7 @@ int tz_main()
 		game::render::update(delta_seconds);
 		game::entity_update(delta_seconds);
 		game::player_update(delta_seconds);
+		game::enemy_update(delta_seconds);
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
