@@ -46,6 +46,15 @@ namespace game::render
 	std::unordered_map<std::string, texture_info> texture_cache = {};
 	std::unordered_map<texture_id, std::string> texture_infos = {};
 
+	struct glyph_data
+	{
+		std::unordered_map<char, texture_id> glyphs = {};
+	};
+
+	std::unordered_map<std::string, glyph_data> fonts = {};
+
+	void impl_init_fonts();
+
 	void setup()
 	{
 		tz::gpu::settings_set_vsync(true);
@@ -64,6 +73,8 @@ namespace game::render
 		background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg, .layer = -90}, quad_flag::match_image_ratio);
 
 		cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
+
+		impl_init_fonts();
 	}
 
 	void update(float delta_seconds)
@@ -314,5 +325,27 @@ namespace game::render
 		normalised -= tz::v2f::filled(1.0f);
 		normalised[0] *= (static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height());
 		return normalised;
+	}
+
+	void impl_init_fonts()
+	{
+		for(const auto& entry : std::filesystem::directory_iterator("./res/images/font"))
+		{
+			if(entry.is_directory())
+			{
+				std::string font_name = entry.path().filename().string();
+
+				auto& glyphs = fonts[font_name];
+
+				for(const auto& glyph_file : std::filesystem::directory_iterator(entry.path()))
+				{
+					if(glyph_file.path().has_extension() && glyph_file.path().extension() == ".png")
+					{
+						char glyph = std::stoi(glyph_file.path().stem().string());
+						glyphs.glyphs[glyph] = create_image_from_file(glyph_file.path());
+					}
+				}
+			}
+		}
 	}
 }
