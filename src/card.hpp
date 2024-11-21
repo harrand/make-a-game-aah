@@ -18,6 +18,7 @@ namespace game
 
 	void card_setup();
 	render::handle create_card_sprite(card c, bool draggable);	
+	render::handle create_card_sprite_facedown(card c, bool draggable);
 }
 
 #endif // GAME_CARD_HPP

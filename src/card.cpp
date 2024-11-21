@@ -12,6 +12,7 @@ namespace game
 {
 	tz::io::image_header cardbase_img;
 	std::string cardbase_data;
+	std::uint32_t facedown_card_sprite;
 
 	tz::v3f card_colours[] =
 	{
@@ -41,6 +42,8 @@ namespace game
 		cardbase_img = tz_must(tz::io::image_info(tz::view_bytes(cardbase_filedata)));
 		cardbase_data.resize(cardbase_img.data_size_bytes);
 		tz::io::parse_image(tz::view_bytes(cardbase_filedata), tz::view_bytes(cardbase_data));
+
+		facedown_card_sprite =  game::render::create_image_from_data(cardbase_img, tz::view_bytes(cardbase_data), "card_facedown");
 	}
 
 	render::handle create_card_sprite(card c, bool draggable)
@@ -65,6 +68,19 @@ namespace game
 		}
 
 		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = card_layer}, flags);
+	}
+
+	render::handle create_card_sprite_facedown(card c, bool draggable)
+	{
+		game::render::quad_flag flags = game::render::quad_flag::match_image_ratio;
+		if(draggable)
+		{
+			flags = flags | game::render::quad_flag::draggable;
+		}
+
+		tz::v3f card_colour = impl_card_colour(game::get_prefab(c.name).power);
+
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = facedown_card_sprite, .colour = card_colour, .layer = card_layer}, flags);
 	}
 
 	void impl_cache_creature_sprite(std::string_view creature_name)
