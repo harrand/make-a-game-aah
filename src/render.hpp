@@ -51,6 +51,10 @@ namespace game::render
 
 	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook);
 
+	namespace detail{struct text_t{};}
+	using text_handle = tz::handle<detail::text_t>;
+	text_handle create_text(const char* font_name, std::string_view text, tz::v2f position, tz::v2f scale = tz::v2f::filled(1.0f), tz::v3f colour = tz::v3f::filled(1.0f));
+
 	std::uint32_t create_image_from_data(tz::io::image_header hdr, std::span<const std::byte> imgdata, std::string name);
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile);
 	tz::io::image_header get_image_info(std::uint32_t texture_id);

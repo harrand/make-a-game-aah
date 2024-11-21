@@ -53,6 +53,13 @@ namespace game::render
 
 	std::unordered_map<std::string, glyph_data> fonts = {};
 
+	struct text_data
+	{
+		std::vector<handle> character_quads{};
+	};
+	std::vector<text_data> texts = {};
+	std::vector<text_handle> text_free_list = {};
+
 	void impl_init_fonts();
 
 	void setup()
@@ -270,6 +277,65 @@ namespace game::render
 	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook)
 	{
 		return flipbooks[flipbook.peek()].frames;
+	}
+
+	text_handle create_text(const char* font_name, std::string_view text, tz::v2f position, tz::v2f scale, tz::v3f colour)
+	{
+		const auto& font = fonts[font_name];
+
+		text_handle ret;
+		if(text_free_list.size())
+		{
+			ret = text_free_list.back();
+			text_free_list.pop_back();
+		}
+		else
+		{
+			ret = static_cast<tz::hanval>(texts.size());
+			texts.push_back({});
+		}
+
+		auto& textdata = texts[ret.peek()];
+		textdata.character_quads.reserve(text.size());
+		tz::v2f offset = tz::v2f::zero();
+		tz::v2f last_glyph_size;
+		for(char c : text)
+		{
+			texture_id texid = -1u;
+
+			auto iter = font.glyphs.find(c);
+			if(iter != font.glyphs.end())
+			{
+				texid = iter->second;
+			}
+			else
+			{
+				// unknown glyph
+			}
+
+			tz::v2f pos = position + (offset * scale * 0.0105f);
+			if(c == '\n')
+			{
+				offset[0] = 0.0f;
+				offset[1] -= last_glyph_size[1] * 3.0f;
+				continue;
+			}
+			else
+			{
+				offset[0] += get_image_info(texid).width;
+			}
+			textdata.character_quads.push_back(create_quad
+			({
+				.position = pos,
+				.scale = scale,
+				.texture_id = texid,
+				.colour = colour,
+				.layer = 5
+			}));
+			const auto& info = get_image_info(texid);
+			last_glyph_size = tz::v2u{info.width, info.height};
+		}
+		return ret;
 	}
 
 	std::uint32_t create_image_from_data(tz::io::image_header imghdr, std::span<const std::byte> imgdata, std::string name)
