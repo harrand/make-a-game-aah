@@ -62,7 +62,7 @@ namespace game
 			std::size_t deck_size = deck.cards.size();
 			float deck_spacing = deck.render.value().scale[0] * deck_card_spacing;
 
-			quad = game::create_card_sprite(c);
+			quad = game::create_card_sprite(c, deck.render.value_or(deck_render_info{}).player_can_play_cards);
 			tz::v2f card_pos = deck.render->position;
 			card_pos[0] += (deck_size * deck_spacing);
 			render::quad_set_position(quad, card_pos);

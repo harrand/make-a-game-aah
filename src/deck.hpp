@@ -10,6 +10,7 @@ namespace game
 		tz::v2f position = tz::v2f::zero();
 		tz::v2f scale = tz::v2f::filled(1.0f);
 		bool cards_face_down = false;
+		bool player_can_play_cards = false;
 	};
 
 	struct deck_info

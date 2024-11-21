@@ -43,7 +43,7 @@ namespace game
 		tz::io::parse_image(tz::view_bytes(cardbase_filedata), tz::view_bytes(cardbase_data));
 	}
 
-	render::handle create_card_sprite(card c)
+	render::handle create_card_sprite(card c, bool draggable)
 	{
 		std::uint32_t card_img;
 		auto cache_iter = sprite_image_cache.find(c.name);
@@ -58,8 +58,13 @@ namespace game
 			impl_cache_creature_sprite(c.name);
 			card_img = sprite_image_cache.at(c.name).texture_id;
 		}
+		game::render::quad_flag flags = game::render::quad_flag::match_image_ratio;
+		if(draggable)
+		{
+			flags = flags | game::render::quad_flag::draggable;
+		}
 
-		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = card_layer}, game::render::quad_flag::draggable | game::render::quad_flag::match_image_ratio);
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = card_layer}, flags);
 	}
 
 	void impl_cache_creature_sprite(std::string_view creature_name)

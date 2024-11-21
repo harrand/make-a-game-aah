@@ -12,7 +12,7 @@ namespace game
 		float mana = 0;
 		float mana_regen = 1.0f;
 
-		const tz::v2f mana_bar_pos = {0.0f, -0.8f};
+		const tz::v2f mana_bar_pos = {0.0f, -0.9f};
 		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
@@ -23,8 +23,9 @@ namespace game
 	{
 		player.deck = game::create_deck({.sprite = game::deck_render_info
 		{
-			.position = {-0.5f, -0.5f},
-			.scale = {1.0f, 1.0f}
+			.position = {-0.5f, -0.7f},
+			.scale = {0.7f, 0.7f},
+			.player_can_play_cards = true
 		}});
 
 		tz::v2f mana_bar_background_dimensions = player.mana_bar_dimensions;
@@ -85,16 +86,21 @@ namespace game
 
 	void player_set_creature(game::prefab prefab)
 	{
+		constexpr tz::v2f pos{-1.5f, 0.0f};
 		if(player.avatar != tz::nullhand)
 		{
 			game::destroy_entity(player.avatar);
 		}
-		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = true, .position = {-1.0f, 0.0f}});
+		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = true, .position = pos, .scale = tz::v2f::filled(1.25f)});
 		game::entity_face_right(player.avatar);
 		if(prefab.cast != tz::nullhand)
 		{
 			game::entity_start_casting(player.avatar);
 		}
+
+		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = true, .position = pos, .parent = player.avatar});
+		game::entity_set_colour_tint(aura, {0.0f, 0.0f, 0.5f});
+		game::entity_set_layer(aura, -1);
 	}
 
 	deck_handle player_deck()
