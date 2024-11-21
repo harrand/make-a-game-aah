@@ -8,6 +8,7 @@ namespace game
 	{
 		std::vector<card> cards = {};
 		std::vector<render::handle> card_quads = {};
+		std::vector<render::text_handle> card_tooltips = {};
 		std::optional<deck_render_info> render;
 	};
 	std::vector<deck_data> decks = {};
@@ -29,6 +30,9 @@ namespace game
 
 		auto& deck = decks[ret.peek()];
 		deck.render = info.sprite.value();
+		deck.card_quads.clear();
+		deck.cards.clear();
+		deck.card_tooltips.clear();
 
 		for(card c : info.initial_cards)
 		{
@@ -49,6 +53,13 @@ namespace game
 				game::render::destroy_quad(h);
 			}
 		}
+		for(render::text_handle h : d.card_tooltips)
+		{
+			if(h != tz::nullhand)
+			{
+				game::render::destroy_text(h);
+			}
+		}
 	}
 
 	void deck_add_card(deck_handle deckh, card c)
@@ -56,6 +67,7 @@ namespace game
 		auto& deck = decks[deckh.peek()];	
 		deck.cards.push_back(c);
 		render::handle& quad = deck.card_quads.emplace_back(tz::nullhand);
+		deck.card_tooltips.push_back(tz::nullhand);
 
 		if(deck.render.has_value())
 		{
@@ -85,6 +97,10 @@ namespace game
 		if(d.render.has_value())
 		{
 			game::render::destroy_quad(d.card_quads[id]);
+			if(d.card_tooltips[id] != tz::nullhand)
+			{
+				game::render::destroy_text(d.card_tooltips[id]);
+			}
 			// move next cards backwards a bit.
 			for(std::size_t i = id+1; i < d.cards.size(); i++)
 			{
@@ -95,11 +111,15 @@ namespace game
 			}
 		}
 		d.card_quads.erase(d.card_quads.begin() + id);
+		d.card_tooltips.erase(d.card_tooltips.begin() + id);
 		d.cards.erase(d.cards.begin() + id);
 	}
 
 	void deck_swap_cards(deck_handle deckh, std::size_t id1, std::size_t id2)
 	{
+		// firstly remove both tooltips if they're up.
+		deck_card_hide_tooltip(deckh, id1);
+		deck_card_hide_tooltip(deckh, id2);
 		auto& deck = decks[deckh.peek()];
 		if(deck.render.has_value())
 		{
@@ -110,6 +130,7 @@ namespace game
 		}
 		std::swap(deck.cards[id1], deck.cards[id2]);
 		std::swap(deck.card_quads[id1], deck.card_quads[id2]);
+		std::swap(deck.card_tooltips[id1], deck.card_tooltips[id2]);
 	}
 
 	void deck_reset_card_position(deck_handle deck, std::size_t id)
@@ -144,6 +165,60 @@ namespace game
 			return false;
 		}
 		return game::render::quad_is_held(d.card_quads[id]);
+	}
+
+	bool deck_card_is_mouseover(deck_handle deck, std::size_t id)
+	{
+		const auto& d = decks[deck.peek()];
+		if(!d.render.has_value())
+		{
+			return false;
+		}
+		return game::render::quad_is_mouseover(d.card_quads[id]);
+	}
+
+	void deck_card_display_tooltip(deck_handle deck, std::size_t id)
+	{
+		auto& d = decks[deck.peek()];
+		if(!d.render.has_value())
+		{
+			return;
+		}
+
+		auto quad = d.card_quads[id];
+		tz::v2f tooltip_position = game::render::quad_get_position(quad);
+		float yoffset = 0.3f;
+		if(tooltip_position[1] > (1.0f - yoffset))
+		{
+			tooltip_position[1] -= yoffset;
+		}
+		else
+		{
+			tooltip_position[1] += yoffset;
+		}
+
+		if(d.card_tooltips[id] == tz::nullhand)
+		{
+			card c = deck_get_card(deck, id);
+			// create text.
+			std::string txt = std::format("{}\n\n{}", c.name, "Insert description here...");
+			d.card_tooltips[id] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.03f), tz::v3f::filled(1.0f));
+		}
+	}
+
+	void deck_card_hide_tooltip(deck_handle deck, std::size_t id)
+	{
+		auto& d = decks[deck.peek()];
+		if(!d.render.has_value())
+		{
+			return;
+		}
+
+		if(d.card_tooltips[id] != tz::nullhand)
+		{
+			game::render::destroy_text(d.card_tooltips[id]);
+			d.card_tooltips[id] = tz::nullhand;
+		}
 	}
 
 	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned)

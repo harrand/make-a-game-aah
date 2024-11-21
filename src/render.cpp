@@ -25,6 +25,7 @@ namespace game::render
 		flipbook_handle flipbook = tz::nullhand;
 		float flipbook_timer = 0.0f;
 		bool held = false;
+		bool mouseover = false;
 		tz::v2f held_offset = tz::v2f::filled(0.0f);
 		bool garbage = false;
 	};
@@ -145,6 +146,7 @@ namespace game::render
 					quadpriv.held_offset = pos - mouse_world_pos;
 					quad_set_layer(q, quad_get_layer(q) + 1);
 				}
+				quadpriv.mouseover = in_region;
 			}
 			
 			if(quadpriv.held)
@@ -259,6 +261,11 @@ namespace game::render
 		return quad_privates[q.peek()].held;
 	}
 
+	bool quad_is_mouseover(handle q)
+	{
+		return quad_privates[q.peek()].mouseover;
+	}
+
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat)
 	{
 		auto id = flipbooks.size();
@@ -330,12 +337,26 @@ namespace game::render
 				.scale = scale,
 				.texture_id = texid,
 				.colour = colour,
-				.layer = 5
+				.layer = 95
 			}));
 			const auto& info = get_image_info(texid);
 			last_glyph_size = tz::v2u{info.width, info.height};
 		}
 		return ret;
+	}
+
+	void destroy_text(text_handle q)
+	{
+		auto& text = texts[q.peek()];
+		for(handle q : text.character_quads)
+		{
+			if(q != tz::nullhand)
+			{
+				destroy_quad(q);
+			}
+		}
+		text.character_quads.clear();
+		text_free_list.push_back(q);
 	}
 
 	std::uint32_t create_image_from_data(tz::io::image_header imghdr, std::span<const std::byte> imgdata, std::string name)

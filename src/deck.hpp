@@ -30,6 +30,10 @@ namespace game
 	std::size_t deck_size(deck_handle deck);
 	card deck_get_card(deck_handle deck, std::size_t id);
 	bool deck_card_is_held(deck_handle deck, std::size_t id);
+	bool deck_card_is_mouseover(deck_handle deck, std::size_t id);
+
+	void deck_card_display_tooltip(deck_handle deck, std::size_t id);
+	void deck_card_hide_tooltip(deck_handle deck, std::size_t id);
 
 	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned);
 }

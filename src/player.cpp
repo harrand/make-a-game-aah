@@ -56,6 +56,7 @@ namespace game
 			if(deck_card_is_held(player.deck, i))
 			{
 				player.deck_hold_array[i] = true;
+				deck_card_hide_tooltip(player.deck, i);
 			}
 			else
 			{
@@ -79,6 +80,15 @@ namespace game
 						// destroy and re-add.
 						game::deck_reset_card_position(player.deck, i);
 					}
+				}
+
+				if(deck_card_is_mouseover(player.deck, i))
+				{
+					deck_card_display_tooltip(player.deck, i);
+				}
+				else
+				{
+					deck_card_hide_tooltip(player.deck, i);
 				}
 			}
 		}
