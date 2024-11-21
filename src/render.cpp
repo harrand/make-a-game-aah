@@ -127,17 +127,17 @@ namespace game::render
 				tz::ren::set_quad_scale(ren, q, scale);
 			}
 
+			tz::v2f pos = tz::ren::get_quad_position(ren, q);
+			tz::v2f scale = tz::ren::get_quad_scale(ren, q) * 0.95f;
+			tz::v2f min = pos - scale;
+			tz::v2f max = pos + scale;
+
+			bool in_region = 
+				min[0] <= mouse_world_pos[0] && mouse_world_pos[0] <= max[0]
+			&& min[1] <= mouse_world_pos[1] && mouse_world_pos[1] <= max[1];
+
 			if(quadpriv.flags & quad_flag::draggable)
 			{
-				tz::v2f pos = tz::ren::get_quad_position(ren, q);
-				tz::v2f scale = tz::ren::get_quad_scale(ren, q) * 0.95f;
-				tz::v2f min = pos - scale;
-				tz::v2f max = pos + scale;
-
-				bool in_region = 
-				   min[0] <= mouse_world_pos[0] && mouse_world_pos[0] <= max[0]
-				&& min[1] <= mouse_world_pos[1] && mouse_world_pos[1] <= max[1];
-
 				if(!clicked_last_frame && tz::os::is_mouse_clicked(tz::os::mouse_button::left) && in_region)
 				{
 					// we just started clicking this frame
@@ -146,8 +146,8 @@ namespace game::render
 					quadpriv.held_offset = pos - mouse_world_pos;
 					quad_set_layer(q, quad_get_layer(q) + 1);
 				}
-				quadpriv.mouseover = in_region;
 			}
+			quadpriv.mouseover = in_region;
 			
 			if(quadpriv.held)
 			{
