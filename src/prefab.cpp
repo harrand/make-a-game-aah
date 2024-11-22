@@ -113,6 +113,7 @@ namespace game
 		{
 			data.description = "<No Description>";
 		}
+		impl_collect_prefab_data(prefab_name, "has_tooltip", data.has_tooltip);
 		return 0;
 	}
 }

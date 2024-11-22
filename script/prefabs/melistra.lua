@@ -1,5 +1,6 @@
 prefabs.melistra =
 {
+	display_name = "Melistra",
 	base_health = 10,
 	movement_speed = 1.3,
 	power = 5,

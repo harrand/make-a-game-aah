@@ -57,6 +57,9 @@ namespace game::render
 	struct text_data
 	{
 		std::vector<handle> character_quads{};
+		tz::v2f position;
+		tz::v2f scale;
+		std::string text;
 	};
 	std::vector<text_data> texts = {};
 	std::vector<text_handle> text_free_list = {};
@@ -131,6 +134,14 @@ namespace game::render
 			tz::v2f scale = tz::ren::get_quad_scale(ren, q) * 0.95f;
 			tz::v2f min = pos - scale;
 			tz::v2f max = pos + scale;
+			if(scale[0] < 0.0f)
+			{
+				std::swap(min[0], max[0]);
+			}
+			if(scale[1] < 0.0f)
+			{
+				std::swap(min[1], max[1]);
+			}
 
 			bool in_region = 
 				min[0] <= mouse_world_pos[0] && mouse_world_pos[0] <= max[0]
@@ -303,6 +314,9 @@ namespace game::render
 		}
 
 		auto& textdata = texts[ret.peek()];
+		textdata.position = position;
+		textdata.scale = scale;
+		textdata.text = text;
 		textdata.character_quads.reserve(text.size());
 		tz::v2f offset = tz::v2f::zero();
 		tz::v2f last_glyph_size;
@@ -357,6 +371,20 @@ namespace game::render
 		}
 		text.character_quads.clear();
 		text_free_list.push_back(q);
+	}
+
+	void text_set_position(text_handle q, tz::v2f position)
+	{
+		auto& text = texts[q.peek()];
+		tz::v2f old_position = text.position;
+		tz::v2f delta = position - old_position;
+		for(render::handle quad : text.character_quads)
+		{
+			tz::v2f old = game::render::quad_get_position(quad);
+			old += delta;
+			game::render::quad_set_position(quad, old);
+		}
+		text.position = position;
 	}
 
 	std::uint32_t create_image_from_data(tz::io::image_header imghdr, std::span<const std::byte> imgdata, std::string name)

@@ -13,6 +13,7 @@ namespace game
 	std::vector<float> speeds = {};
 	std::vector<unsigned int> hps = {};
 	std::vector<prefab> creatures = {};
+	std::vector<bool> player_aligneds = {};
 	std::vector<tz::v2f> positions = {};
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
@@ -29,6 +30,7 @@ namespace game
 	std::vector<std::optional<tz::v2f>> target_locations = {};
 	std::vector<entity_handle> targets = {};
 	std::vector<std::vector<entity_handle>> childrens = {};
+	std::vector<render::text_handle> tooltips = {};
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
@@ -49,6 +51,7 @@ namespace game
 			speeds.push_back({});
 			hps.push_back({});
 			creatures.push_back({});
+			player_aligneds.push_back(false);
 			positions.push_back({});
 			rotations.push_back({});
 			scales.push_back({});
@@ -62,6 +65,7 @@ namespace game
 			target_locations.push_back(std::nullopt);
 			targets.push_back(tz::nullhand);
 			childrens.push_back({});
+			tooltips.push_back(tz::nullhand);
 		}
 
 		// set new data
@@ -70,6 +74,7 @@ namespace game
 
 		hps[ret.peek()] = info.hp == -1u ? prefab.base_health : info.hp;
 
+		player_aligneds[ret.peek()] = info.player_aligned;
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
@@ -101,6 +106,11 @@ namespace game
 
 		entity_free_list.push_back(ent);
 		game::render::destroy_quad(quads[ent.peek()]);
+		if(tooltips[ent.peek()] != tz::nullhand)
+		{
+			game::render::destroy_text(tooltips[ent.peek()]);
+			tooltips[ent.peek()] = tz::nullhand;
+		}
 	}
 
 	void entity_update(float delta_seconds)
@@ -112,6 +122,15 @@ namespace game
 			{
 				// in free list, do not update.
 				continue;
+			}
+
+			if(game::render::quad_is_mouseover(quads[ent.peek()]))
+			{
+				entity_display_tooltip(ent);
+			}
+			else
+			{
+				entity_hide_tooltip(ent);
 			}
 
 			auto prefab = creatures[ent.peek()];
@@ -339,6 +358,46 @@ namespace game
 	{
 		target_locations[ent.peek()] = std::nullopt;
 		targets[ent.peek()] = tar;
+	}
+
+	void entity_display_tooltip(entity_handle ent)
+	{
+		if(!creatures[ent.peek()].has_tooltip)
+		{
+			return;
+		}
+		auto quad = quads[ent.peek()];
+		tz::v2f tooltip_position = game::render::quad_get_position(quad);
+		float yoffset = -0.2f;
+		tooltip_position[0] -= 0.1f;
+		if(tooltip_position[1] > (1.0f + yoffset))
+		{
+			tooltip_position[1] -= yoffset;
+		}
+		else
+		{
+			tooltip_position[1] += yoffset;
+		}
+
+		if(tooltips[ent.peek()] == tz::nullhand)
+		{
+			const bool is_player_aligned = player_aligneds[ent.peek()];
+			std::string txt = std::format("{}", creatures[ent.peek()].display_name);
+			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.025f), is_player_aligned ? tz::v3f{0.0f, 0.0f, 0.5f} : tz::v3f{0.5f, 0.0f, 0.0f});
+		}
+		else
+		{
+			game::render::text_set_position(tooltips[ent.peek()], tooltip_position);
+		}
+	}
+
+	void entity_hide_tooltip(entity_handle ent)
+	{
+		if(tooltips[ent.peek()] != tz::nullhand)
+		{
+			game::render::destroy_text(tooltips[ent.peek()]);
+			tooltips[ent.peek()] = tz::nullhand;
+		}
 	}
 
 	void* entity_get_userdata(entity_handle ent)

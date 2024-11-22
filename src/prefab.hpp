@@ -13,6 +13,7 @@ namespace game
 		unsigned int power = 0;
 		std::string display_name = "";
 		std::string description = "";
+		bool has_tooltip = true;
 		game::render::flipbook_handle idle = tz::nullhand;
 		game::render::flipbook_handle move_horizontal = tz::nullhand;
 		game::render::flipbook_handle move_up = tz::nullhand;

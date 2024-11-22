@@ -61,6 +61,9 @@ namespace game
 	entity_handle entity_get_target(entity_handle ent);
 	void entity_set_target(entity_handle ent, entity_handle tar);
 
+	void entity_display_tooltip(entity_handle ent);
+	void entity_hide_tooltip(entity_handle ent);
+
 	void* entity_get_userdata(entity_handle ent);
 	void entity_set_userdata(entity_handle ent, void* userdata);
 }
