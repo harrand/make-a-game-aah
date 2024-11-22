@@ -32,6 +32,8 @@ namespace game
 	bool deck_card_is_held(deck_handle deck, std::size_t id);
 	bool deck_card_is_mouseover(deck_handle deck, std::size_t id);
 
+	render::handle deck_detach_card(deck_handle deck, std::size_t id);
+
 	void deck_card_display_tooltip(deck_handle deck, std::size_t id);
 	void deck_card_hide_tooltip(deck_handle deck, std::size_t id);
 

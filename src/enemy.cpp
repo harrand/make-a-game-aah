@@ -17,7 +17,15 @@ namespace game
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
 		std::vector<bool> deck_hold_array = {};
+
+		float play_timer = 0.0f;
+		card play_card = {};
+		render::handle play_card_quad = tz::nullhand;
 	} enemy;
+
+	constexpr tz::v2f card_play_position = {1.0f, 0.0f};
+
+	void impl_enemy_play_card(std::size_t id);
 
 	void enemy_setup(game::prefab prefab)
 	{
@@ -81,6 +89,41 @@ namespace game
 						game::deck_reset_card_position(enemy.deck, i);
 					}
 				}
+			}
+		}
+
+		// test: try to play a card
+		// right now logic will just play the first card in its deck as soon as it has the mana for it.
+		if(deck_size(enemy.deck) > 0)
+		{
+			auto card = deck_get_card(enemy.deck, 0);
+			unsigned int power = game::get_prefab(card.name).power;
+			if(enemy_try_spend_mana(power))
+			{
+				impl_enemy_play_card(0);
+			}
+		}
+
+		if(enemy.play_card_quad != tz::nullhand)
+		{
+			tz::v2f pos = render::quad_get_position(enemy.play_card_quad);
+			enemy.play_timer += delta_seconds;
+			if(enemy.play_timer >= 2.0f)
+			{
+				// we're done. play the card.
+				game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = card_play_position});
+				render::destroy_quad(enemy.play_card_quad);
+
+				enemy.play_card = {};
+				enemy.play_card_quad = tz::nullhand;
+				enemy.play_timer = 0.0f;
+			}
+			else
+			{
+				// lerp
+				pos[0] = std::lerp(pos[0], card_play_position[0], delta_seconds * 10);
+				pos[1] = std::lerp(pos[1], card_play_position[1], delta_seconds * 10);
+				render::quad_set_position(enemy.play_card_quad, pos);
 			}
 		}
 	}
@@ -150,5 +193,26 @@ namespace game
 		}
 		enemy_set_mana(enemy.mana - cost);
 		return true;
+	}
+
+	void impl_enemy_play_card(std::size_t id)
+	{
+		if(enemy.play_card_quad != tz::nullhand)
+		{
+			return;
+		}
+		enemy.play_timer = 0.0f;
+		enemy.play_card = deck_get_card(enemy.deck, id);
+		// detach the card
+		// its probably face down, we want it face up
+		render::handle old_card = deck_detach_card(enemy.deck, id);
+		// so we get the old card, save its position, then delete it and spawn the face-up version and use that instead.
+		tz::v2f position = render::quad_get_position(old_card);
+		tz::v2f scale = render::quad_get_scale(old_card);
+
+		render::destroy_quad(old_card);
+		enemy.play_card_quad = game::create_card_sprite(enemy.play_card, false);
+		render::quad_set_position(enemy.play_card_quad, position);
+		render::quad_set_scale(enemy.play_card_quad, scale);
 	}
 }

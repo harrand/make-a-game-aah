@@ -177,6 +177,34 @@ namespace game
 		return game::render::quad_is_mouseover(d.card_quads[id]);
 	}
 
+	render::handle deck_detach_card(deck_handle deck, std::size_t id)
+	{
+		render::handle ret = tz::nullhand;
+		// basically destroy the card without deleting the quad.
+		auto& d = decks[deck.peek()];
+		if(d.render.has_value())
+		{
+			ret = d.card_quads[id];
+			if(d.card_tooltips[id] != tz::nullhand)
+			{
+				game::render::destroy_text(d.card_tooltips[id]);
+			}
+			// move next cards backwards a bit.
+			for(std::size_t i = id+1; i < d.cards.size(); i++)
+			{
+				float deck_spacing = d.render.value().scale[0] * deck_card_spacing;
+				auto pos = game::render::quad_get_position(d.card_quads[i]);
+				pos[0] -= deck_spacing;
+				game::render::quad_set_position(d.card_quads[i], pos);
+			}
+		}
+		d.card_quads.erase(d.card_quads.begin() + id);
+		d.card_tooltips.erase(d.card_tooltips.begin() + id);
+		d.cards.erase(d.cards.begin() + id);
+
+		return ret;
+	}
+
 	void deck_card_display_tooltip(deck_handle deck, std::size_t id)
 	{
 		auto& d = decks[deck.peek()];

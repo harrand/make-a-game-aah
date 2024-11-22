@@ -47,6 +47,10 @@ int tz_main()
 	game::render::create_text("kongtext", "\"It's morbin' time\"\n- Winston Churchill, circa 1945", {0.1f, 0.7f}, tz::v2f::filled(0.03f), {1.0f, 0.5f, 0.5f});
 
 	game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
+	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
+	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
+	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
+	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::player_set_mana(1);
