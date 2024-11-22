@@ -83,6 +83,16 @@ namespace game
 		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = facedown_card_sprite, .colour = card_colour, .layer = card_layer}, flags);
 	}
 
+	std::string card_get_name(card c)
+	{
+		return game::get_prefab(c.name).display_name;
+	}
+
+	std::string card_get_description(card c)
+	{
+		return game::get_prefab(c.name).description;
+	}
+
 	void impl_cache_creature_sprite(std::string_view creature_name)
 	{
 		std::string creature_name_str{creature_name};

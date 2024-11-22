@@ -53,12 +53,18 @@ namespace game
 	}
 
 	template<typename T>
-	void impl_collect_prefab_data(std::string_view prefab_name, const char* data_name, T& data)
+	bool impl_collect_prefab_data(std::string_view prefab_name, const char* data_name, T& data)
 	{
 		tz_must(tz::lua_execute(std::format(R"(
 			myval = prefabs.{}.{}
-			if myval == nil then error("\"prefabs.{}.{}\" expected to be non-nil, but it's nil") end
+			myval_nil = myval == nil
+			--if myval == nil then error("\"prefabs.{}.{}\" expected to be non-nil, but it's nil") end
 		)", prefab_name, data_name, prefab_name, data_name)));
+		bool is_nil = tz_must(tz::lua_get_bool("myval_nil"));
+		if(is_nil)
+		{
+			return false;
+		}
 		if constexpr(std::is_same_v<T, bool>)
 		{
 			data = tz_must(tz::lua_get_bool("myval"));
@@ -79,6 +85,7 @@ namespace game
 		{
 			static_assert(false, "woops");
 		}
+		return true;
 	}
 
 	int impl_get_prefab_data()
@@ -98,6 +105,14 @@ namespace game
 		impl_collect_prefab_data(prefab_name, "base_health", data.base_health);
 		impl_collect_prefab_data(prefab_name, "movement_speed", data.movement_speed);
 		impl_collect_prefab_data(prefab_name, "power", data.power);
+		if(!impl_collect_prefab_data(prefab_name, "display_name", data.display_name))
+		{
+			data.display_name = data.name;
+		}
+		if(!impl_collect_prefab_data(prefab_name, "description", data.description))
+		{
+			data.description = "<No Description>";
+		}
 		return 0;
 	}
 }

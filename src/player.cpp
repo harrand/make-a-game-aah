@@ -60,6 +60,14 @@ namespace game
 			}
 			else
 			{
+				if(deck_card_is_mouseover(player.deck, i))
+				{
+					deck_card_display_tooltip(player.deck, i);
+				}
+				else
+				{
+					deck_card_hide_tooltip(player.deck, i);
+				}
 				// not held anymore
 				card c = game::deck_get_card(player.deck, i);
 				if(player.deck_hold_array[i])
@@ -80,15 +88,6 @@ namespace game
 						// destroy and re-add.
 						game::deck_reset_card_position(player.deck, i);
 					}
-				}
-
-				if(deck_card_is_mouseover(player.deck, i))
-				{
-					deck_card_display_tooltip(player.deck, i);
-				}
-				else
-				{
-					deck_card_hide_tooltip(player.deck, i);
 				}
 			}
 		}

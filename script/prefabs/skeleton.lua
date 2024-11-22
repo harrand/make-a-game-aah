@@ -1,5 +1,7 @@
 prefabs.skeleton =
 {
+	display_name = "Skeleton",
+	description = "Spooky and scary!",
 	on_create = function(ent)
 		local healthbar = create_entity("healthbar")
 		entity_set_parent(healthbar, ent)

@@ -201,7 +201,7 @@ namespace game
 		{
 			card c = deck_get_card(deck, id);
 			// create text.
-			std::string txt = std::format("{}\n\n{}", c.name, "Insert description here...");
+			std::string txt = std::format("{}\n\n{}", game::card_get_name(c), game::card_get_description(c));
 			d.card_tooltips[id] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.03f), tz::v3f::filled(1.0f));
 		}
 	}
