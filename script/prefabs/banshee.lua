@@ -1,5 +1,8 @@
 prefabs.banshee =
 {
+	on_update = function(ent, delta_seconds)
+		ai.wander(ent)
+	end,
 	display_name = "Banshee",
 	description = "aah! a banshee!!!! fuck!!",
 	base_health = 40,

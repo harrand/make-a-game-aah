@@ -12,7 +12,7 @@ namespace game
 		float mana = 0;
 		float mana_regen = 1.0f;
 
-		const tz::v2f mana_bar_pos = {0.0f, 0.9f};
+		const tz::v2f mana_bar_pos = {0.5f, 0.9f};
 		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
@@ -31,8 +31,8 @@ namespace game
 	{
 		enemy.deck = game::create_deck({.sprite = game::deck_render_info
 		{
-			.position = {-0.5f, 0.7f},
-			.scale = {0.7f, 0.7f},
+			.position = {1.5f, 0.7f},
+			.scale = {-0.7f, 0.7f},
 			.cards_face_down = true,
 			.player_can_play_cards = false,
 		}});
