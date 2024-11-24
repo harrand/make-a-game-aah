@@ -252,24 +252,54 @@ namespace game
 			return;
 		}
 
+		card c = deck_get_card(deck, id);
+		std::string txt = std::format("{}\n\n{}", game::card_get_name(c), game::card_get_description(c));
+		tz::v2u text_dims = tz::v2u::zero();
+		unsigned int counterx = 0;
+		for(char c : txt)
+		{
+			if(c != '\n')
+			{
+				text_dims[0] = std::max(text_dims[0], ++counterx);
+			}
+			else
+			{
+				// new line
+				text_dims[1]++;
+				counterx = 0;
+			}
+		}
+		// i want the name of the card to be aligned to the middle of the text.
+		// we know the x width of the text, so add half that many spaces to the front of thet text.
+		for(std::size_t i = 0; i < text_dims[0] / 2; i++)
+		{
+			txt.insert(txt.begin(), ' ');
+		}
+
 		auto quad = d.card_quads[id];
 		tz::v2f tooltip_position = game::render::quad_get_position(quad);
-		float yoffset = 0.3f;
-		if(tooltip_position[1] > (1.0f - yoffset))
+
+		for(std::size_t i = 0; i < 2; i++)
 		{
-			tooltip_position[1] -= yoffset;
+			float off = config_card_tooltip_offset[i];
+			if(off == 0.0f){continue;}
+			if(tooltip_position[i] > (1.0f - off))
+			{
+				tooltip_position[i] -= off;
+			}
+			else
+			{
+				tooltip_position[i] += off;
+			}
 		}
-		else
-		{
-			tooltip_position[1] += yoffset;
-		}
+		tz::v2f text_dimsf = text_dims;
+		text_dimsf[1] *= -1.0f;
+		tooltip_position += (text_dimsf * -config_card_tooltip_text_size * 0.5f);
 
 		if(d.card_tooltips[id] == tz::nullhand)
 		{
-			card c = deck_get_card(deck, id);
 			// create text.
-			std::string txt = std::format("{}\n\n{}", game::card_get_name(c), game::card_get_description(c));
-			d.card_tooltips[id] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.03f), tz::v3f::filled(1.0f));
+			d.card_tooltips[id] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(config_card_tooltip_text_size), tz::v3f::filled(1.0f));
 		}
 	}
 

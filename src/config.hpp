@@ -52,9 +52,13 @@ namespace game
 	constexpr tz::v2f config_avatar_scale = {1.25f, 1.25f};
 	// how much (exact coords) offset should be applied to a tooltip relative to the entity its describing?
 	constexpr tz::v2f config_entity_tooltip_offset = {0.0f, 0.2f};
+	// how much (exact coords) offset should be applied to a tooltip relative to the card its describing?
+	constexpr tz::v2f config_card_tooltip_offset = {0.0f, 0.3f};
 
-	// todo: use
+	// how large is the text of the entity tooltip?
 	constexpr float config_entity_tooltip_text_size = 0.025f;
+	// how large is the text of the card tooltip?
+	constexpr float config_card_tooltip_text_size = 0.03f;
 
 	////////////////////////////////////
 	///////////// INTERNAL /////////////
