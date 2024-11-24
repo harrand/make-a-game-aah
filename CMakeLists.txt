@@ -23,9 +23,6 @@ topaz_add_executable(
 		src/prefab.cpp
 		src/render.cpp
 		src/script.cpp
-	SHADERS
-		src/shaders/quad.vertex.tzsl
-		src/shaders/quad.fragment.tzsl
 	BUNDLE_DIRECTORIES
 		res/
 		script/
