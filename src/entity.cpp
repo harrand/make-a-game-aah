@@ -2,6 +2,7 @@
 #include "render.hpp"
 #include "prefab.hpp"
 #include "config.hpp"
+#include "player.hpp"
 #include "tz/core/lua.hpp"
 #include <vector>
 
@@ -121,16 +122,25 @@ namespace game
 		}
 	}
 
-	void entity_update(float delta_seconds)
+	void iterate_entities(std::function<void(entity_handle)> callback)
 	{
 		for(std::size_t i = 0; i < entity_count; i++)
 		{
 			entity_handle ent = static_cast<tz::hanval>(i);
 			if(std::find(entity_free_list.begin(), entity_free_list.end(), ent) != entity_free_list.end())
 			{
-				// in free list, do not update.
+				// in free list, do not run.
 				continue;
 			}
+			callback(ent);
+		}
+	}
+
+	void entity_update(float delta_seconds)
+	{
+		iterate_entities([delta_seconds](entity_handle ent)
+		{
+			auto i = ent.peek();
 			if(cooldowns[ent.peek()] > 0.0f)
 			{
 				cooldowns[ent.peek()] -= delta_seconds;
@@ -230,7 +240,7 @@ namespace game
 			}
 
 			move_dirs[i] = tz::v2f::zero();
-		}
+		});
 	}
 
 	tz::v2f entity_get_position(entity_handle ent)
@@ -491,6 +501,10 @@ namespace game
 		// deadge
 		auto prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_death; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+		if(player_targets(ent))
+		{
+			player_drop_target_entity();
+		}
 		destroy_entity(ent);
 	}
 }

@@ -1,5 +1,6 @@
 #ifndef GAME_PLAYER_HPP
 #define GAME_PLAYER_HPP
+#include "entity.hpp"
 #include "deck.hpp"
 #include "prefab.hpp"
 
@@ -19,6 +20,9 @@ namespace game
 
 	float player_get_mps();
 	void player_set_mps(float mps);
+
+	bool player_targets(entity_handle ent);
+	void player_drop_target_entity();
 
 	bool player_try_spend_mana(unsigned int cost);
 }

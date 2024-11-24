@@ -1,0 +1,13 @@
+prefabs.reticule =
+{
+	has_tooltip = false,
+	idle =
+	{
+		fps = 1,
+		loop = false,
+		frames =
+		{
+			"reticule.png"
+		}
+	}	
+}

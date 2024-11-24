@@ -70,4 +70,7 @@ namespace game
 	// internal multiplier (how much actual coordinate does an entity with scale 1.0 span)
 	constexpr float config_global_uniform_scale = 0.15f;
 
+	constexpr tz::v3f config_player_reticule_colour_on_entity = {1.0f, 0.0f, 0.0f};
+	constexpr tz::v3f config_player_reticule_colour_on_location = {1.0f, 1.0f, 0.0f};
+
 }

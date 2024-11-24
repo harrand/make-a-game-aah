@@ -1,7 +1,7 @@
 #include "player.hpp"
-#include "entity.hpp"
 #include "config.hpp"
 #include "tz/os/window.hpp"
+#include "tz/os/input.hpp"
 
 namespace game
 {
@@ -19,7 +19,14 @@ namespace game
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
 		std::vector<bool> deck_hold_array = {};
+
+		entity_handle reticule = tz::nullhand;
+
+		entity_handle target_entity = tz::nullhand;
+		std::optional<tz::v2f> target_location = std::nullopt;
 	} player;
+
+	void impl_update_reticule();
 
 	void player_setup(game::prefab prefab)
 	{
@@ -47,6 +54,42 @@ namespace game
 		{
 			player_set_mana(player.mana);
 		}
+
+		if(tz::os::is_mouse_clicked(tz::os::mouse_button::right))
+		{
+			tz::v2f click_pos = render::quad_get_position(render::get_cursor());
+			constexpr float click_radius = 0.1f;
+			float mindist = std::numeric_limits<float>::max();
+			entity_handle closest_enemy = tz::nullhand;
+			game::iterate_entities([&closest_enemy, &mindist, click_pos, reticule = player.reticule](entity_handle ent)
+			{
+				float dist = (click_pos - game::entity_get_position(ent)).length();
+				if(ent == reticule)
+				{
+					return;
+				}
+				if(dist < click_radius)
+				{
+					if(dist < mindist)
+					{
+						mindist = dist;
+						closest_enemy = ent;
+					}
+				}
+			});
+
+			if(closest_enemy != tz::nullhand)
+			{
+				player.target_entity = closest_enemy;
+				player.target_location = std::nullopt;
+			}
+			else
+			{
+				player.target_entity = tz::nullhand;
+				player.target_location = click_pos;
+			}
+		}
+		impl_update_reticule();
 
 		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
 		{
@@ -164,6 +207,20 @@ namespace game
 		player.mana_regen = mps;
 	}
 
+	bool player_targets(entity_handle ent)
+	{
+		return player.target_entity == ent;
+	}
+
+	void player_drop_target_entity()
+	{
+		if(player.target_entity != tz::nullhand)
+		{
+			player.target_location = game::entity_get_position(player.target_entity);
+			player.target_entity = tz::nullhand;
+		}
+	}
+
 	bool player_try_spend_mana(unsigned int cost)
 	{
 		if(player.mana < cost)
@@ -172,5 +229,38 @@ namespace game
 		}
 		player_set_mana(player.mana - cost);
 		return true;
+	}
+
+	void impl_update_reticule()
+	{
+		tz::v2f loc;
+		tz::v3f col;
+		if(player.target_entity != tz::nullhand)
+		{
+			// targetting an entity
+			loc = game::entity_get_position(player.target_entity);
+			col = config_player_reticule_colour_on_entity;
+		}
+		else if(player.target_location.has_value())
+		{
+			// targetting a location
+			loc = player.target_location.value();
+			col = config_player_reticule_colour_on_location;
+		}
+		else
+		{
+			return;
+		}
+
+		// ok we need a reticule and we need it at "loc"
+		if(player.reticule == tz::nullhand)
+		{
+			player.reticule = game::create_entity({.prefab_name = "reticule", .player_aligned = true, .position = loc});
+		}
+		else
+		{
+			game::entity_set_position(player.reticule, loc);
+		}
+		game::entity_set_colour_tint(player.reticule, col);
 	}
 }

@@ -4,6 +4,7 @@
 #include "tz/core/handle.hpp"
 #include <string>
 #include <span>
+#include <functional>
 
 namespace game
 {
@@ -24,6 +25,7 @@ namespace game
 
 	entity_handle create_entity(entity_info info);
 	void destroy_entity(entity_handle ent);
+	void iterate_entities(std::function<void(entity_handle)> callback);
 	void entity_update(float delta_seconds);
 
 	tz::v2f entity_get_position(entity_handle ent);
