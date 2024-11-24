@@ -1,5 +1,6 @@
 #include "enemy.hpp"
 #include "entity.hpp"
+#include "config.hpp"
 
 namespace game
 {
@@ -8,15 +9,14 @@ namespace game
 	{
 		entity_handle avatar = tz::nullhand;
 		deck_handle deck;
-		unsigned int max_mana = 10;
+		unsigned int max_mana = config_default_max_mana;
 		float mana = 0;
-		float mana_regen = 1.0f;
+		float mana_regen = config_default_mps;
 
 		const tz::v2f mana_bar_pos = {0.5f, 0.9f};
 		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
-		std::vector<bool> deck_hold_array = {};
 
 		float play_timer = 0.0f;
 		card play_card = {};
@@ -41,7 +41,7 @@ namespace game
 		mana_bar_background_dimensions[1] *= (1.0f + mana_bar_margin);
 		mana_bar_background_dimensions[0] += (mana_bar_background_dimensions[1] - enemy.mana_bar_dimensions[1]);
 		enemy.mana_bar_background = game::render::create_quad({.position = enemy.mana_bar_pos, .scale = mana_bar_background_dimensions, .layer = 2});
-		enemy.mana_bar = game::render::create_quad({.position = enemy.mana_bar_pos, .scale = enemy.mana_bar_dimensions, .colour = {0.1f, 0.2f, 0.8f}, .layer = 3});
+		enemy.mana_bar = game::render::create_quad({.position = enemy.mana_bar_pos, .scale = enemy.mana_bar_dimensions, .colour = config_mana_bar_colour, .layer = 3});
 
 		enemy_set_creature(prefab);
 	}
@@ -55,50 +55,13 @@ namespace game
 			enemy_set_mana(enemy.mana);
 		}
 
-		for(std::size_t i = 0; i < game::deck_size(enemy.deck); i++)
-		{
-			auto deck_size = game::deck_size(enemy.deck);
-			if(enemy.deck_hold_array.size() != deck_size)
-			{
-				enemy.deck_hold_array.resize(deck_size, false);
-			}
-			if(deck_card_is_held(enemy.deck, i))
-			{
-				enemy.deck_hold_array[i] = true;
-			}
-			else
-			{
-				// not held anymore
-				card c = game::deck_get_card(enemy.deck, i);
-				if(enemy.deck_hold_array[i])
-				{
-					unsigned int cost = game::get_prefab(c.name).power;
-					if(enemy_try_spend_mana(cost))
-					{
-						// but was last frame. i.e we've just let go of it.
-						// play it
-						game::deck_play_card(enemy.deck, i, true);
-						// this will destroy the card, so fix up our deck hold array
-						enemy.deck_hold_array.erase(enemy.deck_hold_array.begin() + i);
-					}
-					else
-					{
-						// couldnt afford it.
-						enemy.deck_hold_array[i] = false;
-						// destroy and re-add.
-						game::deck_reset_card_position(enemy.deck, i);
-					}
-				}
-			}
-		}
-
 		// test: try to play a card
 		// right now logic will just play the first card in its deck as soon as it has the mana for it.
 		if(deck_size(enemy.deck) > 0)
 		{
 			auto card = deck_get_card(enemy.deck, 0);
 			unsigned int power = game::get_prefab(card.name).power;
-			if(enemy_try_spend_mana(power))
+			if(enemy_try_spend_mana(power * config_mana_cost_per_power))
 			{
 				impl_enemy_play_card(0);
 			}
@@ -108,7 +71,7 @@ namespace game
 		{
 			tz::v2f pos = render::quad_get_position(enemy.play_card_quad);
 			enemy.play_timer += delta_seconds;
-			if(enemy.play_timer >= 2.0f)
+			if(enemy.play_timer >= config_computer_play_card_turnaround_time_seconds)
 			{
 				// we're done. play the card.
 				game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = card_play_position});
@@ -121,8 +84,8 @@ namespace game
 			else
 			{
 				// lerp
-				pos[0] = std::lerp(pos[0], card_play_position[0], delta_seconds * 10);
-				pos[1] = std::lerp(pos[1], card_play_position[1], delta_seconds * 10);
+				pos[0] = std::lerp(pos[0], card_play_position[0], delta_seconds * config_computer_play_card_drag_speed);
+				pos[1] = std::lerp(pos[1], card_play_position[1], delta_seconds * config_computer_play_card_drag_speed);
 				render::quad_set_position(enemy.play_card_quad, pos);
 			}
 		}
@@ -143,7 +106,7 @@ namespace game
 		}
 
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = false, .position = pos, .parent = enemy.avatar});
-		game::entity_set_colour_tint(aura, {0.5f, 0.0f, 0.0f});
+		game::entity_set_colour_tint(aura, config_enemy_aligned_colour);
 		game::entity_set_layer(aura, -1);
 	}
 

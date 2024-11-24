@@ -1,5 +1,6 @@
 #include "player.hpp"
 #include "entity.hpp"
+#include "config.hpp"
 
 namespace game
 {
@@ -8,9 +9,9 @@ namespace game
 	{
 		entity_handle avatar = tz::nullhand;
 		deck_handle deck;
-		unsigned int max_mana = 10;
+		unsigned int max_mana = config_default_max_mana;
 		float mana = 0;
-		float mana_regen = 1.0f;
+		float mana_regen = config_default_mps;
 
 		const tz::v2f mana_bar_pos = {-0.5f, -0.9f};
 		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
@@ -32,7 +33,7 @@ namespace game
 		mana_bar_background_dimensions[1] *= (1.0f + mana_bar_margin);
 		mana_bar_background_dimensions[0] += (mana_bar_background_dimensions[1] - player.mana_bar_dimensions[1]);
 		player.mana_bar_background = game::render::create_quad({.position = player.mana_bar_pos, .scale = mana_bar_background_dimensions, .layer = 2});
-		player.mana_bar = game::render::create_quad({.position = player.mana_bar_pos, .scale = player.mana_bar_dimensions, .colour = {0.1f, 0.2f, 0.8f}, .layer = 3});
+		player.mana_bar = game::render::create_quad({.position = player.mana_bar_pos, .scale = player.mana_bar_dimensions, .colour = config_mana_bar_colour, .layer = 3});
 
 		player_set_creature(prefab);
 	}
@@ -72,7 +73,7 @@ namespace game
 				card c = game::deck_get_card(player.deck, i);
 				if(player.deck_hold_array[i])
 				{
-					unsigned int cost = game::get_prefab(c.name).power;
+					unsigned int cost = game::get_prefab(c.name).power * config_mana_cost_per_power;
 					if(player_try_spend_mana(cost))
 					{
 						// but was last frame. i.e we've just let go of it.
@@ -108,7 +109,7 @@ namespace game
 		}
 
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = true, .position = pos, .parent = player.avatar});
-		game::entity_set_colour_tint(aura, {0.0f, 0.0f, 0.5f});
+		game::entity_set_colour_tint(aura, config_player_aligned_colour);
 		game::entity_set_layer(aura, -1);
 	}
 
@@ -148,6 +149,16 @@ namespace game
 		tz::v2f pos = player.mana_bar_pos;
 		pos[0] += (manapct * player.mana_bar_dimensions[0]) - bg_scale[0] + yoffset;
 		game::render::quad_set_position(player.mana_bar, pos);
+	}
+
+	float player_get_mps()
+	{
+		return player.mana_regen;
+	}
+
+	void player_set_mps(float mps)
+	{
+		player.mana_regen = mps;
 	}
 
 	bool player_try_spend_mana(unsigned int cost)

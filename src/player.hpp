@@ -17,6 +17,9 @@ namespace game
 	unsigned int player_get_mana();
 	void player_set_mana(unsigned int mana);
 
+	float player_get_mps();
+	void player_set_mps(float mps);
+
 	bool player_try_spend_mana(unsigned int cost);
 }
 

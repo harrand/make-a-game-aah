@@ -53,6 +53,7 @@ int tz_main()
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::player_set_mana(1);
+	game::player_set_mps(10.0f);
 
 	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())
