@@ -7,8 +7,6 @@
 
 namespace game
 {
-	constexpr float global_uniform_scale = 0.15f;
-
 	namespace detail{struct entity_t{};}
 	using entity_handle = tz::handle<detail::entity_t>;
 	struct entity_info

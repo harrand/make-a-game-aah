@@ -1,7 +1,6 @@
 #include "script.hpp"
-
 #include "entity.hpp"
-
+#include "config.hpp"
 #include "tz/core/job.hpp"
 #include "tz/core/lua.hpp"
 #include <filesystem>
@@ -42,7 +41,7 @@ namespace game
 
 	void impl_create_game_api()
 	{
-		tz::lua_set_number("GLOBAL_UNIFORM_SCALE", global_uniform_scale);
+		tz::lua_set_number("GLOBAL_UNIFORM_SCALE", config_global_uniform_scale);
 		tz::lua_define_function("debuglog", []()
 		{
 			auto [msg] = tz::lua_parse_args<std::string>();

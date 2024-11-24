@@ -1,13 +1,12 @@
 #include "entity.hpp"
 #include "render.hpp"
 #include "prefab.hpp"
+#include "config.hpp"
 #include "tz/core/lua.hpp"
 #include <vector>
 
 namespace game
 {
-	constexpr float global_speed_multiplier = 0.35f;
-	constexpr float leeway_dist = 0.3f;
 	// soa
 	// public
 	std::vector<float> speeds = {};
@@ -37,7 +36,7 @@ namespace game
 
 	entity_handle create_entity(entity_info info)
 	{
-		info.scale *= global_uniform_scale;
+		info.scale *= config_global_uniform_scale;
 		entity_handle ret;
 		// recycle if we can
 		if(entity_free_list.size())
@@ -140,7 +139,7 @@ namespace game
 			auto pos = game::render::quad_get_position(quads[i]);
 			auto maybe_tarloc = target_locations[i];
 			entity_handle tar = targets[i];
-			const float leeway = global_speed_multiplier * speeds[i] * leeway_dist;
+			const float leeway = config_global_speed_multiplier * speeds[i] * config_global_leeway_dist;
 			if(!maybe_tarloc.has_value() && tar != tz::nullhand)
 			{
 				tz::v2f tar_pos = game::render::quad_get_position(quads[tar.peek()]);
@@ -179,7 +178,7 @@ namespace game
 			{
 				// moving in a direction. do the move and update anim.
 				move_dir /= move_dir.length();
-				move_dir *= speeds[i] * delta_seconds * global_speed_multiplier;
+				move_dir *= speeds[i] * delta_seconds * config_global_speed_multiplier;
 				game::render::quad_set_flipbook(quads[i], creatures[i].move_horizontal);
 				auto scale = game::render::quad_get_scale(quads[i]);
 				if(move_dir[0] < 0.0f)
@@ -242,7 +241,7 @@ namespace game
 
 	void entity_set_scale(entity_handle ent, tz::v2f scale)
 	{
-		scale *= global_uniform_scale;
+		scale *= config_global_uniform_scale;
 		scales[ent.peek()] = scale;
 		game::render::quad_set_scale(quads[ent.peek()], scale);
 	}
@@ -383,7 +382,7 @@ namespace game
 		{
 			const bool is_player_aligned = player_aligneds[ent.peek()];
 			std::string txt = std::format("{}", creatures[ent.peek()].display_name);
-			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.025f), is_player_aligned ? tz::v3f{0.0f, 0.0f, 0.5f} : tz::v3f{0.5f, 0.0f, 0.0f});
+			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.025f), is_player_aligned ? config_player_aligned_colour : config_enemy_aligned_colour);
 		}
 		else
 		{

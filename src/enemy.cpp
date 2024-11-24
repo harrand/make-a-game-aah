@@ -1,6 +1,7 @@
 #include "enemy.hpp"
 #include "entity.hpp"
 #include "config.hpp"
+#include "tz/os/window.hpp"
 
 namespace game
 {
@@ -22,8 +23,6 @@ namespace game
 		card play_card = {};
 		render::handle play_card_quad = tz::nullhand;
 	} enemy;
-
-	constexpr tz::v2f card_play_position = {1.0f, 0.0f};
 
 	void impl_enemy_play_card(std::size_t id);
 
@@ -74,7 +73,7 @@ namespace game
 			if(enemy.play_timer >= config_computer_play_card_turnaround_time_seconds)
 			{
 				// we're done. play the card.
-				game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = card_play_position});
+				game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = config_enemy_play_position});
 				render::destroy_quad(enemy.play_card_quad);
 
 				enemy.play_card = {};
@@ -84,8 +83,8 @@ namespace game
 			else
 			{
 				// lerp
-				pos[0] = std::lerp(pos[0], card_play_position[0], delta_seconds * config_computer_play_card_drag_speed);
-				pos[1] = std::lerp(pos[1], card_play_position[1], delta_seconds * config_computer_play_card_drag_speed);
+				pos[0] = std::lerp(pos[0], config_enemy_play_position[0], delta_seconds * config_computer_play_card_drag_speed);
+				pos[1] = std::lerp(pos[1], config_enemy_play_position[1], delta_seconds * config_computer_play_card_drag_speed);
 				render::quad_set_position(enemy.play_card_quad, pos);
 			}
 		}
@@ -93,12 +92,14 @@ namespace game
 
 	void enemy_set_creature(game::prefab prefab)
 	{
-		constexpr tz::v2f pos{1.5f, 0.0f};
+		tz::v2f pos = config_enemy_avatar_position;
+		pos[0] *= (static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height());
+
 		if(enemy.avatar != tz::nullhand)
 		{
 			game::destroy_entity(enemy.avatar);
 		}
-		enemy.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = false, .position = pos, .scale = tz::v2f::filled(1.25f)});
+		enemy.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = false, .position = pos, .scale = config_avatar_scale});
 		game::entity_face_left(enemy.avatar);
 		if(prefab.cast != tz::nullhand)
 		{

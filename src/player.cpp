@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include "entity.hpp"
 #include "config.hpp"
+#include "tz/os/window.hpp"
 
 namespace game
 {
@@ -96,12 +97,14 @@ namespace game
 
 	void player_set_creature(game::prefab prefab)
 	{
-		constexpr tz::v2f pos{-1.5f, 0.0f};
+		tz::v2f pos = config_player_avatar_position;
+		pos[0] *= (static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height());
+
 		if(player.avatar != tz::nullhand)
 		{
 			game::destroy_entity(player.avatar);
 		}
-		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = true, .position = pos, .scale = tz::v2f::filled(1.25f)});
+		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = true, .position = pos, .scale = config_avatar_scale});
 		game::entity_face_right(player.avatar);
 		if(prefab.cast != tz::nullhand)
 		{
