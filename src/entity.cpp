@@ -33,6 +33,8 @@ namespace game
 	std::vector<entity_handle> targets = {};
 	std::vector<std::vector<entity_handle>> childrens = {};
 	std::vector<render::text_handle> tooltips = {};
+	std::vector<entity_handle> healthbars = {};
+	std::vector<float> healthbar_timeouts = {};
 	std::vector<bool> busys = {};
 
 	// meta
@@ -73,6 +75,8 @@ namespace game
 			targets.push_back(tz::nullhand);
 			childrens.push_back({});
 			tooltips.push_back(tz::nullhand);
+			healthbars.push_back(tz::nullhand);
+			healthbar_timeouts.push_back(0.0f);
 			busys.push_back(false);
 		}
 
@@ -104,6 +108,8 @@ namespace game
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
 		move_dirs[ret.peek()] = tz::v2f::zero();
 
+		healthbar_timeouts[ret.peek()] = 0.0f;
+
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_create; if fn ~= nil then fn({}) end", prefab.name, ret.peek())));
 		return ret;
 	}
@@ -121,6 +127,11 @@ namespace game
 		{
 			game::render::destroy_text(tooltips[ent.peek()]);
 			tooltips[ent.peek()] = tz::nullhand;
+		}
+		if(healthbars[ent.peek()] != tz::nullhand)
+		{
+			destroy_entity(healthbars[ent.peek()]);
+			healthbars[ent.peek()] = tz::nullhand;
 		}
 	}
 
@@ -155,6 +166,17 @@ namespace game
 			else
 			{
 				entity_hide_tooltip(ent);
+			}
+
+			// healthbar timeouts
+			if(healthbars[ent.peek()] != tz::nullhand)
+			{
+				float& timeout = healthbar_timeouts[ent.peek()];
+				if((timeout -= delta_seconds) <= 0.0f)
+				{
+					destroy_entity(healthbars[ent.peek()]);
+					healthbars[ent.peek()] = tz::nullhand;
+				}
 			}
 
 			auto prefab = creatures[ent.peek()];
@@ -487,11 +509,19 @@ namespace game
 			if(victim_hp-- <= 1)
 			{
 				impl_on_death(rhs);
-				entity_set_target(lhs, tz::nullhand);
 			}
 			else
 			{
-				entity_set_target(rhs, lhs);
+				// rhs got hurt
+				if(rhs != player_get_avatar() && rhs != enemy_get_avatar())
+				{
+					entity_set_target(rhs, lhs);
+				}
+				if(healthbars[rhs.peek()] == tz::nullhand)
+				{
+					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .parent = rhs});
+					healthbar_timeouts[rhs.peek()] = config_healthbar_duration;
+				}
 			}
 			// rhs should retaliate.
 			cooldowns[lhs.peek()] = creatures[lhs.peek()].base_cooldown;
@@ -509,6 +539,10 @@ namespace game
 		if(ent == player_get_avatar())
 		{
 			player_on_death();
+		}
+		else if(ent == enemy_get_avatar())
+		{
+			// you won
 		}
 		else
 		{
@@ -539,16 +573,21 @@ namespace game
 					{
 						entity_set_target_location(ent, player_get_target_location().value());
 					}
-					else if(enemy_get_avatar() != tz::nullhand)
+					else if(enemy_get_avatar() != tz::nullhand && entity_get_hp(enemy_get_avatar()) > 0)
 					{
 						// player hasn't targetted anything, go for the enemy!
 						entity_set_target(ent, enemy_get_avatar());
 					}
 				}
-				else if(player_get_avatar() != tz::nullhand)
+				else if(player_get_avatar() != tz::nullhand && entity_get_hp(player_get_avatar()) > 0)
 				{
 					// enemy aligned. it should go straight for the player
 					entity_set_target(ent, player_get_avatar());
+				}
+				else
+				{
+					// nothing to go for.
+					entity_set_target(ent, tz::nullhand);
 				}
 			}
 		});

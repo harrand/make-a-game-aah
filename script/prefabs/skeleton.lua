@@ -2,20 +2,8 @@ prefabs.skeleton =
 {
 	display_name = "Skeleton",
 	description = "Spooky and scary!",
-	on_create = function(ent)
-		local healthbar = create_entity("healthbar")
-		entity_set_parent(healthbar, ent)
-		entity_set_hp(ent, 5)
-
-		local x, y = entity_get_position(ent)
-		local patrol =
-		{
-			x - 1.0, y + 0.0,
-			x + 1.0, y + 0.0
-		}
-		entity_set_patrol(ent, table.unpack(patrol))
-	end,
 	base_health = 10,
+	base_cooldown = 0.1,
 	movement_speed = 1.0,
 	power = 2,
 	idle =

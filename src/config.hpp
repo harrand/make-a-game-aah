@@ -15,7 +15,7 @@ namespace game
 	constexpr float config_mana_cost_per_power = 10.0f;
 
 	// leeway is how far away an entity can be from another but still be considered "touching". leeway is proportional to the speed of the entity, infact equal to a % of it - this value between 0 and 1
-	constexpr float config_global_leeway_dist = 0.3f;
+	constexpr float config_global_leeway_dist = 0.5f;
 	
 
 	////////////////////////////////
@@ -72,5 +72,6 @@ namespace game
 
 	constexpr tz::v3f config_player_reticule_colour_on_entity = {1.0f, 0.0f, 0.0f};
 	constexpr tz::v3f config_player_reticule_colour_on_location = {1.0f, 1.0f, 0.0f};
+	constexpr float config_healthbar_duration = 5.0f;
 
 }
