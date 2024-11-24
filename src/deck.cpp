@@ -1,5 +1,7 @@
 #include "deck.hpp"
 #include "entity.hpp"
+#include "config.hpp"
+#include <optional>
 
 namespace game
 {
@@ -9,6 +11,7 @@ namespace game
 		std::vector<card> cards = {};
 		std::vector<render::handle> card_quads = {};
 		std::vector<render::text_handle> card_tooltips = {};
+		std::vector<std::optional<tz::v2f>> card_target_locations = {};
 		std::optional<deck_render_info> render;
 	};
 	std::vector<deck_data> decks = {};
@@ -33,6 +36,7 @@ namespace game
 		deck.card_quads.clear();
 		deck.cards.clear();
 		deck.card_tooltips.clear();
+		deck.card_target_locations.clear();
 
 		for(card c : info.initial_cards)
 		{
@@ -62,12 +66,45 @@ namespace game
 		}
 	}
 
+	void deck_update(float delta_seconds)
+	{
+		for(std::size_t i = 0; i < decks.size(); i++)
+		{
+			auto& deck = decks[i];
+			if(!deck.render.has_value())
+			{
+				continue;
+			}
+			for(std::size_t j = 0; j < deck.cards.size(); j++)
+			{
+				auto pos = deck.card_target_locations[j];
+				if(!pos.has_value())
+				{
+					continue;
+				}
+				auto old = render::quad_get_position(deck.card_quads[j]);
+				if((pos.value() - old).length() < 0.1f)
+				{
+					old = pos.value();
+					deck.card_target_locations[j] = std::nullopt;
+				}
+				else
+				{
+					old[0] = std::lerp(old[0], pos.value()[0], delta_seconds * config_computer_play_card_drag_speed);
+					old[1] = std::lerp(old[1], pos.value()[1], delta_seconds * config_computer_play_card_drag_speed);
+				}
+				render::quad_set_position(deck.card_quads[j], old);
+			}
+		}
+	}
+
 	void deck_add_card(deck_handle deckh, card c)
 	{
 		auto& deck = decks[deckh.peek()];	
 		deck.cards.push_back(c);
 		render::handle& quad = deck.card_quads.emplace_back(tz::nullhand);
 		deck.card_tooltips.push_back(tz::nullhand);
+		deck.card_target_locations.push_back(std::nullopt);
 
 		if(deck.render.has_value())
 		{
@@ -107,11 +144,12 @@ namespace game
 				float deck_spacing = d.render.value().scale[0] * deck_card_spacing;
 				auto pos = game::render::quad_get_position(d.card_quads[i]);
 				pos[0] -= deck_spacing;
-				game::render::quad_set_position(d.card_quads[i], pos);
+				d.card_target_locations[i] = pos;
 			}
 		}
 		d.card_quads.erase(d.card_quads.begin() + id);
 		d.card_tooltips.erase(d.card_tooltips.begin() + id);
+		d.card_target_locations.erase(d.card_target_locations.begin() + id);
 		d.cards.erase(d.cards.begin() + id);
 	}
 
@@ -195,12 +233,13 @@ namespace game
 				float deck_spacing = d.render.value().scale[0] * deck_card_spacing;
 				auto pos = game::render::quad_get_position(d.card_quads[i]);
 				pos[0] -= deck_spacing;
-				game::render::quad_set_position(d.card_quads[i], pos);
+				d.card_target_locations[i] = pos;
 			}
 		}
 		d.card_quads.erase(d.card_quads.begin() + id);
 		d.card_tooltips.erase(d.card_tooltips.begin() + id);
 		d.cards.erase(d.cards.begin() + id);
+		d.card_target_locations.erase(d.card_target_locations.begin() + id);
 
 		return ret;
 	}

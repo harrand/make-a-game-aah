@@ -22,6 +22,7 @@ namespace game
 	using deck_handle = tz::handle<deck_info>;
 	deck_handle create_deck(deck_info info = {});
 	void destroy_deck(deck_handle deck);
+	void deck_update(float delta_seconds);
 
 	void deck_add_card(deck_handle deck, card c);
 	void deck_destroy_card(deck_handle deck, std::size_t id);

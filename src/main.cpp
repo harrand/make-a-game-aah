@@ -66,6 +66,7 @@ int tz_main()
 		game::entity_update(delta_seconds);
 		game::player_update(delta_seconds);
 		game::enemy_update(delta_seconds);
+		game::deck_update(delta_seconds);
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
