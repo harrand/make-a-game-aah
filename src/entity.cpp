@@ -518,8 +518,12 @@ namespace game
 		// everyone targetting it should drop target.
 		iterate_entities([dead_person = ent](entity_handle ent)
 		{
-			if(ent == dead_person) return;
-			if(!creatures[ent.peek()].combat) return;
+			if(
+				ent == dead_person ||
+				!creatures[ent.peek()].combat ||
+				ent == enemy_get_avatar() ||
+				ent == player_get_avatar()	
+				) return;
 			if(entity_get_target(ent) == dead_person)
 			{
 				// an entity was targetting the now dead entity.
