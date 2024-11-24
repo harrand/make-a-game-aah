@@ -365,24 +365,47 @@ namespace game
 		{
 			return;
 		}
+		std::string txt = std::format("{}", creatures[ent.peek()].display_name);
+		tz::v2u text_dims = tz::v2u::zero();
+		unsigned int counterx = 0;
+		for(char c : txt)
+		{
+			if(c != '\n')
+			{
+				text_dims[0] = std::max(text_dims[0], ++counterx);
+			}
+			else
+			{
+				// new line
+				text_dims[1]++;
+				counterx = 0;
+			}
+		}
 		auto quad = quads[ent.peek()];
 		tz::v2f tooltip_position = game::render::quad_get_position(quad);
-		float yoffset = -0.2f;
-		tooltip_position[0] -= 0.1f;
-		if(tooltip_position[1] > (1.0f + yoffset))
+		for(std::size_t i = 0; i < 2; i++)
 		{
-			tooltip_position[1] -= yoffset;
+			float off = config_entity_tooltip_offset[i];
+			if(i == 0)
+			{
+				off = -off;
+			}
+			if(off == 0.0f){continue;}
+			if(tooltip_position[i] > (1.0f - off))
+			{
+				tooltip_position[i] += off;
+			}
+			else
+			{
+				tooltip_position[i] -= off;
+			}
 		}
-		else
-		{
-			tooltip_position[1] += yoffset;
-		}
+		tooltip_position += (static_cast<tz::v2f>(text_dims) * -config_entity_tooltip_text_size * 0.5f);
 
 		if(tooltips[ent.peek()] == tz::nullhand)
 		{
 			const bool is_player_aligned = player_aligneds[ent.peek()];
-			std::string txt = std::format("{}", creatures[ent.peek()].display_name);
-			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(0.025f), is_player_aligned ? config_player_aligned_colour : config_enemy_aligned_colour);
+			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(config_entity_tooltip_text_size), is_player_aligned ? config_player_aligned_colour : config_enemy_aligned_colour);
 		}
 		else
 		{
