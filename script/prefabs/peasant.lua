@@ -2,9 +2,8 @@ prefabs.peasant =
 {
 	display_name = "Peasant",
 	description = "bro has 0 money",
-	base_health = 10,
+	base_health = 5,
 	movement_speed = 1.2,
-	base_cooldown = 0.5,
 	power = 1,
 	idle =
 	{

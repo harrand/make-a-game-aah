@@ -519,7 +519,7 @@ namespace game
 				}
 				if(healthbars[rhs.peek()] == tz::nullhand)
 				{
-					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .parent = rhs});
+					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .position = entity_get_position(rhs), .parent = rhs});
 					healthbar_timeouts[rhs.peek()] = config_healthbar_duration;
 				}
 			}

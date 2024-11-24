@@ -1,7 +1,7 @@
 prefabs.nightmare =
 {
 	display_name = "Melistra's Nightmare",
-	base_health = 10,
+	base_health = 50,
 	movement_speed = 1.3,
 	power = 5,
 	idle =

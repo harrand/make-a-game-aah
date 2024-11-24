@@ -2,7 +2,7 @@ prefabs.banshee =
 {
 	display_name = "Banshee",
 	description = "aah! a banshee!!!! fuck!!",
-	base_health = 40,
+	base_health = 10,
 	movement_speed = 0.4,
 	power = 3,
 	idle =
