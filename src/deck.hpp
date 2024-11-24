@@ -1,6 +1,7 @@
 #ifndef GAME_DECK_HPP
 #define GAME_DECK_HPP
 #include "card.hpp"
+#include "entity.hpp"
 #include "tz/core/handle.hpp"
 
 namespace game
@@ -38,7 +39,7 @@ namespace game
 	void deck_card_display_tooltip(deck_handle deck, std::size_t id);
 	void deck_card_hide_tooltip(deck_handle deck, std::size_t id);
 
-	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned);
+	entity_handle deck_play_card(deck_handle deck, std::size_t id, bool player_aligned);
 }
 
 #endif // GAME_DECK_HPP

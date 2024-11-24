@@ -80,12 +80,6 @@ int tz_main()
 		{
 			game::deck_swap_cards(game::player_deck(), 0, 1);
 		}
-		if(tz::os::is_mouse_clicked(tz::os::mouse_button::right))
-		{
-			auto [mx, my] = tz::os::get_mouse_click_position(tz::os::mouse_button::right);
-			
-			game::entity_set_target_location(skel, game::render::screen_to_world({mx, my}));
-		}
 	}
 	tz::terminate();
 }

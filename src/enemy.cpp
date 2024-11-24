@@ -1,4 +1,5 @@
 #include "enemy.hpp"
+#include "player.hpp"
 #include "entity.hpp"
 #include "config.hpp"
 #include "tz/os/window.hpp"
@@ -73,12 +74,14 @@ namespace game
 			if(enemy.play_timer >= config_computer_play_card_turnaround_time_seconds)
 			{
 				// we're done. play the card.
-				game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = config_enemy_play_position});
+				entity_handle ent = game::create_entity({.prefab_name = enemy.play_card.name, .player_aligned = false, .position = config_enemy_play_position});
 				render::destroy_quad(enemy.play_card_quad);
 
 				enemy.play_card = {};
 				enemy.play_card_quad = tz::nullhand;
 				enemy.play_timer = 0.0f;
+
+				game::entity_set_target(ent, game::player_get_avatar());
 			}
 			else
 			{
@@ -147,6 +150,11 @@ namespace game
 		tz::v2f pos = enemy.mana_bar_pos;
 		pos[0] += (manapct * enemy.mana_bar_dimensions[0]) - bg_scale[0] + yoffset;
 		game::render::quad_set_position(enemy.mana_bar, pos);
+	}
+
+	entity_handle enemy_get_avatar()
+	{
+		return enemy.avatar;
 	}
 
 	bool enemy_try_spend_mana(unsigned int cost)

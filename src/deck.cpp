@@ -318,7 +318,7 @@ namespace game
 		}
 	}
 
-	void deck_play_card(deck_handle deck, std::size_t id, bool player_aligned)
+	entity_handle deck_play_card(deck_handle deck, std::size_t id, bool player_aligned)
 	{
 		const auto& d = decks[deck.peek()];
 		tz::v2f pos;
@@ -333,7 +333,8 @@ namespace game
 		}
 
 		card c = deck_get_card(deck, id);
-		game::create_entity({.prefab_name = c.name, .player_aligned = player_aligned, .position = pos, .scale = {player_aligned ? 1.0f : -1.0f, 1.0f}});
+		entity_handle ret = game::create_entity({.prefab_name = c.name, .player_aligned = player_aligned, .position = pos, .scale = {player_aligned ? 1.0f : -1.0f, 1.0f}});
 		deck_destroy_card(deck, id);
+		return ret;
 	}
 }

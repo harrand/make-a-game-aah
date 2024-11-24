@@ -3,6 +3,7 @@
 #include "prefab.hpp"
 #include "config.hpp"
 #include "player.hpp"
+#include "enemy.hpp"
 #include "tz/core/lua.hpp"
 #include <vector>
 
@@ -101,6 +102,7 @@ namespace game
 
 		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale});
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
+		move_dirs[ret.peek()] = tz::v2f::zero();
 
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_create; if fn ~= nil then fn({}) end", prefab.name, ret.peek())));
 		return ret;
@@ -498,13 +500,53 @@ namespace game
 
 	void impl_on_death(entity_handle ent)
 	{
-		// deadge
 		auto prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_death; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
 		if(player_targets(ent))
 		{
 			player_drop_target_entity();
 		}
-		destroy_entity(ent);
+		if(ent == player_get_avatar())
+		{
+			player_on_death();
+		}
+		else
+		{
+			destroy_entity(ent);
+		}
+
+		// everyone targetting it should drop target.
+		iterate_entities([dead_person = ent](entity_handle ent)
+		{
+			if(ent == dead_person) return;
+			if(!creatures[ent.peek()].combat) return;
+			if(entity_get_target(ent) == dead_person)
+			{
+				// an entity was targetting the now dead entity.
+				// was it player aligned?
+				if(player_aligneds[ent.peek()])
+				{
+					// yes, it should target the players target
+					if(player_get_target() != tz::nullhand)
+					{
+						entity_set_target(ent, player_get_target());
+					}
+					else if(player_get_target_location().has_value())
+					{
+						entity_set_target_location(ent, player_get_target_location().value());
+					}
+					else if(enemy_get_avatar() != tz::nullhand)
+					{
+						// player hasn't targetted anything, go for the enemy!
+						entity_set_target(ent, enemy_get_avatar());
+					}
+				}
+				else if(player_get_avatar() != tz::nullhand)
+				{
+					// enemy aligned. it should go straight for the player
+					entity_set_target(ent, player_get_avatar());
+				}
+			}
+		});
 	}
 }

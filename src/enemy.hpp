@@ -17,6 +17,8 @@ namespace game
 	unsigned int enemy_get_mana();
 	void enemy_set_mana(unsigned int mana);
 
+	entity_handle enemy_get_avatar();
+
 	bool enemy_try_spend_mana(unsigned int cost);
 }
 

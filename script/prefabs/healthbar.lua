@@ -3,6 +3,7 @@ prefabs.healthbar =
 	impl_scale = {0.5, 0.1},
 	impl_bar_margin = 0.6,
 	has_tooltip = false,
+	combat = false,
 	on_create = function(ent)
 		entity_set_scale(ent, prefabs.healthbar.impl_scale[1], prefabs.healthbar.impl_scale[2])
 		entity_set_colour_tint(ent, 1.0, 1.0, 1.0)

@@ -122,7 +122,16 @@ namespace game
 					{
 						// but was last frame. i.e we've just let go of it.
 						// play it
-						game::deck_play_card(player.deck, i, true);
+						entity_handle ent = game::deck_play_card(player.deck, i, true);
+
+						if(player.target_entity != tz::nullhand)
+						{
+							game::entity_set_target(ent, player.target_entity);
+						}
+						else if(player.target_location.has_value())
+						{
+							game::entity_set_target_location(ent, player.target_location.value());
+						}
 						// this will destroy the card, so fix up our deck hold array
 						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
 					}
@@ -219,6 +228,27 @@ namespace game
 			player.target_location = game::entity_get_position(player.target_entity);
 			player.target_entity = tz::nullhand;
 		}
+	}
+
+	entity_handle player_get_avatar()
+	{
+		return player.avatar;
+	}
+
+	void player_on_death()
+	{
+		float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
+		game::render::create_text("kongtext", "YOU DIED :(", {-x, 0.0f}, tz::v2f::filled(0.3f), {1.0f, 0.0f, 0.0f});
+	}
+
+	entity_handle player_get_target()
+	{
+		return player.target_entity;
+	}
+
+	std::optional<tz::v2f> player_get_target_location()
+	{
+		return player.target_location;
 	}
 
 	bool player_try_spend_mana(unsigned int cost)

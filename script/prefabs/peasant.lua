@@ -2,9 +2,6 @@ prefabs.peasant =
 {
 	display_name = "Peasant",
 	description = "bro has 0 money",
-	on_update = function(ent, delta_seconds)
-		ai.wander(ent)
-	end,
 	base_health = 10,
 	movement_speed = 1.2,
 	power = 1,

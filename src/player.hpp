@@ -24,6 +24,12 @@ namespace game
 	bool player_targets(entity_handle ent);
 	void player_drop_target_entity();
 
+	entity_handle player_get_avatar();
+	void player_on_death();
+
+	entity_handle player_get_target();
+	std::optional<tz::v2f> player_get_target_location();
+
 	bool player_try_spend_mana(unsigned int cost);
 }
 
