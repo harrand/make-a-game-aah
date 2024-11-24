@@ -52,6 +52,10 @@ int tz_main()
 	game::deck_add_card(game::enemy_deck(), {.name = "nightmare"});
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
+	game::entity_handle skel2 = game::create_entity({.prefab_name = "skeleton", .player_aligned = true});
+	game::entity_set_position(skel2, {-1.0f, 0.0f});
+	game::entity_set_target(skel2, skel);
+	game::entity_set_hp(skel2, 999);
 	game::player_set_mana(1);
 	game::player_set_mps(10.0f);
 

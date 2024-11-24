@@ -5,7 +5,7 @@ prefabs.skeleton =
 	on_create = function(ent)
 		local healthbar = create_entity("healthbar")
 		entity_set_parent(healthbar, ent)
-		entity_set_hp(ent, 1)
+		entity_set_hp(ent, 5)
 
 		local x, y = entity_get_position(ent)
 		local patrol =

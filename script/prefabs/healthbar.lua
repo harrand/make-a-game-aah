@@ -20,11 +20,11 @@ prefabs.healthbar =
 		-- parent is the thing we're monitoring
 		local parent = entity_get_parent(ent)
 		-- if no parent then we should kill ourselves
-		if parent == nil then destroy_entity(ent); return end
+		local child = entity_get_userdata(ent)
+		if parent == nil or (entity_get_hp(parent) == 0) then destroy_entity(ent); destroy_entity(child); return end
 
 		-- max hp = {0.0, 0.5, 0.0}
 		-- 0   hp = {1.0, 0.0, 0.0}
-		local child = entity_get_userdata(ent)
 		local hp_pct = entity_get_hp(parent) / entity_get_max_hp(parent)
 
 		local parent_scalex, parent_scaley = entity_get_scale(parent)

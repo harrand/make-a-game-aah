@@ -16,6 +16,7 @@ namespace game
 	std::vector<tz::v2f> positions = {};
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
+	std::vector<float> cooldowns = {};
 	std::vector<entity_handle> parents = {};
 	std::vector<void*> userdatas = {};
 	std::vector<std::vector<tz::v2f>> patrols = {};
@@ -30,9 +31,13 @@ namespace game
 	std::vector<entity_handle> targets = {};
 	std::vector<std::vector<entity_handle>> childrens = {};
 	std::vector<render::text_handle> tooltips = {};
+	std::vector<bool> busys = {};
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
+
+	void impl_melee_attack(entity_handle lhs, entity_handle rhs);
+	void impl_on_death(entity_handle ent);
 
 	entity_handle create_entity(entity_info info)
 	{
@@ -54,6 +59,7 @@ namespace game
 			positions.push_back({});
 			rotations.push_back({});
 			scales.push_back({});
+			cooldowns.push_back(0.0f);
 			parents.push_back({});
 			userdatas.push_back(nullptr);
 			patrols.push_back({});
@@ -65,6 +71,7 @@ namespace game
 			targets.push_back(tz::nullhand);
 			childrens.push_back({});
 			tooltips.push_back(tz::nullhand);
+			busys.push_back(false);
 		}
 
 		// set new data
@@ -77,6 +84,7 @@ namespace game
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
+		cooldowns[ret.peek()] = 0.0f;
 		parents[ret.peek()] = info.parent;
 		userdatas[ret.peek()] = info.userdata;
 		patrols[ret.peek()] = {};
@@ -86,6 +94,7 @@ namespace game
 			childrens[info.parent.peek()].push_back(ret);
 		}
 		childrens[ret.peek()] = {};
+		busys[ret.peek()] = false;
 
 		speeds[ret.peek()] = prefab.movement_speed;
 
@@ -122,6 +131,10 @@ namespace game
 				// in free list, do not update.
 				continue;
 			}
+			if(cooldowns[ent.peek()] > 0.0f)
+			{
+				cooldowns[ent.peek()] -= delta_seconds;
+			}
 
 			if(game::render::quad_is_mouseover(quads[ent.peek()]))
 			{
@@ -140,6 +153,7 @@ namespace game
 			auto maybe_tarloc = target_locations[i];
 			entity_handle tar = targets[i];
 			const float leeway = config_global_speed_multiplier * speeds[i] * config_global_leeway_dist;
+			// if we dont have a target location but we do have a target entity, set tarloc (or attack if we're in range)
 			if(!maybe_tarloc.has_value() && tar != tz::nullhand)
 			{
 				tz::v2f tar_pos = game::render::quad_get_position(quads[tar.peek()]);
@@ -149,9 +163,14 @@ namespace game
 				}
 				else
 				{
-					targets[i] = tz::nullhand;
+					//targets[i] = tz::nullhand;
+					if(tar != tz::nullhand)
+					{
+						impl_melee_attack(ent, tar);
+					}
 				}
 			}
+			// do we have a target location?
 			if(maybe_tarloc.has_value())
 			{
 				if((maybe_tarloc.value() - pos).length() > leeway)
@@ -160,21 +179,32 @@ namespace game
 				}
 				else
 				{
+					// reached location
 					if(patrols[i].size())
 					{
+						// next patrol waypoint
 						patrol_cursors[i] = (patrol_cursors[i] + 1) % patrols[i].size();
 						target_locations[i] = patrols[i][patrol_cursors[i]];
 					}
 					else
 					{
+						// stop chasing.
 						target_locations[i] = std::nullopt;
 					}
+				}
+			}
+			else if(tar == tz::nullhand)
+			{
+				// no target location. do we have a patrol?
+				if(patrols[i].size())
+				{
+					target_locations[i] = patrols[i][patrol_cursors[i]];
 				}
 			}
 
 			// handle movement.
 			tz::v2f move_dir = move_dirs[i];
-			if(move_dir.length() > 0)
+			if(move_dir.length() > 0 && hps[i] > 0.0f)
 			{
 				// moving in a direction. do the move and update anim.
 				move_dir /= move_dir.length();
@@ -193,10 +223,10 @@ namespace game
 				auto pos = game::render::quad_get_position(quads[i]);
 				entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
 			}
-			else
+			else if(!busys[i])
 			{
-				// not moving. idle.
-				//game::render::quad_set_flipbook(quads[i], creatures[i].idle);
+				// not moving and not doing anything idle.
+				game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 			}
 
 			move_dirs[i] = tz::v2f::zero();
@@ -260,7 +290,10 @@ namespace game
 		}
 		parents[ent.peek()] = parent;
 		// local position is unchanged.
-		childrens[parent.peek()].push_back(ent);
+		if(parent != tz::nullhand)
+		{
+			childrens[parent.peek()].push_back(ent);
+		}
 		// however need to update our position now we have a parent, we do that by setting our local position to itself.
 		entity_set_position(ent, positions[ent.peek()]);
 	}
@@ -306,11 +339,13 @@ namespace game
 
 	void entity_start_casting(entity_handle ent)
 	{
+		busys[ent.peek()] = true;
 		game::render::quad_set_flipbook(quads[ent.peek()], creatures[ent.peek()].cast);
 	}
 
 	void entity_stop_casting(entity_handle ent)
 	{
+		busys[ent.peek()] = false;
 		game::render::quad_set_flipbook(quads[ent.peek()], creatures[ent.peek()].idle);
 	}
 	
@@ -430,5 +465,32 @@ namespace game
 	void entity_set_userdata(entity_handle ent, void* userdata)
 	{
 		userdatas[ent.peek()] = userdata;
+	}
+
+	void impl_melee_attack(entity_handle lhs, entity_handle rhs)
+	{
+		if(cooldowns[lhs.peek()] <= 0.0f && hps[lhs.peek()] > 0.0f)
+		{
+			auto& victim_hp = hps[rhs.peek()];
+			if(victim_hp-- <= 1)
+			{
+				impl_on_death(rhs);
+				entity_set_target(lhs, tz::nullhand);
+			}
+			else
+			{
+				entity_set_target(rhs, lhs);
+			}
+			// rhs should retaliate.
+			cooldowns[lhs.peek()] = creatures[lhs.peek()].base_cooldown;
+		}	
+	}
+
+	void impl_on_death(entity_handle ent)
+	{
+		// deadge
+		auto prefab = creatures[ent.peek()];
+		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_death; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+		destroy_entity(ent);
 	}
 }
