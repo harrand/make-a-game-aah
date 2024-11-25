@@ -223,6 +223,11 @@ namespace game
 
 	void player_drop_target_entity()
 	{
+		if(player.target_entity != tz::nullhand && player.reticule != tz::nullhand)
+		{
+			destroy_entity(player.reticule);
+			player.reticule = tz::nullhand;
+		}
 		player.target_entity = tz::nullhand;
 	}
 
