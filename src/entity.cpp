@@ -246,29 +246,44 @@ namespace game
 
 			// handle movement.
 			tz::v2f move_dir = move_dirs[i];
-			if(move_dir.length() > 0 && hps[i] > 0.0f)
+			if(hps[i] > 0.0f)
 			{
-				// moving in a direction. do the move and update anim.
-				move_dir /= move_dir.length();
-				move_dir *= speeds[i] * delta_seconds * config_global_speed_multiplier;
-				game::render::quad_set_flipbook(quads[i], creatures[i].move_horizontal);
-				auto scale = game::render::quad_get_scale(quads[i]);
-				if(move_dir[0] < 0.0f)
+				if(move_dir.length() > 0)
 				{
-					scale[0] = -std::abs(scale[0]);
+					// moving in a direction. do the move and update anim.
+					move_dir /= move_dir.length();
+					move_dir *= speeds[i] * delta_seconds * config_global_speed_multiplier;
+					game::render::quad_set_flipbook(quads[i], creatures[i].move_horizontal);
+					auto scale = game::render::quad_get_scale(quads[i]);
+					if(move_dir[0] < 0.0f)
+					{
+						scale[0] = -std::abs(scale[0]);
+					}
+					else if(move_dir[0] > 0.0f)
+					{
+						scale[0] = std::abs(scale[0]);
+					}
+					game::render::quad_set_scale(quads[i], scale);
+					auto pos = entity_get_position(ent);
+					entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
 				}
-				else if(move_dir[0] > 0.0f)
+				else if(!busys[i])
 				{
-					scale[0] = std::abs(scale[0]);
+					if(player_aligneds[i] && creatures[i].combat)
+					{
+						// do something
+						if(player_get_target() != tz::nullhand)
+						{
+							entity_set_target(ent, player_get_target());
+						}
+						else if(player_get_target_location().has_value())
+						{
+							entity_set_target_location(ent, player_get_target_location().value());
+						}
+					}
+					// not moving and not doing anything idle.
+					game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 				}
-				game::render::quad_set_scale(quads[i], scale);
-				auto pos = entity_get_position(ent);
-				entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
-			}
-			else if(!busys[i])
-			{
-				// not moving and not doing anything idle.
-				game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 			}
 
 			move_dirs[i] = tz::v2f::zero();
@@ -513,6 +528,9 @@ namespace game
 	{
 		if(cooldowns[lhs.peek()] <= 0.0f && hps[lhs.peek()] > 0.0f)
 		{
+			busys[lhs.peek()] = true;
+			game::render::quad_set_flipbook(quads[lhs.peek()], creatures[lhs.peek()].idle);
+
 			auto& victim_hp = hps[rhs.peek()];
 			if(victim_hp-- <= 1)
 			{
@@ -568,6 +586,7 @@ namespace game
 				) return;
 			if(entity_get_target(ent) == dead_person)
 			{
+				busys[ent.peek()] = false;
 				// an entity was targetting the now dead entity.
 				// was it player aligned?
 				if(player_aligneds[ent.peek()])
