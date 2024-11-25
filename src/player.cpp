@@ -223,11 +223,7 @@ namespace game
 
 	void player_drop_target_entity()
 	{
-		if(player.target_entity != tz::nullhand)
-		{
-			player.target_location = game::entity_get_position(player.target_entity);
-			player.target_entity = tz::nullhand;
-		}
+		player.target_entity = tz::nullhand;
 	}
 
 	entity_handle player_get_avatar()
