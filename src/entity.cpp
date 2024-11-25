@@ -91,16 +91,14 @@ namespace game
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
 		cooldowns[ret.peek()] = 0.0f;
-		parents[ret.peek()] = info.parent;
 		userdatas[ret.peek()] = info.userdata;
 		patrols[ret.peek()] = {};
 		patrol_cursors[ret.peek()] = 0;
-		if(info.parent != tz::nullhand)
-		{
-			childrens[info.parent.peek()].push_back(ret);
-		}
+		parents[ret.peek()] = tz::nullhand;
 		childrens[ret.peek()] = {};
 		busys[ret.peek()] = false;
+		targets[ret.peek()] = tz::nullhand;
+		target_locations[ret.peek()] = std::nullopt;
 
 		speeds[ret.peek()] = prefab.movement_speed;
 
@@ -111,6 +109,10 @@ namespace game
 		healthbar_timeouts[ret.peek()] = 0.0f;
 
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_create; if fn ~= nil then fn({}) end", prefab.name, ret.peek())));
+		if(info.parent != tz::nullhand)
+		{
+			entity_set_parent(ret, info.parent);
+		}
 		return ret;
 	}
 
@@ -120,6 +122,12 @@ namespace game
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_destroy; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
 
 		entity_set_parent(ent, tz::nullhand);
+
+		auto children = childrens[ent.peek()];
+		for(auto child : children)
+		{
+			entity_set_parent(child, tz::nullhand);
+		}
 
 		entity_free_list.push_back(ent);
 		game::render::destroy_quad(quads[ent.peek()]);
@@ -254,7 +262,7 @@ namespace game
 					scale[0] = std::abs(scale[0]);
 				}
 				game::render::quad_set_scale(quads[i], scale);
-				auto pos = game::render::quad_get_position(quads[i]);
+				auto pos = entity_get_position(ent);
 				entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
 			}
 			else if(!busys[i])
@@ -305,8 +313,8 @@ namespace game
 
 	void entity_set_scale(entity_handle ent, tz::v2f scale)
 	{
-		scale *= config_global_uniform_scale;
 		scales[ent.peek()] = scale;
+		scale *= config_global_uniform_scale;
 		game::render::quad_set_scale(quads[ent.peek()], scale);
 	}
 
@@ -519,7 +527,7 @@ namespace game
 				}
 				if(healthbars[rhs.peek()] == tz::nullhand)
 				{
-					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .position = entity_get_position(rhs), .parent = rhs});
+					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .position = tz::v2f::zero(), .parent = rhs});
 					healthbar_timeouts[rhs.peek()] = config_healthbar_duration;
 				}
 			}

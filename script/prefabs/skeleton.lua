@@ -2,8 +2,8 @@ prefabs.skeleton =
 {
 	display_name = "Skeleton",
 	description = "Spooky and scary!",
-	base_health = 2,
-	base_cooldown = 0.5,
+	base_health = 5,
+	base_cooldown = 0.6,
 	movement_speed = 1.0,
 	power = 2,
 	idle =

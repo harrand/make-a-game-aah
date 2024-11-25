@@ -1,8 +1,8 @@
 prefabs.knight =
 {
-	base_health = 15,
+	base_health = 20,
 	movement_speed = 0.6,
-	base_cooldown = 3,
+	base_cooldown = 0.5,
 	power = 4,
 	idle =
 	{
