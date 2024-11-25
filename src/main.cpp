@@ -50,8 +50,10 @@ int tz_main()
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
 		game::deck_add_card(game::enemy_deck(), {.name = "skeleton"});
+		game::deck_add_card(game::enemy_deck(), {.name = "banshee"});
+		game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 	}
-	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
+	game::deck_add_card(game::enemy_deck(), {.name = "nightmare"});
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
 	game::entity_handle skel2 = game::create_entity({.prefab_name = "skeleton", .player_aligned = true});
