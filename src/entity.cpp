@@ -526,7 +526,7 @@ namespace game
 
 	void impl_melee_attack(entity_handle lhs, entity_handle rhs)
 	{
-		if(cooldowns[lhs.peek()] <= 0.0f && hps[lhs.peek()] > 0.0f)
+		if(cooldowns[lhs.peek()] <= 0.0f && hps[lhs.peek()] > 0.0f && hps[rhs.peek()] > 0.0f)
 		{
 			busys[lhs.peek()] = true;
 			game::render::quad_set_flipbook(quads[lhs.peek()], creatures[lhs.peek()].idle);
@@ -600,10 +600,9 @@ namespace game
 					{
 						entity_set_target_location(ent, player_get_target_location().value());
 					}
-					else if(enemy_get_avatar() != tz::nullhand && entity_get_hp(enemy_get_avatar()) > 0)
+					else
 					{
-						// player hasn't targetted anything, go for the enemy!
-						entity_set_target(ent, enemy_get_avatar());
+						entity_set_target(ent, tz::nullhand);
 					}
 				}
 				else if(player_get_avatar() != tz::nullhand && entity_get_hp(player_get_avatar()) > 0)
