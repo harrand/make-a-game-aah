@@ -37,6 +37,8 @@ namespace game::render
 	void quad_set_position(handle q, tz::v2f pos);
 	short quad_get_layer(handle q);
 	void quad_set_layer(handle q, short layer);
+	float quad_get_rotation(handle q);
+	void quad_set_rotation(handle q, float rotation);
 	tz::v2f quad_get_scale(handle q);
 	void quad_set_scale(handle q, tz::v2f scale);
 	tz::v3f quad_get_colour(handle q);

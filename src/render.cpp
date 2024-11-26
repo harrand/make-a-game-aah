@@ -225,6 +225,16 @@ namespace game::render
 		tz::ren::set_quad_layer(ren, q, layer);
 	}
 
+	float quad_get_rotation(handle q)
+	{
+		return tz::ren::get_quad_rotation(ren, q);
+	}
+
+	void quad_set_rotation(handle q, float rotation)
+	{
+		tz::ren::set_quad_rotation(ren, q, rotation);
+	}
+
 	tz::v2f quad_get_scale(handle q)
 	{
 		return tz::ren::get_quad_scale(ren, q);

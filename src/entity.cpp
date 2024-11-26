@@ -269,6 +269,17 @@ namespace game
 					game::render::quad_set_scale(quads[i], scale);
 					auto pos = entity_get_position(ent);
 					entity_set_position(static_cast<tz::hanval>(i), pos + move_dir);
+
+					if(creatures[i].face_move_direction)
+					{
+						float rotation = std::atan2(move_dir[1], move_dir[0]);
+						if(move_dir[0] < 0.0f)
+						{
+							rotation += 3.14159f;
+						}
+						render::quad_set_rotation(quads[i], rotation);
+					}
+
 				}
 				else if(!busys[i])
 				{

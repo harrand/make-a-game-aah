@@ -5,6 +5,7 @@ prefabs.sparkle =
 	base_cooldown = 99999,
 	movement_speed = 2.5,
 	leeway_coefficient = 0.05,
+	face_move_direction = true,
 	power = 1,
 	idle =
 	{
