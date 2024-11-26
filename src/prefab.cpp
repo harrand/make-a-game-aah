@@ -114,6 +114,7 @@ namespace game
 			data.description = "<No Description>";
 		}
 		impl_collect_prefab_data(prefab_name, "base_cooldown", data.base_cooldown);
+		impl_collect_prefab_data(prefab_name, "leeway_coefficient", data.leeway_coefficient);
 		impl_collect_prefab_data(prefab_name, "has_tooltip", data.has_tooltip);
 		impl_collect_prefab_data(prefab_name, "combat", data.combat);
 		return 0;

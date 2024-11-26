@@ -19,6 +19,7 @@ namespace game
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
 	std::vector<float> cooldowns = {};
+	std::vector<float> leeway_coefficients = {};
 	std::vector<entity_handle> parents = {};
 	std::vector<void*> userdatas = {};
 	std::vector<std::vector<tz::v2f>> patrols = {};
@@ -64,6 +65,7 @@ namespace game
 			rotations.push_back({});
 			scales.push_back({});
 			cooldowns.push_back(0.0f);
+			leeway_coefficients.push_back(1.0f);
 			parents.push_back({});
 			userdatas.push_back(nullptr);
 			patrols.push_back({});
@@ -91,6 +93,7 @@ namespace game
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
 		cooldowns[ret.peek()] = 0.0f;
+		leeway_coefficients[ret.peek()] = prefab.leeway_coefficient;
 		userdatas[ret.peek()] = info.userdata;
 		patrols[ret.peek()] = {};
 		patrol_cursors[ret.peek()] = 0;
@@ -194,7 +197,7 @@ namespace game
 			auto pos = game::render::quad_get_position(quads[i]);
 			auto maybe_tarloc = target_locations[i];
 			entity_handle tar = targets[i];
-			const float leeway = config_global_speed_multiplier * speeds[i] * config_global_leeway_dist;
+			const float leeway = config_global_speed_multiplier * speeds[i] * config_global_leeway_dist * leeway_coefficients[i];
 			// if we dont have a target location but we do have a target entity, set tarloc (or attack if we're in range)
 			if(!maybe_tarloc.has_value() && tar != tz::nullhand)
 			{
