@@ -37,9 +37,6 @@ int tz_main()
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
-	auto sparkle = game::create_entity({.prefab_name = "sparkle", .player_aligned = true, .position = {-1.5f, 0.0f}, .scale = tz::v2f::filled(0.4f)});
-	game::entity_set_colour_tint(sparkle, {1.0f, 0.7f, 0.2f});
-
 	for(std::size_t i = 0; i < 3; i++)
 	{
 		game::deck_add_card(game::player_deck(), {.name = "banshee"});
@@ -47,6 +44,7 @@ int tz_main()
 		game::deck_add_card(game::player_deck(), {.name = "knight"});
 		game::deck_add_card(game::player_deck(), {.name = "skeleton"});
 	}
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
 
 	for(std::size_t i = 0; i < 3; i++)
 	{

@@ -1,12 +1,17 @@
-prefabs.sparkle =
+prefabs.firebolt =
 {
-	display_name = "sparkle",
+	display_name = "Firebolt",
+	description = "Launch a bolt of fire at a target, dealing damage",
 	base_health = 99999,
 	base_cooldown = 99999,
 	movement_speed = 2.5,
 	leeway_coefficient = 0.05,
 	face_move_direction = true,
-	power = 1,
+	colour_tint_r = 1.0,
+	colour_tint_g = 0.7,
+	colour_tint_b = 0.2,
+	spell_decoration = true,
+	power = 2,
 	idle =
 	{
 		fps = 12,
@@ -24,4 +29,4 @@ prefabs.sparkle =
 		}
 	},
 }
-prefabs.sparkle.move_horizontal = prefabs.sparkle.idle
+prefabs.firebolt.move_horizontal = prefabs.firebolt.idle

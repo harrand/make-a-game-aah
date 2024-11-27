@@ -18,6 +18,8 @@ namespace game
 		float base_cooldown = 1.0f;
 		float leeway_coefficient = 1.0f;
 		bool face_move_direction = false;
+		bool spell_decoration = false;
+		tz::v3f colour_tint = tz::v3f::filled(1.0f);
 		game::render::flipbook_handle idle = tz::nullhand;
 		game::render::flipbook_handle move_horizontal = tz::nullhand;
 		game::render::flipbook_handle move_up = tz::nullhand;

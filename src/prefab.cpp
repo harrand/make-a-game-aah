@@ -118,6 +118,14 @@ namespace game
 		impl_collect_prefab_data(prefab_name, "face_move_direction", data.face_move_direction);
 		impl_collect_prefab_data(prefab_name, "has_tooltip", data.has_tooltip);
 		impl_collect_prefab_data(prefab_name, "combat", data.combat);
+		impl_collect_prefab_data(prefab_name, "spell_decoration", data.spell_decoration);
+		float colour_tint_r = 1.0f;
+		float colour_tint_g = 1.0f;
+		float colour_tint_b = 1.0f;
+		impl_collect_prefab_data(prefab_name, "colour_tint_r", colour_tint_r);
+		impl_collect_prefab_data(prefab_name, "colour_tint_g", colour_tint_g);
+		impl_collect_prefab_data(prefab_name, "colour_tint_b", colour_tint_b);
+		data.colour_tint = {colour_tint_r, colour_tint_g, colour_tint_b};
 		return 0;
 	}
 }

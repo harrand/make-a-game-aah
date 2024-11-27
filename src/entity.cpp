@@ -105,7 +105,7 @@ namespace game
 
 		speeds[ret.peek()] = prefab.movement_speed;
 
-		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale});
+		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale, .colour = prefab.colour_tint});
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
 		move_dirs[ret.peek()] = tz::v2f::zero();
 
