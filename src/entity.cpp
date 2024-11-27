@@ -43,6 +43,8 @@ namespace game
 
 	void impl_melee_attack(entity_handle lhs, entity_handle rhs);
 	void impl_on_death(entity_handle ent);
+	bool impl_entity_destroyed(entity_handle ent);
+	void impl_all_stop_targetting(entity_handle ent);
 
 	entity_handle create_entity(entity_info info)
 	{
@@ -123,6 +125,7 @@ namespace game
 	{
 		auto prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_destroy; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
+		impl_all_stop_targetting(ent);
 
 		entity_set_parent(ent, tz::nullhand);
 
@@ -546,25 +549,32 @@ namespace game
 			game::render::quad_set_flipbook(quads[lhs.peek()], creatures[lhs.peek()].idle);
 
 			auto& victim_hp = hps[rhs.peek()];
-			if(victim_hp-- <= 1)
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then fn({}, {}) end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
+			// its possible on_hit leads to either entity being destroyed.
+			if(!impl_entity_destroyed(rhs))
 			{
-				impl_on_death(rhs);
+				if(victim_hp-- <= 1)
+				{
+					impl_on_death(rhs);
+				}
+				else
+				{
+					// rhs got hurt
+					if(rhs != player_get_avatar() && rhs != enemy_get_avatar() && !impl_entity_destroyed(lhs))
+					{
+						entity_set_target(rhs, lhs);
+					}
+					if(healthbars[rhs.peek()] == tz::nullhand)
+					{
+						healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .position = tz::v2f::zero(), .parent = rhs});
+						healthbar_timeouts[rhs.peek()] = config_healthbar_duration;
+					}
+				}
 			}
-			else
+			if(!impl_entity_destroyed(lhs))
 			{
-				// rhs got hurt
-				if(rhs != player_get_avatar() && rhs != enemy_get_avatar())
-				{
-					entity_set_target(rhs, lhs);
-				}
-				if(healthbars[rhs.peek()] == tz::nullhand)
-				{
-					healthbars[rhs.peek()] = create_entity({.prefab_name = "healthbar", .position = tz::v2f::zero(), .parent = rhs});
-					healthbar_timeouts[rhs.peek()] = config_healthbar_duration;
-				}
+				cooldowns[lhs.peek()] = creatures[lhs.peek()].base_cooldown;
 			}
-			// rhs should retaliate.
-			cooldowns[lhs.peek()] = creatures[lhs.peek()].base_cooldown;
 		}	
 	}
 
@@ -588,7 +598,16 @@ namespace game
 		{
 			destroy_entity(ent);
 		}
+		impl_all_stop_targetting(ent);
+	}
 
+	bool impl_entity_destroyed(entity_handle ent)
+	{
+		return std::find(entity_free_list.begin(), entity_free_list.end(), ent) != entity_free_list.end();
+	}
+
+	void impl_all_stop_targetting(entity_handle ent)
+	{
 		// everyone targetting it should drop target.
 		iterate_entities([dead_person = ent](entity_handle ent)
 		{

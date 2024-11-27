@@ -28,5 +28,16 @@ prefabs.firebolt =
 			"spell/sparkle/7.png",
 		}
 	},
+	on_update = function(me, delta)
+		if entity_get_target(me) == nil then
+			destroy_entity(me)
+		end
+	end,
+	on_create = function(me)
+		entity_set_scale(me, 0.4, 0.4)
+	end,
+	on_hit = function(me, victim)
+		destroy_entity(me)
+	end
 }
 prefabs.firebolt.move_horizontal = prefabs.firebolt.idle

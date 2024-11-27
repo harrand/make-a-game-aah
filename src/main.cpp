@@ -45,6 +45,11 @@ int tz_main()
 		game::deck_add_card(game::player_deck(), {.name = "skeleton"});
 	}
 	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
+	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
 
 	for(std::size_t i = 0; i < 3; i++)
 	{
