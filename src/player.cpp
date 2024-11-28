@@ -117,8 +117,22 @@ namespace game
 				card c = game::deck_get_card(player.deck, i);
 				if(player.deck_hold_array[i])
 				{
-					unsigned int cost = game::get_prefab(c.name).power * config_mana_cost_per_power;
-					if(player_try_spend_mana(cost))
+					auto prefab = game::get_prefab(c.name);
+					unsigned int cost = prefab.power * config_mana_cost_per_power;
+					bool can_play = true;
+					if(prefab.require_target_entity_to_play)
+					{
+						can_play &= player.target_entity != tz::nullhand;
+					}
+					if(prefab.require_target_location_to_play)
+					{
+						can_play &= player.target_location.has_value();
+					}
+					if(can_play)
+					{
+						can_play = player_try_spend_mana(cost);
+					}
+					if(can_play)
 					{
 						// but was last frame. i.e we've just let go of it.
 						// play it

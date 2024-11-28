@@ -119,6 +119,8 @@ namespace game
 		impl_collect_prefab_data(prefab_name, "has_tooltip", data.has_tooltip);
 		impl_collect_prefab_data(prefab_name, "combat", data.combat);
 		impl_collect_prefab_data(prefab_name, "spell_decoration", data.spell_decoration);
+		impl_collect_prefab_data(prefab_name, "require_target_entity_to_play", data.require_target_entity_to_play);
+		impl_collect_prefab_data(prefab_name, "require_target_location_to_play", data.require_target_location_to_play);
 		float colour_tint_r = 1.0f;
 		float colour_tint_g = 1.0f;
 		float colour_tint_b = 1.0f;

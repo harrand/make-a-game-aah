@@ -19,6 +19,8 @@ namespace game
 		float leeway_coefficient = 1.0f;
 		bool face_move_direction = false;
 		bool spell_decoration = false;
+		bool require_target_entity_to_play = false;
+		bool require_target_location_to_play = false;
 		tz::v3f colour_tint = tz::v3f::filled(1.0f);
 		game::render::flipbook_handle idle = tz::nullhand;
 		game::render::flipbook_handle move_horizontal = tz::nullhand;

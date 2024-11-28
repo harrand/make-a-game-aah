@@ -54,6 +54,7 @@ int tz_main()
 	for(std::size_t i = 0; i < 3; i++)
 	{
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
+		game::deck_add_card(game::enemy_deck(), {.name = "firebolt"});
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
 		game::deck_add_card(game::enemy_deck(), {.name = "skeleton"});
 		game::deck_add_card(game::enemy_deck(), {.name = "banshee"});

@@ -11,6 +11,7 @@ prefabs.firebolt =
 	colour_tint_g = 0.7,
 	colour_tint_b = 0.2,
 	spell_decoration = true,
+	require_target_entity_to_play = true,
 	power = 2,
 	idle =
 	{
