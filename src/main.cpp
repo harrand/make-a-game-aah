@@ -37,18 +37,20 @@ int tz_main()
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
-	for(std::size_t i = 0; i < 12; i++)
+	for(std::size_t i = 0; i < 3; i++)
 	{
+		game::deck_add_card(game::player_deck(), {.name = "peasant"});
 		game::deck_add_card(game::player_deck(), {.name = "archer"});
+		game::deck_add_card(game::player_deck(), {.name = "knight"});
 	}
-	game::deck_add_card(game::player_deck(), {.name = "general"});
 
-	for(std::size_t i = 0; i < 7; i++)
+	for(std::size_t i = 0; i < 5; i++)
 	{
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
-		game::deck_add_card(game::enemy_deck(), {.name = "banshee"});
+		game::deck_add_card(game::enemy_deck(), {.name = "archer"});
+		game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 	}
-	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
+	game::deck_add_card(game::enemy_deck(), {.name = "general"});
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "knight"});
 	game::entity_handle skel2 = game::create_entity({.prefab_name = "knight", .player_aligned = true});
