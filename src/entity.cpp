@@ -19,8 +19,10 @@ namespace game
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
 	std::vector<float> cooldowns = {};
+	std::vector<unsigned int> damages = {};
 	std::vector<float> leeway_coefficients = {};
 	std::vector<entity_handle> parents = {};
+	std::vector<entity_handle> owners = {};
 	std::vector<void*> userdatas = {};
 	std::vector<std::vector<tz::v2f>> patrols = {};
 	std::vector<std::size_t> patrol_cursors = {};
@@ -67,8 +69,10 @@ namespace game
 			rotations.push_back({});
 			scales.push_back({});
 			cooldowns.push_back(0.0f);
+			damages.push_back(1);
 			leeway_coefficients.push_back(1.0f);
 			parents.push_back({});
+			owners.push_back({});
 			userdatas.push_back(nullptr);
 			patrols.push_back({});
 			patrol_cursors.push_back(0);
@@ -95,11 +99,13 @@ namespace game
 		rotations[ret.peek()] = info.rotation;
 		scales[ret.peek()] = info.scale;
 		cooldowns[ret.peek()] = 0.0f;
+		damages[ret.peek()] = prefab.base_damage;
 		leeway_coefficients[ret.peek()] = prefab.leeway_coefficient;
 		userdatas[ret.peek()] = info.userdata;
 		patrols[ret.peek()] = {};
 		patrol_cursors[ret.peek()] = 0;
 		parents[ret.peek()] = tz::nullhand;
+		owners[ret.peek()] = tz::nullhand;
 		childrens[ret.peek()] = {};
 		busys[ret.peek()] = false;
 		targets[ret.peek()] = tz::nullhand;
@@ -428,6 +434,16 @@ namespace game
 		move_dirs[ent.peek()] += dir;
 	}
 
+	void entity_set_cooldown(entity_handle ent, float cooldown)
+	{
+		cooldowns[ent.peek()] = cooldown;
+	}
+
+	void entity_set_owner(entity_handle ent, entity_handle owner)
+	{
+		owners[ent.peek()] = owner;
+	}
+
 	bool entity_is_player_aligned(entity_handle ent)
 	{
 		return player_aligneds[ent.peek()];
@@ -613,16 +629,25 @@ namespace game
 			// its possible on_hit leads to either entity being destroyed.
 			if(!impl_entity_destroyed(rhs))
 			{
-				if(victim_hp-- <= 1)
+				unsigned int dmg = damages[lhs.peek()];
+				if(victim_hp <= dmg)
 				{
+					victim_hp = 0;
 					impl_on_death(rhs);
 				}
-				else
+				else if(dmg > 0)
 				{
+					victim_hp -= dmg;
 					// rhs got hurt
-					if(rhs != player_get_avatar() && rhs != enemy_get_avatar() && !impl_entity_destroyed(lhs))
+					entity_handle retaliation_target = lhs;
+					while(owners[retaliation_target.peek()] != tz::nullhand)
 					{
-						entity_set_target(rhs, lhs);
+						retaliation_target = owners[retaliation_target.peek()];
+					}
+					if(rhs != player_get_avatar() && rhs != enemy_get_avatar() && !impl_entity_destroyed(retaliation_target))
+					{
+						volatile bool breakpt = lhs != retaliation_target;
+						entity_set_target(rhs, retaliation_target);
 					}
 					if(healthbars[rhs.peek()] == tz::nullhand)
 					{

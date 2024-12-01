@@ -4,9 +4,17 @@ prefabs.archer =
 	description = "bro has 0 money",
 	base_health = 5,
 	base_cooldown = 0.7,
+	base_damage = 0,
 	movement_speed = 0.5,
 	power = 3,
 	leeway_coefficient = 8.0,
+	on_hit = function(me, victim)
+		local arrow = create_entity("arrow")
+		entity_set_is_player_aligned(arrow, entity_is_player_aligned(me))
+		entity_set_position(arrow, entity_get_position(me))
+		entity_set_target(arrow, victim)
+		entity_set_owner(arrow, me)
+	end,
 	idle =
 	{
 		fps = 2,

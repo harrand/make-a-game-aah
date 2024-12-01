@@ -17,6 +17,7 @@ namespace game
 		bool combat = true;
 		float base_cooldown = 1.0f;
 		float leeway_coefficient = 1.0f;
+		unsigned int base_damage = 1;
 		bool face_move_direction = false;
 		bool spell_decoration = false;
 		bool require_target_entity_to_play = false;

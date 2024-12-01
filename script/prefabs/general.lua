@@ -5,6 +5,7 @@ prefabs.general =
 	base_health = 80,
 	movement_speed = 1.2,
 	base_cooldown = 0.2,
+	base_damage = 2,
 	power = 5,
 	idle =
 	{
