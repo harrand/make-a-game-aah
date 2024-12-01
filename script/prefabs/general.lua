@@ -1,7 +1,7 @@
 prefabs.general =
 {
 	display_name = "The General",
-	description = "Commands the knights of the castle.",
+	description = "A mighty warrior who commands the Knights.",
 	base_health = 80,
 	movement_speed = 1.2,
 	base_cooldown = 0.2,

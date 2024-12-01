@@ -1,7 +1,7 @@
 prefabs.banshee =
 {
 	display_name = "Banshee",
-	description = "aah! a banshee!!!! fuck!!",
+	description = "The wrathful ghost of a wronged woman. Will attempt to possess a victim.",
 	base_health = 10,
 	base_cooldown = 0.7,
 	movement_speed = 0.4,

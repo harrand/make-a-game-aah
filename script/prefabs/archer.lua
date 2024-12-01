@@ -1,7 +1,7 @@
 prefabs.archer =
 {
 	display_name = "Archer",
-	description = "bro has 0 money",
+	description = "A ranged attacker with a keen eye.",
 	base_health = 5,
 	base_cooldown = 0.7,
 	base_damage = 0,

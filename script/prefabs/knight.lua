@@ -1,5 +1,7 @@
 prefabs.knight =
 {
+	display_name = "Knight",
+	description = "An armoured warrior boasting a mighty greatsword.",
 	base_health = 20,
 	movement_speed = 0.6,
 	base_cooldown = 0.5,

@@ -1,7 +1,7 @@
 prefabs.peasant =
 {
 	display_name = "Peasant",
-	description = "bro has 0 money",
+	description = "An angry man with a rusty pitchfork.",
 	base_health = 5,
 	movement_speed = 1.2,
 	power = 1,
