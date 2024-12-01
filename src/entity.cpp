@@ -656,6 +656,10 @@ namespace game
 	void impl_all_stop_targetting(entity_handle ent)
 	{
 		// everyone targetting it should drop target.
+		if(player_targets(ent))
+		{
+			player_drop_target_entity();
+		}
 		iterate_entities([dead_person = ent](entity_handle ent)
 		{
 			if(

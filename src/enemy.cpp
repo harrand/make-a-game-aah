@@ -109,7 +109,7 @@ namespace game
 			game::entity_start_casting(enemy.avatar);
 		}
 
-		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = false, .position = pos, .parent = enemy.avatar});
+		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = false, .position = tz::v2f::zero(), .parent = enemy.avatar});
 		game::entity_set_colour_tint(aura, config_enemy_aligned_colour);
 		game::entity_set_layer(aura, -1);
 	}
