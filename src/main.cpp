@@ -39,14 +39,8 @@ int tz_main()
 
 	for(std::size_t i = 0; i < 12; i++)
 	{
-		game::deck_add_card(game::player_deck(), {.name = "banshee"});
+		game::deck_add_card(game::player_deck(), {.name = "archer"});
 	}
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
-	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
 
 	for(std::size_t i = 0; i < 7; i++)
 	{
