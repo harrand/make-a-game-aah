@@ -500,6 +500,19 @@ namespace game
 		{
 			busys[ent.peek()] = false;
 		}
+		else
+		{
+			float ent_x = entity_get_position(ent)[0];
+			float tar_x = entity_get_position(tar)[0];
+			if(ent_x > tar_x)
+			{
+				entity_face_left(ent);
+			}
+			else
+			{
+				entity_face_right(ent);
+			}
+		}
 	}
 
 	void entity_display_tooltip(entity_handle ent)

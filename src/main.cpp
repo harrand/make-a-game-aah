@@ -29,7 +29,7 @@ int tz_main()
 	game::prefab_setup();
 	game::card_setup();
 	game::player_setup(game::get_prefab("melistra"));
-	game::enemy_setup(game::get_prefab("knight"));
+	game::enemy_setup(game::get_prefab("general"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -43,6 +43,7 @@ int tz_main()
 		game::deck_add_card(game::player_deck(), {.name = "archer"});
 		game::deck_add_card(game::player_deck(), {.name = "knight"});
 	}
+	game::deck_add_card(game::player_deck(), {.name = "general"});
 
 	for(std::size_t i = 0; i < 5; i++)
 	{
