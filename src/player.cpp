@@ -280,6 +280,11 @@ namespace game
 	{
 		tz::v2f loc;
 		tz::v3f col;
+
+		if(player.target_entity != tz::nullhand && game::entity_is_player_aligned(player.target_entity))
+		{
+			player_drop_target_entity();
+		}
 		if(player.target_entity != tz::nullhand)
 		{
 			// targetting an entity

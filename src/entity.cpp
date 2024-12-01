@@ -437,31 +437,24 @@ namespace game
 	{
 		bool aligned = player_aligneds[ent.peek()];
 		// clear target if swapping sides
-		// also everyone who is targeting ent that is about to become an ally should drop target
+		player_aligneds[ent.peek()] = player_aligned;
+		// also everyone who is targeting ent that is about to become an ally should drop target (including the player and enemy reticules)
+		if(player_aligned)
+		{
+			if(player_targets(ent))
+			{
+				player_drop_target_entity();
+			}
+		}
+		else
+		{
+			// same thing but for enemy
+		}
 		if(aligned != player_aligned)
 		{
 			entity_set_target(ent, tz::nullhand);
-			iterate_entities([me = ent](entity_handle ent)
-			{
-				if(
-					ent == me ||
-					!creatures[ent.peek()].combat ||
-					ent == enemy_get_avatar() ||
-					ent == player_get_avatar()	
-					) return;
-				// if alignments currently dont match (i.e they are enemies)
-				// then when i swap the alignment they will now be allies
-				// in which case drop target
-				if(entity_is_player_aligned(ent) != entity_is_player_aligned(me))
-				{
-					if(entity_get_target(ent) == me)
-					{
-						entity_set_target(ent, tz::nullhand);
-					}
-				}
-			});
+			impl_all_stop_targetting(ent);
 		}
-		player_aligneds[ent.peek()] = player_aligned;
 	}
 
 	std::span<const tz::v2f> entity_get_patrol(entity_handle ent)
@@ -596,7 +589,14 @@ namespace game
 			game::render::quad_set_flipbook(quads[lhs.peek()], flipbook);
 
 			auto& victim_hp = hps[rhs.peek()];
-			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then fn({}, {}) end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then _tmpret = fn({}, {}); end if _tmpret == nil then _tmpret = false end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
+			bool cancel = tz_must(tz::lua_get_bool("_tmpret"));
+			if(cancel)
+			{
+				tz_must(tz::lua_execute("_tmpret = false"));
+				busys[lhs.peek()] = false;
+				return;
+			}
 			// its possible on_hit leads to either entity being destroyed.
 			if(!impl_entity_destroyed(rhs))
 			{

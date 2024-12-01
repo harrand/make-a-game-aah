@@ -7,8 +7,12 @@ prefabs.banshee =
 	movement_speed = 0.4,
 	power = 3,
 	on_hit = function(me, victim)
-		destroy_entity(me)
 		entity_set_is_player_aligned(victim, entity_is_player_aligned(me))
+		destroy_entity(me)
+
+		local r, g, b = entity_get_colour_tint(victim)
+		entity_set_colour_tint(victim, r * 0.4, g * 0.7, b * 1.5)
+		return true
 	end,
 	idle =
 	{
