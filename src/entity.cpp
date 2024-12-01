@@ -428,6 +428,42 @@ namespace game
 		move_dirs[ent.peek()] += dir;
 	}
 
+	bool entity_is_player_aligned(entity_handle ent)
+	{
+		return player_aligneds[ent.peek()];
+	}
+
+	void entity_set_is_player_aligned(entity_handle ent, bool player_aligned)
+	{
+		bool aligned = player_aligneds[ent.peek()];
+		// clear target if swapping sides
+		// also everyone who is targeting ent that is about to become an ally should drop target
+		if(aligned != player_aligned)
+		{
+			entity_set_target(ent, tz::nullhand);
+			iterate_entities([me = ent](entity_handle ent)
+			{
+				if(
+					ent == me ||
+					!creatures[ent.peek()].combat ||
+					ent == enemy_get_avatar() ||
+					ent == player_get_avatar()	
+					) return;
+				// if alignments currently dont match (i.e they are enemies)
+				// then when i swap the alignment they will now be allies
+				// in which case drop target
+				if(entity_is_player_aligned(ent) != entity_is_player_aligned(me))
+				{
+					if(entity_get_target(ent) == me)
+					{
+						entity_set_target(ent, tz::nullhand);
+					}
+				}
+			});
+		}
+		player_aligneds[ent.peek()] = player_aligned;
+	}
+
 	std::span<const tz::v2f> entity_get_patrol(entity_handle ent)
 	{
 		return patrols[ent.peek()];
@@ -466,6 +502,11 @@ namespace game
 	{
 		target_locations[ent.peek()] = std::nullopt;
 		targets[ent.peek()] = tar;
+		// dropping a target will stop you from being busy.
+		if(tar == tz::nullhand)
+		{
+			busys[ent.peek()] = false;
+		}
 	}
 
 	void entity_display_tooltip(entity_handle ent)

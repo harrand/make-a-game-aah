@@ -195,6 +195,20 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_is_player_aligned", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			tz::lua_push_bool(game::entity_is_player_aligned(static_cast<tz::hanval>(ent)));
+			return 1;
+		});
+
+		tz::lua_define_function("entity_set_is_player_aligned", []()
+		{
+			auto [ent, player_aligned] = tz::lua_parse_args<std::int64_t, bool>();
+			game::entity_set_is_player_aligned(static_cast<tz::hanval>(ent), player_aligned);
+			return 0;
+		});
+
 		tz::lua_define_function("entity_get_patrol", []()->int
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();
