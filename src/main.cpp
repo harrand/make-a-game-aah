@@ -45,6 +45,7 @@ int tz_main()
 	}
 	game::deck_add_card(game::player_deck(), {.name = "general"});
 	game::deck_add_card(game::player_deck(), {.name = "assassin"});
+	game::deck_add_card(game::player_deck(), {.name = "bear"});
 
 	for(std::size_t i = 0; i < 5; i++)
 	{
