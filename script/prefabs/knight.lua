@@ -23,7 +23,7 @@ prefabs.knight =
 			"creature/knight/idle0.png",
 			"creature/knight/side0.png",
 			"creature/knight/idle0.png",
-			"creature/knight/side1.png"
+			"creature/knight/side1.png",
 		}
 	},
 	attack =

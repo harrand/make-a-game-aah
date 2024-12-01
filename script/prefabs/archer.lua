@@ -31,7 +31,7 @@ prefabs.archer =
 	},
 	attack =
 	{
-		fps = 6,
+		fps = 12,
 		loop = true,
 		frames =
 		{
@@ -42,6 +42,9 @@ prefabs.archer =
 			"creature/archer/attack1.png",
 			"creature/archer/attack1.png",
 			"creature/archer/attack1.png",
+			"creature/archer/attack2.png",
+			"creature/archer/attack2.png",
+			"creature/archer/attack2.png",
 			"creature/archer/idle0.png"
 		}
 	}
