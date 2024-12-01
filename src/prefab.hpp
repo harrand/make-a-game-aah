@@ -27,6 +27,7 @@ namespace game
 		game::render::flipbook_handle move_up = tz::nullhand;
 		game::render::flipbook_handle move_down = tz::nullhand;
 		game::render::flipbook_handle cast = tz::nullhand;
+		game::render::flipbook_handle attack = tz::nullhand;
 	};
 
 	void prefab_setup();

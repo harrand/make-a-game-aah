@@ -25,5 +25,18 @@ prefabs.knight =
 			"creature/knight/idle0.png",
 			"creature/knight/side1.png"
 		}
+	},
+	attack =
+	{
+		fps = 8,
+		loop = true,
+		frames =
+		{
+			"creature/knight/attack0.png",
+			"creature/knight/attack1.png",
+			"creature/knight/attack0.png",
+			"creature/knight/attack2.png",
+			"creature/knight/attack2.png",
+		}
 	}
 }

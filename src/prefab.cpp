@@ -102,6 +102,7 @@ namespace game
 		impl_collect_prefab_animation(prefab_name, "move_up", data.move_up);
 		impl_collect_prefab_animation(prefab_name, "move_down", data.move_down);
 		impl_collect_prefab_animation(prefab_name, "cast", data.cast);
+		impl_collect_prefab_animation(prefab_name, "attack", data.attack);
 		impl_collect_prefab_data(prefab_name, "base_health", data.base_health);
 		impl_collect_prefab_data(prefab_name, "movement_speed", data.movement_speed);
 		impl_collect_prefab_data(prefab_name, "power", data.power);

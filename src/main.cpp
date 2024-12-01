@@ -29,7 +29,7 @@ int tz_main()
 	game::prefab_setup();
 	game::card_setup();
 	game::player_setup(game::get_prefab("melistra"));
-	game::enemy_setup(game::get_prefab("nightmare"));
+	game::enemy_setup(game::get_prefab("knight"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -51,21 +51,17 @@ int tz_main()
 	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
 	game::deck_add_card(game::player_deck(), {.name = "firebolt"});
 
-	for(std::size_t i = 0; i < 3; i++)
+	for(std::size_t i = 0; i < 15; i++)
 	{
 		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
-		game::deck_add_card(game::enemy_deck(), {.name = "firebolt"});
-		game::deck_add_card(game::enemy_deck(), {.name = "peasant"});
-		game::deck_add_card(game::enemy_deck(), {.name = "skeleton"});
-		game::deck_add_card(game::enemy_deck(), {.name = "banshee"});
-		game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 	}
-	game::deck_add_card(game::enemy_deck(), {.name = "nightmare"});
+	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 
-	game::entity_handle skel = game::create_entity({.prefab_name = "skeleton"});
-	game::entity_handle skel2 = game::create_entity({.prefab_name = "skeleton", .player_aligned = true});
+	game::entity_handle skel = game::create_entity({.prefab_name = "knight"});
+	game::entity_handle skel2 = game::create_entity({.prefab_name = "knight", .player_aligned = true});
 	game::entity_set_position(skel2, {-1.0f, 0.0f});
 	game::entity_set_target(skel2, skel);
+	game::entity_set_target(skel, skel2);
 	game::entity_set_hp(skel2, 999);
 	game::player_set_mana(1);
 	game::player_set_mps(10.0f);

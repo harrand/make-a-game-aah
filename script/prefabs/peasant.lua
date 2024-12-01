@@ -26,5 +26,15 @@ prefabs.peasant =
 			"creature/peasant/idle0.png",
 			"creature/peasant/side1.png"
 		}
+	},
+	attack =
+	{
+		fps = 5,
+		loop = true,
+		frames =
+		{
+			"creature/peasant/attack0.png",
+			"creature/peasant/attack1.png"
+		}
 	}
 }

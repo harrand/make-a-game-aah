@@ -546,7 +546,13 @@ namespace game
 		if(cooldowns[lhs.peek()] <= 0.0f && hps[lhs.peek()] > 0.0f && hps[rhs.peek()] > 0.0f)
 		{
 			busys[lhs.peek()] = true;
-			game::render::quad_set_flipbook(quads[lhs.peek()], creatures[lhs.peek()].idle);
+
+			auto flipbook = creatures[lhs.peek()].attack;
+			if(flipbook == tz::nullhand)
+			{
+				flipbook = creatures[lhs.peek()].idle;
+			}
+			game::render::quad_set_flipbook(quads[lhs.peek()], flipbook);
 
 			auto& victim_hp = hps[rhs.peek()];
 			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then fn({}, {}) end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
