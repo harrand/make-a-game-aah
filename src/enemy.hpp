@@ -10,6 +10,7 @@ namespace game
 	void enemy_set_creature(game::prefab prefab);
 
 	deck_handle enemy_deck();
+	void enemy_set_pool(std::span<const card> cards);
 
 	unsigned int enemy_get_max_mana();
 	void enemy_set_max_mana(unsigned int mana);

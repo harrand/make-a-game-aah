@@ -24,6 +24,9 @@ namespace game
 
 		entity_handle target_entity = tz::nullhand;
 		std::optional<tz::v2f> target_location = std::nullopt;
+
+		std::vector<card> card_pool = {};
+		std::size_t card_pool_cursor = 0;
 	} player;
 
 	void impl_update_reticule();
@@ -148,6 +151,13 @@ namespace game
 						}
 						// this will destroy the card, so fix up our deck hold array
 						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+
+						// draw a new card?
+						if(player.card_pool.size())
+						{
+							game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
+							player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
+						}
 					}
 					else
 					{
@@ -185,6 +195,14 @@ namespace game
 	deck_handle player_deck()
 	{
 		return player.deck;
+	}
+
+	void player_set_pool(std::span<const card> cards)
+	{
+		player.card_pool.clear();
+		player.card_pool.resize(cards.size());
+		std::copy(cards.begin(), cards.end(), player.card_pool.begin());
+		player.card_pool_cursor = 0;
 	}
 
 	unsigned int player_get_max_mana()

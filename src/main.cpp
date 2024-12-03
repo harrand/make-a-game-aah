@@ -51,6 +51,56 @@ int tz_main()
 	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
 	game::deck_add_card(game::enemy_deck(), {.name = "general"});
 
+	game::card player_cards[] =
+	{
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "peasant"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "knight"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "bear"
+		},
+	};
+	game::player_set_pool(player_cards);
+
+	game::card enemy_cards[] =
+	{
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "peasant"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "knight"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "bear"
+		},
+	};
+	game::enemy_set_pool(enemy_cards);
+
 	game::entity_handle skel = game::create_entity({.prefab_name = "knight"});
 	game::entity_handle skel2 = game::create_entity({.prefab_name = "knight", .player_aligned = true});
 	game::entity_set_position(skel2, {-1.0f, 0.0f});

@@ -11,6 +11,7 @@ namespace game
 	void player_set_creature(game::prefab prefab);
 
 	deck_handle player_deck();
+	void player_set_pool(std::span<const card> cards);
 
 	unsigned int player_get_max_mana();
 	void player_set_max_mana(unsigned int mana);

@@ -23,6 +23,9 @@ namespace game
 		float play_timer = 0.0f;
 		card play_card = {};
 		render::handle play_card_quad = tz::nullhand;
+
+		std::vector<card> card_pool = {};
+		std::size_t card_pool_cursor = 0;
 	} enemy;
 
 	void impl_enemy_play_card(std::size_t id);
@@ -82,6 +85,13 @@ namespace game
 				enemy.play_timer = 0.0f;
 
 				game::entity_set_target(ent, game::player_get_avatar());
+				
+				// draw a new card?
+				if(enemy.card_pool.size())
+				{
+					game::deck_add_card(enemy.deck, enemy.card_pool[enemy.card_pool_cursor]);
+					enemy.card_pool_cursor = (enemy.card_pool_cursor + 1) % enemy.card_pool.size();	
+				}
 			}
 			else
 			{
@@ -117,6 +127,15 @@ namespace game
 	deck_handle enemy_deck()
 	{
 		return enemy.deck;
+	}
+
+	void enemy_set_pool(std::span<const card> cards)
+	{
+		enemy.card_pool.clear();
+		enemy.card_pool.resize(cards.size());
+
+		enemy.card_pool_cursor = 0;
+		std::copy(cards.begin(), cards.end(), enemy.card_pool.begin());
 	}
 
 	unsigned int enemy_get_max_mana()
