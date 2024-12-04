@@ -17,7 +17,6 @@ topaz_add_executable(
 		src/main.cpp
 		src/card.cpp
 		src/deck.cpp
-		src/enemy.cpp
 		src/entity.cpp
 		src/player.cpp
 		src/prefab.cpp

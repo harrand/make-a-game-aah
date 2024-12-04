@@ -3,7 +3,6 @@
 #include "prefab.hpp"
 #include "config.hpp"
 #include "player.hpp"
-#include "enemy.hpp"
 #include "tz/core/lua.hpp"
 #include <vector>
 
@@ -292,6 +291,8 @@ namespace game
 				}
 				else if(!busys[i])
 				{
+					// todo: have the player control their idle entities.
+					/*
 					if(player_aligneds[i] && creatures[i].combat)
 					{
 						// do something
@@ -305,6 +306,7 @@ namespace game
 						}
 					}
 					// not moving and not doing anything idle.
+					*/
 					game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 				}
 			}
@@ -454,18 +456,14 @@ namespace game
 		bool aligned = player_aligneds[ent.peek()];
 		// clear target if swapping sides
 		player_aligneds[ent.peek()] = player_aligned;
-		// also everyone who is targeting ent that is about to become an ally should drop target (including the player and enemy reticules)
-		if(player_aligned)
+		game::iterate_players([ent, good = aligned](player_handle p)
 		{
-			if(player_targets(ent))
+			if(player_targets(p, ent) && good != player_is_good(p))
 			{
-				player_drop_target_entity();
+				player_drop_target_entity(p);
 			}
-		}
-		else
-		{
-			// same thing but for enemy
-		}
+		});
+
 		if(aligned != player_aligned)
 		{
 			entity_set_target(ent, tz::nullhand);
@@ -644,9 +642,17 @@ namespace game
 					{
 						retaliation_target = owners[retaliation_target.peek()];
 					}
-					if(rhs != player_get_avatar() && rhs != enemy_get_avatar() && !impl_entity_destroyed(retaliation_target))
+					// if rhs is a player avatar, well they never target anything, so dont bother.
+					bool rhs_is_player = false;
+					iterate_players([&rhs_is_player, rhs](player_handle p)
 					{
-						volatile bool breakpt = lhs != retaliation_target;
+						if(player_get_avatar(p) == rhs)
+						{
+							rhs_is_player = true;
+						}
+					});
+					if(!rhs_is_player && !impl_entity_destroyed(retaliation_target))
+					{
 						entity_set_target(rhs, retaliation_target);
 					}
 					if(healthbars[rhs.peek()] == tz::nullhand)
@@ -667,19 +673,22 @@ namespace game
 	{
 		auto prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_death; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
-		if(player_targets(ent))
+		bool ent_is_player = false;
+		iterate_players([ent, &ent_is_player](player_handle p)
 		{
-			player_drop_target_entity();
-		}
-		if(ent == player_get_avatar())
-		{
-			player_on_death();
-		}
-		else if(ent == enemy_get_avatar())
-		{
-			// you won
-		}
-		else
+			// all players must stop targetting it.
+			if(player_targets(p, ent))
+			{
+				player_drop_target_entity(p);
+			}
+			// if it was a player, then invoke their callback.
+			if(ent == player_get_avatar(p))
+			{
+				player_on_death(p);
+				ent_is_player = true;
+			}
+		});
+		if(!ent_is_player)
 		{
 			destroy_entity(ent);
 		}
@@ -694,26 +703,36 @@ namespace game
 	void impl_all_stop_targetting(entity_handle ent)
 	{
 		// everyone targetting it should drop target.
-		if(player_targets(ent))
+		bool ent_is_player = false;
+		iterate_players([ent, &ent_is_player](player_handle p)
 		{
-			player_drop_target_entity();
-		}
-		iterate_entities([dead_person = ent](entity_handle ent)
+			if(player_targets(p, ent))
+			{
+				player_drop_target_entity(p);
+			}
+			if(player_get_avatar(p) == ent)
+			{
+				ent_is_player = true;
+			}
+		});
+		iterate_entities([dead_person = ent, ent_is_player](entity_handle ent)
 		{
 			if(
 				ent == dead_person ||
 				!creatures[ent.peek()].combat ||
-				ent == enemy_get_avatar() ||
-				ent == player_get_avatar()	
+				ent_is_player
 				) return;
 			if(entity_get_target(ent) == dead_person)
 			{
 				busys[ent.peek()] = false;
 				// an entity was targetting the now dead entity.
 				// was it player aligned?
+				// ok, then the player who is controlling it should now decide what it should do next.
+
+				/*
 				if(player_aligneds[ent.peek()])
 				{
-					// yes, it should target the players target
+					// yes, it
 					if(player_get_target() != tz::nullhand)
 					{
 						entity_set_target(ent, player_get_target());
@@ -737,6 +756,8 @@ namespace game
 					// nothing to go for.
 					entity_set_target(ent, tz::nullhand);
 				}
+				*/
+				entity_set_target(ent, tz::nullhand);
 			}
 		});
 	}

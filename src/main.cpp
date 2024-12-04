@@ -6,7 +6,6 @@
 
 #include "card.hpp"
 #include "player.hpp"
-#include "enemy.hpp"
 #include "prefab.hpp"
 #include "entity.hpp"
 #include "render.hpp"
@@ -28,8 +27,9 @@ int tz_main()
 	game::script_initialise();
 	game::prefab_setup();
 	game::card_setup();
-	game::player_setup(game::get_prefab("melistra"));
-	game::enemy_setup(game::get_prefab("peasant"));
+
+	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
+	auto enemy = game::create_player(game::player_type::cpu, false, game::get_prefab("peasant"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -39,17 +39,17 @@ int tz_main()
 
 	for(std::size_t i = 0; i < 3; i++)
 	{
-		game::deck_add_card(game::player_deck(), {.name = "peasant"});
-		game::deck_add_card(game::player_deck(), {.name = "archer"});
-		game::deck_add_card(game::player_deck(), {.name = "knight"});
+		game::deck_add_card(game::player_deck(player), {.name = "peasant"});
+		game::deck_add_card(game::player_deck(player), {.name = "archer"});
+		game::deck_add_card(game::player_deck(player), {.name = "knight"});
 	}
-	game::deck_add_card(game::player_deck(), {.name = "general"});
-	game::deck_add_card(game::player_deck(), {.name = "assassin"});
-	game::deck_add_card(game::player_deck(), {.name = "bear"});
-	game::deck_add_card(game::player_deck(), {.name = "warbear"});
+	game::deck_add_card(game::player_deck(player), {.name = "general"});
+	game::deck_add_card(game::player_deck(player), {.name = "assassin"});
+	game::deck_add_card(game::player_deck(player), {.name = "bear"});
+	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
 
-	game::deck_add_card(game::enemy_deck(), {.name = "knight"});
-	game::deck_add_card(game::enemy_deck(), {.name = "general"});
+	game::deck_add_card(game::player_deck(enemy), {.name = "knight"});
+	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
 	game::card player_cards[] =
 	{
@@ -74,7 +74,7 @@ int tz_main()
 			.name = "bear"
 		},
 	};
-	game::player_set_pool(player_cards);
+	game::player_set_pool(player, player_cards);
 
 	game::card enemy_cards[] =
 	{
@@ -99,7 +99,7 @@ int tz_main()
 			.name = "bear"
 		},
 	};
-	game::enemy_set_pool(enemy_cards);
+	game::player_set_pool(enemy, enemy_cards);
 
 	game::entity_handle skel = game::create_entity({.prefab_name = "knight"});
 	game::entity_handle skel2 = game::create_entity({.prefab_name = "knight", .player_aligned = true});
@@ -107,8 +107,8 @@ int tz_main()
 	game::entity_set_target(skel2, skel);
 	game::entity_set_target(skel, skel2);
 	game::entity_set_hp(skel2, 999);
-	game::player_set_mana(1);
-	game::player_set_mps(10.0f);
+	game::player_set_mana(player, 1);
+	game::player_set_mps(player, 10.0f);
 
 	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())
@@ -120,7 +120,6 @@ int tz_main()
 		game::render::update(delta_seconds);
 		game::entity_update(delta_seconds);
 		game::player_update(delta_seconds);
-		game::enemy_update(delta_seconds);
 		game::deck_update(delta_seconds);
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::escape))
@@ -129,7 +128,7 @@ int tz_main()
 		}
 		if(tz::os::is_key_pressed(tz::os::key::z))
 		{
-			game::deck_swap_cards(game::player_deck(), 0, 1);
+			game::deck_swap_cards(game::player_deck(player), 0, 1);
 		}
 	}
 	tz::terminate();
