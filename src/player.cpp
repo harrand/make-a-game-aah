@@ -201,8 +201,6 @@ namespace game
 		}
 		const auto& player = players[p.peek()];
 
-		tz_assert(p == human_player, "human player is wrong, logic error");
-
 		if(player.target_entity != tz::nullhand)
 		{
 			game::entity_set_target(ent, player.target_entity);
@@ -210,6 +208,22 @@ namespace game
 		else if(player.target_location.has_value())
 		{
 			game::entity_set_target_location(ent, player.target_location.value());
+		}
+		else
+		{
+			switch(player.type)
+			{
+				case player_type::cpu:
+					// todo: find an enemy entity and chase them
+					// todo: prioritise an enemy entity if it has recently attacked the enemy's avatar or one of their entities.
+				break;
+				case player_type::human:
+					tz_assert(p == human_player, "human player is wrong, logic error");
+					// no reticule has been set by the human player so we hit this code path
+					// should we do anything? so far im thinking do nothing and let the entity sit idle.
+					// alternatively, automatically go for an enemy avatar?
+				break;
+			}
 		}
 	}
 
