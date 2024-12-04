@@ -54,6 +54,7 @@ namespace game
 	void entity_move(entity_handle ent, tz::v2f dir);
 
 	void entity_set_cooldown(entity_handle ent, float cooldown);
+	entity_handle entity_get_owner(entity_handle ent);
 	void entity_set_owner(entity_handle ent, entity_handle owner);
 
 	bool entity_is_player_aligned(entity_handle ent);

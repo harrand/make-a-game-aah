@@ -291,22 +291,14 @@ namespace game
 				}
 				else if(!busys[i])
 				{
-					// todo: have the player control their idle entities.
-					/*
-					if(player_aligneds[i] && creatures[i].combat)
+					if(creatures[i].combat)
 					{
-						// do something
-						if(player_get_target() != tz::nullhand)
+						player_handle p = game::try_get_player_that_controls_entity(ent);
+						if(p != tz::nullhand)
 						{
-							entity_set_target(ent, player_get_target());
-						}
-						else if(player_get_target_location().has_value())
-						{
-							entity_set_target_location(ent, player_get_target_location().value());
+							game::player_control_entity(p, ent);
 						}
 					}
-					// not moving and not doing anything idle.
-					*/
 					game::render::quad_set_flipbook(quads[i], creatures[i].idle);
 				}
 			}
@@ -439,6 +431,11 @@ namespace game
 	void entity_set_cooldown(entity_handle ent, float cooldown)
 	{
 		cooldowns[ent.peek()] = cooldown;
+	}
+
+	entity_handle entity_get_owner(entity_handle ent)
+	{
+		return owners[ent.peek()];
 	}
 
 	void entity_set_owner(entity_handle ent, entity_handle owner)
@@ -703,24 +700,18 @@ namespace game
 	void impl_all_stop_targetting(entity_handle ent)
 	{
 		// everyone targetting it should drop target.
-		bool ent_is_player = false;
-		iterate_players([ent, &ent_is_player](player_handle p)
+		iterate_players([ent](player_handle p)
 		{
 			if(player_targets(p, ent))
 			{
 				player_drop_target_entity(p);
 			}
-			if(player_get_avatar(p) == ent)
-			{
-				ent_is_player = true;
-			}
 		});
-		iterate_entities([dead_person = ent, ent_is_player](entity_handle ent)
+		iterate_entities([dead_person = ent](entity_handle ent)
 		{
 			if(
 				ent == dead_person ||
-				!creatures[ent.peek()].combat ||
-				ent_is_player
+				!creatures[ent.peek()].combat
 				) return;
 			if(entity_get_target(ent) == dead_person)
 			{
@@ -728,36 +719,12 @@ namespace game
 				// an entity was targetting the now dead entity.
 				// was it player aligned?
 				// ok, then the player who is controlling it should now decide what it should do next.
-
-				/*
-				if(player_aligneds[ent.peek()])
-				{
-					// yes, it
-					if(player_get_target() != tz::nullhand)
-					{
-						entity_set_target(ent, player_get_target());
-					}
-					else if(player_get_target_location().has_value())
-					{
-						entity_set_target_location(ent, player_get_target_location().value());
-					}
-					else
-					{
-						entity_set_target(ent, tz::nullhand);
-					}
-				}
-				else if(player_get_avatar() != tz::nullhand && entity_get_hp(player_get_avatar()) > 0)
-				{
-					// enemy aligned. it should go straight for the player
-					entity_set_target(ent, player_get_avatar());
-				}
-				else
-				{
-					// nothing to go for.
-					entity_set_target(ent, tz::nullhand);
-				}
-				*/
+				player_handle p = game::try_get_player_that_controls_entity(ent);
 				entity_set_target(ent, tz::nullhand);
+				if(p != tz::nullhand)
+				{
+					game::player_control_entity(p, ent);
+				}
 			}
 		});
 	}

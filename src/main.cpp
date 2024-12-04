@@ -101,12 +101,6 @@ int tz_main()
 	};
 	game::player_set_pool(enemy, enemy_cards);
 
-	game::entity_handle skel = game::create_entity({.prefab_name = "knight"});
-	game::entity_handle skel2 = game::create_entity({.prefab_name = "knight", .player_aligned = true});
-	game::entity_set_position(skel2, {-1.0f, 0.0f});
-	game::entity_set_target(skel2, skel);
-	game::entity_set_target(skel, skel2);
-	game::entity_set_hp(skel2, 999);
 	game::player_set_mana(player, 1);
 	game::player_set_mps(player, 10.0f);
 

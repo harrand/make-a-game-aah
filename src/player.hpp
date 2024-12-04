@@ -36,6 +36,10 @@ namespace game
 
 	bool player_targets(player_handle p, entity_handle ent);
 	void player_drop_target_entity(player_handle p);
+	bool player_owns(player_handle p, entity_handle e);
+
+	void player_control_entity(player_handle p, entity_handle e);
+	player_handle try_get_player_that_controls_entity(entity_handle e);
 
 	entity_handle player_get_avatar(player_handle p);
 	void player_on_death(player_handle p);

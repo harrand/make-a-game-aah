@@ -177,6 +177,55 @@ namespace game
 		player.target_entity = tz::nullhand;
 	}
 
+	bool player_owns(player_handle p, entity_handle e)
+	{
+		entity_handle par = game::entity_get_owner(e);
+		while(par != tz::nullhand)
+		{
+			if(par == players[p.peek()].avatar)
+			{
+				return true;
+			}
+			par = game::entity_get_owner(par);
+		}
+		return false;
+	}
+
+	void player_control_entity(player_handle p, entity_handle ent)
+	{
+		// should we check if player owns it first?
+		// yes for now
+		if(!player_owns(p, ent))
+		{
+			return;
+		}
+		const auto& player = players[p.peek()];
+
+		tz_assert(p == human_player, "human player is wrong, logic error");
+
+		if(player.target_entity != tz::nullhand)
+		{
+			game::entity_set_target(ent, player.target_entity);
+		}
+		else if(player.target_location.has_value())
+		{
+			game::entity_set_target_location(ent, player.target_location.value());
+		}
+	}
+
+	player_handle try_get_player_that_controls_entity(entity_handle e)
+	{
+		for(std::size_t i = 0; i < players.size(); i++)
+		{
+			player_handle p = static_cast<tz::hanval>(i);
+			if(player_owns(p, e))
+			{
+				return p;
+			}
+		}
+		return tz::nullhand;
+	}
+
 	entity_handle player_get_avatar(player_handle p)
 	{
 		auto& player = players[p.peek()];
@@ -275,15 +324,8 @@ namespace game
 						// but was last frame. i.e we've just let go of it.
 						// play it
 						entity_handle ent = game::deck_play_card(player.deck, i, true);
-
-						if(player.target_entity != tz::nullhand)
-						{
-							game::entity_set_target(ent, player.target_entity);
-						}
-						else if(player.target_location.has_value())
-						{
-							game::entity_set_target_location(ent, player.target_location.value());
-						}
+						game::entity_set_owner(ent, player.avatar);
+						player_control_entity(p, ent);
 						// this will destroy the card, so fix up our deck hold array
 						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
 
