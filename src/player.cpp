@@ -36,9 +36,11 @@ namespace game
 	std::vector<player_data> players = {};
 	player_handle human_player = tz::nullhand;
 
+	void impl_update_single_player(player_handle p, float delta_seconds);
 	void impl_update_reticule();
 	void impl_setup_player(player_handle p, game::prefab prefab);
 	bool impl_ensure_no_human_players();
+	void impl_update_human_player();
 
 	void iterate_players(std::function<void(player_handle)> callback)
 	{
@@ -70,7 +72,6 @@ namespace game
 			human_player = ret;
 		}
 
-
 		players.push_back({.type = type, .good = good});
 		impl_setup_player(ret, prefab);
 
@@ -82,127 +83,7 @@ namespace game
 	{
 		for(std::size_t i = 0; i < players.size(); i++)
 		{
-			player_data& player = players[i];
-			player_handle p = static_cast<tz::hanval>(i);
-
-			float last_whole_mana = std::floor(player.mana);
-			player.mana += std::clamp(player.mana_regen * delta_seconds, 0.0f, static_cast<float>(player.max_mana));
-			if(std::floor(player.mana) > last_whole_mana)
-			{
-				player_set_mana(p, player.mana);
-			}
-
-			if(tz::os::is_mouse_clicked(tz::os::mouse_button::right))
-			{
-				tz::v2f click_pos = render::quad_get_position(render::get_cursor());
-				constexpr float click_radius = 0.1f;
-				float mindist = std::numeric_limits<float>::max();
-				entity_handle closest_enemy = tz::nullhand;
-				game::iterate_entities([&closest_enemy, &mindist, click_pos, reticule = reticule](entity_handle ent)
-				{
-					float dist = (click_pos - game::entity_get_position(ent)).length();
-					if(ent == reticule)
-					{
-						return;
-					}
-					if(dist < click_radius)
-					{
-						if(dist < mindist)
-						{
-							mindist = dist;
-							closest_enemy = ent;
-						}
-					}
-				});
-
-				if(closest_enemy != tz::nullhand)
-				{
-					player.target_entity = closest_enemy;
-					player.target_location = std::nullopt;
-				}
-				else
-				{
-					player.target_entity = tz::nullhand;
-					player.target_location = click_pos;
-				}
-			}
-			impl_update_reticule();
-
-			for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
-			{
-				auto deck_size = game::deck_size(player.deck);
-				if(player.deck_hold_array.size() != deck_size)
-				{
-					player.deck_hold_array.resize(deck_size, false);
-				}
-				if(deck_card_is_held(player.deck, i))
-				{
-					player.deck_hold_array[i] = true;
-					deck_card_hide_tooltip(player.deck, i);
-				}
-				else
-				{
-					if(deck_card_is_mouseover(player.deck, i))
-					{
-						deck_card_display_tooltip(player.deck, i);
-					}
-					else
-					{
-						deck_card_hide_tooltip(player.deck, i);
-					}
-					// not held anymore
-					card c = game::deck_get_card(player.deck, i);
-					if(player.deck_hold_array[i])
-					{
-						auto prefab = game::get_prefab(c.name);
-						unsigned int cost = prefab.power * config_mana_cost_per_power;
-						bool can_play = true;
-						if(prefab.require_target_entity_to_play)
-						{
-							can_play &= player.target_entity != tz::nullhand;
-						}
-						if(prefab.require_target_location_to_play)
-						{
-							can_play &= player.target_location.has_value();
-						}
-						if(can_play)
-						{
-							can_play = player_try_spend_mana(p, cost);
-						}
-						if(can_play)
-						{
-							// but was last frame. i.e we've just let go of it.
-							// play it
-							entity_handle ent = game::deck_play_card(player.deck, i, true);
-
-							if(player.target_entity != tz::nullhand)
-							{
-								game::entity_set_target(ent, player.target_entity);
-							}
-							else if(player.target_location.has_value())
-							{
-								game::entity_set_target_location(ent, player.target_location.value());
-							}
-							// this will destroy the card, so fix up our deck hold array
-							player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
-
-							// draw a new card?
-							if(player.card_pool.size())
-							{
-								game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
-								player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
-							}
-						}
-						else
-						{
-							// couldnt afford it.
-							player.deck_hold_array[i] = false;
-							// destroy and re-add.
-							game::deck_reset_card_position(player.deck, i);
-						}
-					}
-				}
-			}
+			impl_update_single_player(static_cast<tz::hanval>(i), delta_seconds);
 		}
 	}
 
@@ -333,6 +214,142 @@ namespace game
 		}
 		player_set_mana(p, player.mana - cost);
 		return true;
+	}
+
+	void impl_update_single_player(player_handle p, float delta_seconds)
+	{
+		auto& player = players[p.peek()];
+
+		float last_whole_mana = std::floor(player.mana);
+		player.mana += std::clamp(player.mana_regen * delta_seconds, 0.0f, static_cast<float>(player.max_mana));
+		if(std::floor(player.mana) > last_whole_mana)
+		{
+			player_set_mana(p, player.mana);
+		}
+
+		impl_update_human_player();
+
+		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
+		{
+			auto deck_size = game::deck_size(player.deck);
+			if(player.deck_hold_array.size() != deck_size)
+			{
+				player.deck_hold_array.resize(deck_size, false);
+			}
+			if(deck_card_is_held(player.deck, i))
+			{
+				player.deck_hold_array[i] = true;
+				deck_card_hide_tooltip(player.deck, i);
+			}
+			else
+			{
+				if(deck_card_is_mouseover(player.deck, i))
+				{
+					deck_card_display_tooltip(player.deck, i);
+				}
+				else
+				{
+					deck_card_hide_tooltip(player.deck, i);
+				}
+				// not held anymore
+				card c = game::deck_get_card(player.deck, i);
+				if(player.deck_hold_array[i])
+				{
+					auto prefab = game::get_prefab(c.name);
+					unsigned int cost = prefab.power * config_mana_cost_per_power;
+					bool can_play = true;
+					if(prefab.require_target_entity_to_play)
+					{
+						can_play &= player.target_entity != tz::nullhand;
+					}
+					if(prefab.require_target_location_to_play)
+					{
+						can_play &= player.target_location.has_value();
+					}
+					if(can_play)
+					{
+						can_play = player_try_spend_mana(p, cost);
+					}
+					if(can_play)
+					{
+						// but was last frame. i.e we've just let go of it.
+						// play it
+						entity_handle ent = game::deck_play_card(player.deck, i, true);
+
+						if(player.target_entity != tz::nullhand)
+						{
+							game::entity_set_target(ent, player.target_entity);
+						}
+						else if(player.target_location.has_value())
+						{
+							game::entity_set_target_location(ent, player.target_location.value());
+						}
+						// this will destroy the card, so fix up our deck hold array
+						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+
+						// draw a new card?
+						if(player.card_pool.size())
+						{
+							game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
+							player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
+						}
+					}
+					else
+					{
+						// couldnt afford it.
+						player.deck_hold_array[i] = false;
+						// destroy and re-add.
+						game::deck_reset_card_position(player.deck, i);
+					}
+				}
+			}
+		}
+	}
+
+	void impl_update_human_player()
+	{
+		if(human_player == tz::nullhand)
+		{
+			return;
+		}
+
+		auto& player = players[human_player.peek()];
+		if(tz::os::is_mouse_clicked(tz::os::mouse_button::right))
+		{
+			tz::v2f click_pos = render::quad_get_position(render::get_cursor());
+			constexpr float click_radius = 0.1f;
+			float mindist = std::numeric_limits<float>::max();
+			entity_handle closest_enemy = tz::nullhand;
+			game::iterate_entities([&closest_enemy, &mindist, click_pos, reticule = reticule](entity_handle ent)
+			{
+				float dist = (click_pos - game::entity_get_position(ent)).length();
+				if(ent == reticule)
+				{
+					return;
+				}
+				if(dist < click_radius)
+				{
+					if(dist < mindist)
+					{
+						mindist = dist;
+						closest_enemy = ent;
+					}
+				}
+			});
+
+			if(closest_enemy != tz::nullhand)
+			{
+				player.target_entity = closest_enemy;
+				player.target_location = std::nullopt;
+			}
+			else
+			{
+				player.target_entity = tz::nullhand;
+				player.target_location = click_pos;
+			}
+		}
+		impl_update_reticule();
+
 	}
 
 	void impl_update_reticule()
