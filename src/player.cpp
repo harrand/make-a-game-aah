@@ -46,7 +46,7 @@ namespace game
 	bool impl_ensure_no_human_players();
 	void impl_update_cpu_player(player_handle p, float delta_seconds);
 	void impl_update_human_player();
-	void impl_handle_deck(player_handle p);
+	void impl_human_handle_deck(player_handle p);
 	void impl_cpu_select_card_to_play(player_handle p, std::size_t deck_id);
 	bool impl_cpu_try_play_selected_card(player_handle p, float delta_seconds);
 
@@ -299,15 +299,15 @@ namespace game
 		}
 
 		impl_update_human_player();
-		if(player.type == player_type::cpu)
+		switch(player.type)
 		{
-			impl_update_cpu_player(p, delta_seconds);
-			impl_cpu_try_play_selected_card(p, delta_seconds);
-		}
-
-		if(player.good)
-		{
-			impl_handle_deck(p);
+			case player_type::cpu:
+				impl_update_cpu_player(p, delta_seconds);
+				impl_cpu_try_play_selected_card(p, delta_seconds);
+			break;
+			case player_type::human:
+				impl_human_handle_deck(p);
+			break;
 		}
 	}
 
@@ -469,14 +469,7 @@ namespace game
 			});
 	}
 
-	void impl_handle_deck_cpu(player_handle p)
-	{
-		// just try to play the first card in the deck as soon as we have mana for it.
-		// todo: improve ai logic.
-
-	}
-
-	void impl_handle_deck_human(player_handle p)
+	void impl_human_handle_deck(player_handle p)
 	{
 		tz_assert(p == human_player, "human player internal logic error");
 		auto& player = players[p.peek()];
@@ -547,20 +540,6 @@ namespace game
 					}
 				}
 			}
-		}
-	}
-
-	void impl_handle_deck(player_handle p)
-	{
-		auto& player = players[p.peek()];
-		switch(player.type)
-		{
-			case player_type::cpu:
-				impl_handle_deck_cpu(p);
-			break;
-			case player_type::human:
-				impl_handle_deck_human(p);
-			break;
 		}
 	}
 
