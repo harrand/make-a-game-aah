@@ -31,6 +31,10 @@ namespace game
 
 		std::vector<card> card_pool = {};
 		std::size_t card_pool_cursor = 0;
+
+		float cpu_play_timer = 0.0f;
+		card cpu_play_card = {};
+		render::handle cpu_play_card_quad = tz::nullhand;
 	};
 
 	std::vector<player_data> players = {};
@@ -40,7 +44,11 @@ namespace game
 	void impl_update_reticule();
 	void impl_setup_player(player_handle p, game::prefab prefab);
 	bool impl_ensure_no_human_players();
+	void impl_update_cpu_player(player_handle p, float delta_seconds);
 	void impl_update_human_player();
+	void impl_handle_deck(player_handle p);
+	void impl_cpu_select_card_to_play(player_handle p, std::size_t deck_id);
+	bool impl_cpu_try_play_selected_card(player_handle p, float delta_seconds);
 
 	void iterate_players(std::function<void(player_handle)> callback)
 	{
@@ -291,73 +299,34 @@ namespace game
 		}
 
 		impl_update_human_player();
-
-		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
+		if(player.type == player_type::cpu)
 		{
-			auto deck_size = game::deck_size(player.deck);
-			if(player.deck_hold_array.size() != deck_size)
-			{
-				player.deck_hold_array.resize(deck_size, false);
-			}
-			if(deck_card_is_held(player.deck, i))
-			{
-				player.deck_hold_array[i] = true;
-				deck_card_hide_tooltip(player.deck, i);
-			}
-			else
-			{
-				if(deck_card_is_mouseover(player.deck, i))
-				{
-					deck_card_display_tooltip(player.deck, i);
-				}
-				else
-				{
-					deck_card_hide_tooltip(player.deck, i);
-				}
-				// not held anymore
-				card c = game::deck_get_card(player.deck, i);
-				if(player.deck_hold_array[i])
-				{
-					auto prefab = game::get_prefab(c.name);
-					unsigned int cost = prefab.power * config_mana_cost_per_power;
-					bool can_play = true;
-					if(prefab.require_target_entity_to_play)
-					{
-						can_play &= player.target_entity != tz::nullhand;
-					}
-					if(prefab.require_target_location_to_play)
-					{
-						can_play &= player.target_location.has_value();
-					}
-					if(can_play)
-					{
-						can_play = player_try_spend_mana(p, cost);
-					}
-					if(can_play)
-					{
-						// but was last frame. i.e we've just let go of it.
-						// play it
-						entity_handle ent = game::deck_play_card(player.deck, i, true);
-						game::entity_set_owner(ent, player.avatar);
-						player_control_entity(p, ent);
-						// this will destroy the card, so fix up our deck hold array
-						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+			impl_update_cpu_player(p, delta_seconds);
+			impl_cpu_try_play_selected_card(p, delta_seconds);
+		}
 
-						// draw a new card?
-						if(player.card_pool.size())
-						{
-							game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
-							player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
-						}
-					}
-					else
-					{
-						// couldnt afford it.
-						player.deck_hold_array[i] = false;
-						// destroy and re-add.
-						game::deck_reset_card_position(player.deck, i);
-					}
-				}
+		if(player.good)
+		{
+			impl_handle_deck(p);
+		}
+	}
+
+	void impl_update_cpu_player(player_handle p, float delta_seconds)
+	{
+		const auto& player = players[p.peek()];
+		if(player.type != player_type::cpu){return;}
+
+		impl_cpu_try_play_selected_card(p, delta_seconds);
+
+		// for now, just try to play index 0 in the deck if we have a card and we have the mana for it
+		const std::size_t play_card_id = 0;
+		if(game::deck_size(player.deck) > 0)
+		{
+			auto card = deck_get_card(player.deck, play_card_id);
+			unsigned int power = game::get_prefab(card.name).power;
+			if(player_try_spend_mana(p, power * config_mana_cost_per_power))
+			{
+				impl_cpu_select_card_to_play(p, play_card_id);
 			}
 		}
 	}
@@ -457,6 +426,7 @@ namespace game
 		{
 			.position = deck_pos,
 			.scale = {0.7f, 0.7f},
+			.cards_face_down = !player.good,
 			.player_can_play_cards = player.good
 		}});
 
@@ -497,5 +467,161 @@ namespace game
 			{
 				return p.type == player_type::human;
 			});
+	}
+
+	void impl_handle_deck_cpu(player_handle p)
+	{
+		// just try to play the first card in the deck as soon as we have mana for it.
+		// todo: improve ai logic.
+
+	}
+
+	void impl_handle_deck_human(player_handle p)
+	{
+		tz_assert(p == human_player, "human player internal logic error");
+		auto& player = players[p.peek()];
+		for(std::size_t i = 0; i < game::deck_size(player.deck); i++)
+		{
+			auto deck_size = game::deck_size(player.deck);
+			if(player.deck_hold_array.size() != deck_size)
+			{
+				player.deck_hold_array.resize(deck_size, false);
+			}
+			if(deck_card_is_held(player.deck, i))
+			{
+				player.deck_hold_array[i] = true;
+				deck_card_hide_tooltip(player.deck, i);
+			}
+			else
+			{
+				if(deck_card_is_mouseover(player.deck, i))
+				{
+					deck_card_display_tooltip(player.deck, i);
+				}
+				else
+				{
+					deck_card_hide_tooltip(player.deck, i);
+				}
+				// not held anymore
+				card c = game::deck_get_card(player.deck, i);
+				if(player.deck_hold_array[i])
+				{
+					auto prefab = game::get_prefab(c.name);
+					unsigned int cost = prefab.power * config_mana_cost_per_power;
+					bool can_play = true;
+					if(prefab.require_target_entity_to_play)
+					{
+						can_play &= player.target_entity != tz::nullhand;
+					}
+					if(prefab.require_target_location_to_play)
+					{
+						can_play &= player.target_location.has_value();
+					}
+					if(can_play)
+					{
+						can_play = player_try_spend_mana(p, cost);
+					}
+					if(can_play)
+					{
+						// but was last frame. i.e we've just let go of it.
+						// play it
+						entity_handle ent = game::deck_play_card(player.deck, i, true);
+						game::entity_set_owner(ent, player.avatar);
+						player_control_entity(p, ent);
+						// this will destroy the card, so fix up our deck hold array
+						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
+
+						// draw a new card?
+						if(player.card_pool.size())
+						{
+							game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
+							player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
+						}
+					}
+					else
+					{
+						// couldnt afford it.
+						player.deck_hold_array[i] = false;
+						// destroy and re-add.
+						game::deck_reset_card_position(player.deck, i);
+					}
+				}
+			}
+		}
+	}
+
+	void impl_handle_deck(player_handle p)
+	{
+		auto& player = players[p.peek()];
+		switch(player.type)
+		{
+			case player_type::cpu:
+				impl_handle_deck_cpu(p);
+			break;
+			case player_type::human:
+				impl_handle_deck_human(p);
+			break;
+		}
+	}
+
+	void impl_cpu_select_card_to_play(player_handle p, std::size_t id)
+	{
+		auto& player = players[p.peek()];
+		if(player.cpu_play_card_quad != tz::nullhand)
+		{
+			return;
+		}
+		player.cpu_play_timer = 0.0f;
+		player.cpu_play_card = deck_get_card(player.deck, id);
+		// detach the card
+		// its probably face down, we want it face up
+		render::handle old_card = deck_detach_card(player.deck, id);
+		// so we get the old card, save its position, then delete it and spawn the face-up version and use that instead.
+		tz::v2f position = render::quad_get_position(old_card);
+		tz::v2f scale = render::quad_get_scale(old_card);
+
+		render::destroy_quad(old_card);
+		player.cpu_play_card_quad = game::create_card_sprite(player.cpu_play_card, false);
+		render::quad_set_position(player.cpu_play_card_quad, position);
+		render::quad_set_scale(player.cpu_play_card_quad, scale);	
+	}
+
+	bool impl_cpu_try_play_selected_card(player_handle p, float delta_seconds)
+	{
+		auto& player = players[p.peek()];
+		if(player.cpu_play_card_quad != tz::nullhand)
+		{
+			tz::v2f pos = render::quad_get_position(player.cpu_play_card_quad);
+			player.cpu_play_timer += delta_seconds;
+			if(player.cpu_play_timer >= config_computer_play_card_turnaround_time_seconds)
+			{
+				// we're done. play the card.
+				entity_handle ent = game::create_entity({.prefab_name = player.cpu_play_card.name, .player_aligned = false, .position = config_enemy_play_position});
+				render::destroy_quad(player.cpu_play_card_quad);
+
+				player.cpu_play_card = {};
+				player.cpu_play_card_quad = tz::nullhand;
+				player.cpu_play_timer = 0.0f;
+
+				game::entity_set_owner(ent, player.avatar);
+				player_control_entity(p, ent);
+				
+				// draw a new card?
+				if(player.card_pool.size())
+				{
+					game::deck_add_card(player.deck, player.card_pool[player.card_pool_cursor]);
+					player.card_pool_cursor = (player.card_pool_cursor + 1) % player.card_pool.size();	
+				}
+				return true;
+			}
+			else
+			{
+				// lerp
+				pos[0] = std::lerp(pos[0], config_enemy_play_position[0], delta_seconds * config_computer_play_card_drag_speed);
+				pos[1] = std::lerp(pos[1], config_enemy_play_position[1], delta_seconds * config_computer_play_card_drag_speed);
+				render::quad_set_position(player.cpu_play_card_quad, pos);
+			}
+		}
+		return false;
 	}
 }
