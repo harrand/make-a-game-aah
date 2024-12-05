@@ -13,6 +13,7 @@ prefabs.archer =
 		entity_set_is_player_aligned(arrow, entity_is_player_aligned(me))
 		entity_set_position(arrow, entity_get_position(me))
 		entity_set_target(arrow, victim)
+		entity_set_userdata(arrow, victim)
 		entity_set_owner(arrow, me)
 	end,
 	idle =

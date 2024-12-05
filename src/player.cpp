@@ -219,18 +219,30 @@ namespace game
 		}
 		else
 		{
-			switch(player.type)
+			if(entity_get_prefab(ent).combat)
 			{
-				case player_type::cpu:
-					// todo: find an enemy entity and chase them
-					// todo: prioritise an enemy entity if it has recently attacked the enemy's avatar or one of their entities.
-				break;
-				case player_type::human:
-					tz_assert(p == human_player, "human player is wrong, logic error");
-					// no reticule has been set by the human player so we hit this code path
-					// should we do anything? so far im thinking do nothing and let the entity sit idle.
-					// alternatively, automatically go for an enemy avatar?
-				break;
+				// todo: find an enemy entity and chase them
+				// todo: prioritise an enemy entity if it has recently attacked the enemy's avatar or one of their entities.
+				constexpr float aggro_range = 0.5f;
+				float min_dist = aggro_range;
+				entity_handle nearest_enemy = tz::nullhand;
+				game::iterate_entities([player, ent, &min_dist, &nearest_enemy](entity_handle other)
+				{
+					float dst = (entity_get_position(other) - entity_get_position(ent)).length();
+					if(dst >= min_dist) {return;}
+					if(!entity_get_prefab(other).combat) {return;}
+
+					if(entity_is_player_aligned(other) != player.good)
+					{
+						min_dist = dst;
+						nearest_enemy = other;
+					}
+				});
+
+				if(nearest_enemy != tz::nullhand)
+				{
+					entity_set_target(ent, nearest_enemy);
+				}
 			}
 		}
 	}

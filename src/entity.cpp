@@ -397,6 +397,11 @@ namespace game
 		return creatures[ent.peek()].base_health;
 	}
 
+	game::prefab entity_get_prefab(entity_handle ent)
+	{
+		return creatures[ent.peek()];
+	}
+
 	void entity_face_left(entity_handle ent)
 	{
 		auto sc = game::render::quad_get_scale(quads[ent.peek()]);

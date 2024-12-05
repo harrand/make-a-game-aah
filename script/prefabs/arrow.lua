@@ -20,7 +20,12 @@ prefabs.arrow =
 		}
 	},
 	on_update = function(me, delta)
-		if entity_get_target(me) == nil then
+		local tar = entity_get_target(me)
+		local usrdata = entity_get_userdata(me)
+		-- if tar is ever nil, we have dropped target, so we need to despawn
+		-- when we are created, we expect our userdata to contain our initial target
+		-- so if our target ever changes then we must despawn, or the arrow will suddenly change trajectory.
+		if tar == nil or (tar ~= usrdata) then
 			destroy_entity(me)
 		end
 	end,
