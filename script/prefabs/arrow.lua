@@ -4,6 +4,7 @@ prefabs.arrow =
 	description = "Launch a bolt of fire at a target, dealing damage",
 	base_health = 99999,
 	base_cooldown = 99999,
+	base_damage = 1,
 	movement_speed = 2.5,
 	leeway_coefficient = 0.05,
 	face_move_direction = true,

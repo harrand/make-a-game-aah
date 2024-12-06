@@ -4,13 +4,15 @@ prefabs.firebolt =
 	description = "Launch a bolt of fire at a target, dealing damage",
 	base_health = 99999,
 	base_cooldown = 99999,
+	base_damage = 3,
 	movement_speed = 2.5,
 	leeway_coefficient = 0.05,
-	face_move_direction = true,
 	colour_tint_r = 1.0,
-	colour_tint_g = 0.7,
+	colour_tint_g = 0.4,
 	colour_tint_b = 0.2,
+	face_move_direction = true,
 	spell_decoration = true,
+	attackable = false,
 	require_target_entity_to_play = true,
 	power = 2,
 	idle =
@@ -30,12 +32,17 @@ prefabs.firebolt =
 		}
 	},
 	on_update = function(me, delta)
-		if entity_get_target(me) == nil then
+		local tar = entity_get_target(me)
+		local usrdata = entity_get_userdata(me)
+		-- if tar is ever nil, we have dropped target, so we need to despawn
+		-- when we are created, we expect our userdata to contain our initial target
+		-- so if our target ever changes then we must despawn, or the firebolt will suddenly change trajectory.
+		if tar == nil or (tar ~= usrdata) then
 			destroy_entity(me)
 		end
 	end,
 	on_create = function(me)
-		entity_set_scale(me, 0.4, 0.4)
+		entity_set_scale(me, 0.6, 0.3)
 	end,
 	on_hit = function(me, victim)
 		destroy_entity(me)
