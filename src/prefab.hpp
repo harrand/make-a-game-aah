@@ -15,6 +15,7 @@ namespace game
 		std::string description = "";
 		bool has_tooltip = true;
 		bool combat = true;
+		bool attackable = true;
 		float base_cooldown = 1.0f;
 		float leeway_coefficient = 1.0f;
 		unsigned int base_damage = 1;

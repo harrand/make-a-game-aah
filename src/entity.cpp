@@ -639,8 +639,13 @@ namespace game
 				{
 					victim_hp -= dmg;
 					// rhs got hurt
+
+					// so by default we should have the victim target the attacker.
+					// but what if the victim is struck by an arrow? they shouldnt hit the arrow, they should go for its owner
+					// however, if you always target the owner, then if a knight attacks you, the retaliation target will be its owner i.e beeline straight for the player who summoned that knight.
+					//
 					entity_handle retaliation_target = lhs;
-					while(owners[retaliation_target.peek()] != tz::nullhand)
+					while(owners[retaliation_target.peek()] != tz::nullhand && !creatures[retaliation_target.peek()].attackable)
 					{
 						retaliation_target = owners[retaliation_target.peek()];
 					}

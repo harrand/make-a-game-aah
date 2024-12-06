@@ -223,14 +223,13 @@ namespace game
 			{
 				// todo: find an enemy entity and chase them
 				// todo: prioritise an enemy entity if it has recently attacked the enemy's avatar or one of their entities.
-				constexpr float aggro_range = 0.5f;
-				float min_dist = aggro_range;
+				float min_dist = config_default_aggro_range;
 				entity_handle nearest_enemy = tz::nullhand;
 				game::iterate_entities([player, ent, &min_dist, &nearest_enemy](entity_handle other)
 				{
 					float dst = (entity_get_position(other) - entity_get_position(ent)).length();
 					if(dst >= min_dist) {return;}
-					if(!entity_get_prefab(other).combat) {return;}
+					if(!entity_get_prefab(other).combat || !entity_get_prefab(other).attackable) {return;}
 
 					if(entity_is_player_aligned(other) != player.good)
 					{

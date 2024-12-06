@@ -66,7 +66,17 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
+			.name = "peasant"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
 			.name = "archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "assassin"
 		},
 		game::card
 		{
@@ -76,7 +86,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "bear"
+			.name = "knight"
 		},
 	};
 	game::player_set_pool(player, player_cards);
@@ -101,7 +111,12 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "bear"
+			.name = "warbear"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "general"
 		},
 	};
 	game::player_set_pool(enemy, enemy_cards);

@@ -16,6 +16,7 @@ namespace game
 
 	// leeway is how far away an entity can be from another but still be considered "touching". leeway is proportional to the speed of the entity, infact equal to a % of it - this value between 0 and 1
 	constexpr float config_global_leeway_dist = 0.5f;
+	constexpr float config_default_aggro_range = 1.0f;
 	
 
 	////////////////////////////////

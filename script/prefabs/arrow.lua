@@ -8,6 +8,7 @@ prefabs.arrow =
 	leeway_coefficient = 0.05,
 	face_move_direction = true,
 	spell_decoration = true,
+	attackable = false,
 	require_target_entity_to_play = true,
 	power = 2,
 	idle =
