@@ -29,7 +29,7 @@ int tz_main()
 	game::card_setup();
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
-	auto enemy = game::create_player(game::player_type::cpu, false, game::get_prefab("peasant"));
+	auto enemy = game::create_player(game::player_type::cpu, false, game::get_prefab("general"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -37,23 +37,7 @@ int tz_main()
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
-	for(std::size_t i = 0; i < 3; i++)
-	{
-		game::deck_add_card(game::player_deck(player), {.name = "peasant"});
-		game::deck_add_card(game::player_deck(player), {.name = "archer"});
-		game::deck_add_card(game::player_deck(player), {.name = "knight"});
-	}
-	game::deck_add_card(game::player_deck(player), {.name = "general"});
-	game::deck_add_card(game::player_deck(player), {.name = "assassin"});
-	game::deck_add_card(game::player_deck(player), {.name = "bear"});
-	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
-
-	game::deck_add_card(game::player_deck(enemy), {.name = "knight"});
-	for(std::size_t i = 0; i < 3; i++)
-	{
-		game::deck_add_card(game::player_deck(enemy), {.name = "peasant"});
-		game::deck_add_card(game::player_deck(enemy), {.name = "archer"});
-	}
+	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
 	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
 	game::card player_cards[] =
@@ -86,7 +70,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "knight"
+			.name = "melistra"
 		},
 	};
 	game::player_set_pool(player, player_cards);
@@ -121,7 +105,7 @@ int tz_main()
 	};
 	game::player_set_pool(enemy, enemy_cards);
 
-	game::player_set_mana(player, 1);
+	game::player_set_mana(player, 999);
 	game::player_set_mps(player, 10.0f);
 
 	std::uint64_t time = tz::time_nanos();

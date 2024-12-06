@@ -50,7 +50,7 @@ namespace game
 	constexpr tz::v2f config_enemy_play_position = {1.0f, 0.0f};
 
 	// when an entity is set as either the player/enemy avatar, it ought to display slightly larger than normal - determined by this scale vector.
-	constexpr tz::v2f config_avatar_scale = {1.25f, 1.25f};
+	constexpr tz::v2f config_avatar_scale = {1.0f, 1.0f};
 	// how much (exact coords) offset should be applied to a tooltip relative to the entity its describing?
 	constexpr tz::v2f config_entity_tooltip_offset = {0.0f, 0.2f};
 	// how much (exact coords) offset should be applied to a tooltip relative to the card its describing?

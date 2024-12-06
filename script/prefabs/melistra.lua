@@ -1,9 +1,20 @@
 prefabs.melistra =
 {
 	display_name = "Melistra",
-	base_health = 10,
-	movement_speed = 1.3,
+	base_health = 40,
+	base_cooldown = 1.333,
+	base_damage = 0,
+	movement_speed = 0.4,
 	power = 5,
+	leeway_coefficient = 18.0,
+	on_hit = function(me, victim)
+		local firebolt = create_entity("firebolt")
+		entity_set_is_player_aligned(firebolt, entity_is_player_aligned(me))
+		entity_set_position(firebolt, entity_get_position(me))
+		entity_set_target(firebolt, victim)
+		entity_set_userdata(firebolt, victim)
+		entity_set_owner(firebolt, me)
+	end,
 	idle =
 	{
 		fps = 2,
@@ -16,29 +27,31 @@ prefabs.melistra =
 	},
 	move_horizontal =
 	{
-		fps = 5,
+		fps = 4,
 		loop = true,
 		frames =
 		{
 			"creature/melistra/idle0.png",
 			"creature/melistra/side0.png",
 			"creature/melistra/idle0.png",
-			"creature/melistra/side1.png"
+			"creature/melistra/side1.png",
 		}
 	},
-	cast =
+
+	attack =
 	{
-		fps = 7,
+		fps = 6,
 		loop = true,
 		frames =
 		{
-			"creature/melistra/cast0.png",
-			"creature/melistra/cast1.png",
-			"creature/melistra/cast2.png",
-			"creature/melistra/cast3.png",
-			"creature/melistra/cast4.png",
-			"creature/melistra/cast5.png",
-			"creature/melistra/cast6.png"
+			"creature/melistra/attack0.png",
+			"creature/melistra/attack1.png",
+			"creature/melistra/attack2.png",
+			"creature/melistra/attack3.png",
+			"creature/melistra/attack4.png",
+			"creature/melistra/attack5.png",
+			"creature/melistra/attack6.png",
+			"creature/melistra/attack7.png",
 		}
 	}
 }

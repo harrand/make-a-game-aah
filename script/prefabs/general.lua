@@ -4,7 +4,7 @@ prefabs.general =
 	description = "A mighty warrior who commands the Knights.",
 	base_health = 80,
 	movement_speed = 1.2,
-	base_cooldown = 0.2,
+	base_cooldown = 0.35,
 	base_damage = 2,
 	power = 5,
 	idle =
@@ -31,7 +31,7 @@ prefabs.general =
 	},
 	attack =
 	{
-		fps = 12,
+		fps = 7,
 		loop = true,
 		frames =
 		{
