@@ -2,7 +2,7 @@ prefabs.assassin =
 {
 	display_name = "Assassin",
 	description = "A deadly, but fragile attacker who excels at picking off lone enemies.",
-	base_health = 3,
+	base_health = 6,
 	base_cooldown = 0.2,
 	movement_speed = 2.2,
 	leeway_coefficient = 0.1,

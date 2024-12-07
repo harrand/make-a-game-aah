@@ -302,11 +302,14 @@ namespace game
 	{
 		auto& player = players[p.peek()];
 
-		float last_whole_mana = std::floor(player.mana);
-		player.mana += std::clamp(player.mana_regen * delta_seconds, 0.0f, static_cast<float>(player.max_mana));
-		if(std::floor(player.mana) > last_whole_mana)
+		if(player.avatar != tz::nullhand && entity_get_hp(player.avatar) > 0)
 		{
-			player_set_mana(p, player.mana);
+			float last_whole_mana = std::floor(player.mana);
+			player.mana += std::clamp(player.mana_regen * delta_seconds, 0.0f, static_cast<float>(player.max_mana));
+			if(std::floor(player.mana) > last_whole_mana)
+			{
+				player_set_mana(p, player.mana);
+			}
 		}
 
 		impl_update_human_player();

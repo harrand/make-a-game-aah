@@ -2,7 +2,7 @@ prefabs.melistra =
 {
 	display_name = "Melistra",
 	base_health = 40,
-	base_cooldown = 1.333,
+	base_cooldown = 0.75,
 	base_damage = 0,
 	movement_speed = 0.4,
 	power = 5,
@@ -40,7 +40,7 @@ prefabs.melistra =
 
 	attack =
 	{
-		fps = 6,
+		fps = 12,
 		loop = true,
 		frames =
 		{
@@ -50,6 +50,8 @@ prefabs.melistra =
 			"creature/melistra/attack3.png",
 			"creature/melistra/attack4.png",
 			"creature/melistra/attack5.png",
+			"creature/melistra/attack5.png",
+			"creature/melistra/attack6.png",
 			"creature/melistra/attack6.png",
 			"creature/melistra/attack7.png",
 		}
