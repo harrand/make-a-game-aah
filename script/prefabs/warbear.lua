@@ -7,6 +7,7 @@ prefabs.warbear =
 	base_cooldown = 2.0,
 	base_damage = 3,
 	power = 5,
+	taunt = true,
 	idle =
 	{
 		fps = 1,

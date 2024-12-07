@@ -38,6 +38,9 @@ int tz_main()
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
 	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
+	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
+	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
+
 	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
 	game::card player_cards[] =

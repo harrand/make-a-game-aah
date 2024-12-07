@@ -6,6 +6,7 @@ prefabs.bear =
 	movement_speed = 0.5,
 	base_cooldown = 2.0,
 	base_damage = 3,
+	taunt = true,
 	power = 4,
 	idle =
 	{

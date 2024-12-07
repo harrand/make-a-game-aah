@@ -120,6 +120,7 @@ namespace game
 		impl_collect_prefab_data(prefab_name, "face_move_direction", data.face_move_direction);
 		impl_collect_prefab_data(prefab_name, "has_tooltip", data.has_tooltip);
 		impl_collect_prefab_data(prefab_name, "combat", data.combat);
+		impl_collect_prefab_data(prefab_name, "taunt", data.taunt);
 		impl_collect_prefab_data(prefab_name, "attackable", data.attackable);
 		impl_collect_prefab_data(prefab_name, "spell_decoration", data.spell_decoration);
 		impl_collect_prefab_data(prefab_name, "require_target_entity_to_play", data.require_target_entity_to_play);

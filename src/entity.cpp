@@ -510,6 +510,14 @@ namespace game
 	void entity_set_target(entity_handle ent, entity_handle tar)
 	{
 		target_locations[ent.peek()] = std::nullopt;
+		if(targets[ent.peek()] != tz::nullhand)
+		{
+			// if we already have a target, cancel this operation if its a taunt entity
+			if(creatures[targets[ent.peek()].peek()].taunt)
+			{
+				return;
+			}
+		}
 		targets[ent.peek()] = tar;
 		// dropping a target will stop you from being busy.
 		if(tar == tz::nullhand)
