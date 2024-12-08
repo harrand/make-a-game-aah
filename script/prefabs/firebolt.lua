@@ -10,6 +10,7 @@ prefabs.firebolt =
 	colour_tint_r = 1.0,
 	colour_tint_g = 0.4,
 	colour_tint_b = 0.2,
+	emissive = true,
 	face_move_direction = true,
 	spell_decoration = true,
 	attackable = false,

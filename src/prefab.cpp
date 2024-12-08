@@ -132,6 +132,7 @@ namespace game
 		impl_collect_prefab_data(prefab_name, "colour_tint_g", colour_tint_g);
 		impl_collect_prefab_data(prefab_name, "colour_tint_b", colour_tint_b);
 		data.colour_tint = {colour_tint_r, colour_tint_g, colour_tint_b};
+		impl_collect_prefab_data(prefab_name, "emissive", data.emissive);
 		return 0;
 	}
 }

@@ -25,6 +25,7 @@ namespace game
 		bool require_target_entity_to_play = false;
 		bool require_target_location_to_play = false;
 		tz::v3f colour_tint = tz::v3f::filled(1.0f);
+		bool emissive = false;
 		game::render::flipbook_handle idle = tz::nullhand;
 		game::render::flipbook_handle move_horizontal = tz::nullhand;
 		game::render::flipbook_handle move_up = tz::nullhand;
