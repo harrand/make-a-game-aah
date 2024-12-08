@@ -9,6 +9,8 @@
 #include "tz/gpu/settings.hpp"
 #include "tz/gpu/shader.hpp"
 
+#include ImportedShaderHeader(bloom_blur, vertex)
+#include ImportedShaderHeader(bloom_blur, fragment)
 #include ImportedShaderHeader(quad_bloom, fragment)
 
 #include <vector>
@@ -17,7 +19,12 @@
 namespace game::render
 {
 	tz::ren::quad_renderer_handle ren;
+	tz::gpu::resource_handle output_image = tz::nullhand;
 	tz::gpu::resource_handle bloom_image = tz::nullhand;
+
+	tz::gpu::pass_handle bloom_blur_pass = tz::nullhand;
+	tz::gpu::graph_handle bloom_blur_graph = tz::nullhand;
+
 	handle background;
 	handle cursor;
 	std::uint32_t bgimg;
@@ -76,42 +83,89 @@ namespace game::render
 
 	void setup()
 	{
+		// first set graphics settings.
 		tz::gpu::settings_set_vsync(true);
 
-		std::vector<std::byte> bloom_imgdata;
-		bloom_imgdata.resize(tz::os::window_get_width() * tz::os::window_get_height() * 4);
-		bloom_image = tz_must(tz::gpu::create_image
-		({
-			.type = tz::gpu::image_type::rgba,
-			.data = bloom_imgdata,
-			.name = "Game Bloom Image",
-			.flags = tz::gpu::image_flag::colour_target | tz::gpu::image_flag::resize_to_match_window_resource
-		}));
+		// then setup the bloom blur pass.
 
-		tz::gpu::resource_handle colour_targets[] =
 		{
-			tz::gpu::window_resource,
-			bloom_image
-		};
+			std::vector<std::byte> output_imgdata;
+			output_imgdata.resize(tz::os::window_get_width() * tz::os::window_get_height() * 4);
+			output_image = tz_must(tz::gpu::create_image
+			({
+				.type = tz::gpu::image_type::rgba,
+				.data = output_imgdata,
+				.name = "Game Output Image",
+				.flags = tz::gpu::image_flag::colour_target | tz::gpu::image_flag::resize_to_match_window_resource
+			}));
 
-		ren = tz_must(tz::ren::create_quad_renderer
-		({
-			.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
-			.colour_targets = colour_targets,
-			.flags =
-				tz::ren::quad_renderer_flag::graph_present_after
-			|	tz::ren::quad_renderer_flag::alpha_clipping
-			|	tz::ren::quad_renderer_flag::allow_negative_scale
-			|	tz::ren::quad_renderer_flag::enable_layering
-			|	tz::ren::quad_renderer_flag::custom_fragment_shader,
-			.custom_fragment_shader = ImportedShaderSource(quad_bloom, fragment),
-			.extra_data_per_quad = sizeof(quad_extra_shader_data)
-		}));
+			std::vector<std::byte> bloom_imgdata;
+			bloom_imgdata.resize(tz::os::window_get_width() * tz::os::window_get_height() * 4);
+			bloom_image = tz_must(tz::gpu::create_image
+			({
+				.type = tz::gpu::image_type::rgba,
+				.data = bloom_imgdata,
+				.name = "Game Bloom Image",
+				.flags = tz::gpu::image_flag::colour_target | tz::gpu::image_flag::resize_to_match_window_resource
+			}));
 
-		bgimg = create_image_from_file("./res/images/bgforest.png");
-		background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg, .layer = -90}, quad_flag::match_image_ratio);
+			tz::gpu::resource_handle colour_targets[] =
+			{
+				tz::gpu::window_resource
+			};
 
-		cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
+			tz::gpu::resource_handle resources[] =
+			{
+				output_image,
+				bloom_image
+			};
+
+			bloom_blur_pass = tz_must(tz::gpu::create_pass
+			({
+				.graphics =
+				{
+					.colour_targets = colour_targets,
+					.culling = tz::gpu::cull::none,
+					.flags = tz::gpu::graphics_flag::no_depth_test,
+					.triangle_count = 1,
+				},
+				.shader = tz_must(tz::gpu::create_graphics_shader(ImportedShaderSource(bloom_blur, vertex), ImportedShaderSource(bloom_blur, fragment))),
+				.resources = resources
+			}));
+
+			bloom_blur_graph = tz::gpu::create_graph("Bloom Graph");
+			tz::gpu::graph_add_pass(bloom_blur_graph, bloom_blur_pass);
+		}
+
+		// finally, create the quad renderer.
+
+		{
+			tz::gpu::resource_handle colour_targets[] =
+			{
+				output_image,
+				bloom_image
+			};
+
+			ren = tz_must(tz::ren::create_quad_renderer
+			({
+				.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
+				.colour_targets = colour_targets,
+				.post_render = bloom_blur_graph,
+				.flags =
+					tz::ren::quad_renderer_flag::graph_present_after
+				|	tz::ren::quad_renderer_flag::alpha_clipping
+				|	tz::ren::quad_renderer_flag::allow_negative_scale
+				|	tz::ren::quad_renderer_flag::enable_layering
+				|	tz::ren::quad_renderer_flag::custom_fragment_shader,
+				.custom_fragment_shader = ImportedShaderSource(quad_bloom, fragment),
+				.extra_data_per_quad = sizeof(quad_extra_shader_data),
+			}));
+
+			bgimg = create_image_from_file("./res/images/bgforest.png");
+			background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg, .layer = -90}, quad_flag::match_image_ratio);
+
+			cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
+		}
 
 		impl_init_fonts();
 	}

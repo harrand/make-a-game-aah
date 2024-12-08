@@ -55,14 +55,16 @@ void main()
 		}
 		frag_colour.xyz *= texcol.xyz;
 	}
+	// hard-coded ambient lighting.
+	frag_colour.xyz *= 0.7f;
 	if(extra.data[quad_id].emissive != 0)
 	{
 		bloom_colour = frag_colour;
+		colour = vec4(0.0f);
 	}
 	else
 	{
 		bloom_colour = vec4(0.0f);
+		colour = frag_colour;
 	}
-
-	colour = frag_colour;
 }

@@ -1,0 +1,12 @@
+shader(type = vertex);
+
+output(id = 0) vec2 uv;
+
+void main()
+{
+	float x = float((in::vertex_id & 1) << 2);
+	float y = float((in::vertex_id & 2) << 1);
+	uv = vec2(x * 0.5f, 1.0f - (y * 0.5f));
+
+	out::position = vec4(x - 1.0f, y - 1.0f, 0.0f, 1.0f);
+}
