@@ -7,6 +7,9 @@
 #include "tz/os/window.hpp"
 #include "tz/io/image.hpp"
 #include "tz/gpu/settings.hpp"
+#include "tz/gpu/shader.hpp"
+
+#include ImportedShaderHeader(quad_bloom, fragment)
 
 #include <vector>
 #include <unordered_map>
@@ -14,6 +17,7 @@
 namespace game::render
 {
 	tz::ren::quad_renderer_handle ren;
+	tz::gpu::resource_handle bloom_image = tz::nullhand;
 	handle background;
 	handle cursor;
 	std::uint32_t bgimg;
@@ -28,6 +32,10 @@ namespace game::render
 		bool mouseover = false;
 		tz::v2f held_offset = tz::v2f::filled(0.0f);
 		bool garbage = false;
+	};
+	struct quad_extra_shader_data
+	{
+		std::uint32_t emissive = 0;
 	};
 	std::vector<quad_private_data> quad_privates = {};
 
@@ -69,15 +77,35 @@ namespace game::render
 	void setup()
 	{
 		tz::gpu::settings_set_vsync(true);
+
+		std::vector<std::byte> bloom_imgdata;
+		bloom_imgdata.resize(tz::os::window_get_width() * tz::os::window_get_height() * 4);
+		bloom_image = tz_must(tz::gpu::create_image
+		({
+			.type = tz::gpu::image_type::rgba,
+			.data = bloom_imgdata,
+			.name = "Game Bloom Image",
+			.flags = tz::gpu::image_flag::colour_target | tz::gpu::image_flag::resize_to_match_window_resource
+		}));
+
+		tz::gpu::resource_handle colour_targets[] =
+		{
+			tz::gpu::window_resource,
+			bloom_image
+		};
+
 		ren = tz_must(tz::ren::create_quad_renderer
 		({
 			.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
+			.colour_targets = colour_targets,
 			.flags =
 				tz::ren::quad_renderer_flag::graph_present_after
 			|	tz::ren::quad_renderer_flag::alpha_clipping
 			|	tz::ren::quad_renderer_flag::allow_negative_scale
 			|	tz::ren::quad_renderer_flag::enable_layering
-
+			|	tz::ren::quad_renderer_flag::custom_fragment_shader,
+			.custom_fragment_shader = ImportedShaderSource(quad_bloom, fragment),
+			.extra_data_per_quad = sizeof(quad_extra_shader_data)
 		}));
 
 		bgimg = create_image_from_file("./res/images/bgforest.png");
@@ -194,6 +222,11 @@ namespace game::render
 		{
 			quad_privates[ret.peek()] = {.flags = flags};
 		}
+
+		quad_extra_shader_data extra{.emissive = static_cast<bool>((flags & quad_flag::emissive))};
+		std::span<const quad_extra_shader_data> extra_span{&extra, 1};
+		tz::ren::quad_renderer_set_quad_extra_data(ren, ret, std::as_bytes(extra_span));
+		
 		return ret;
 	}
 

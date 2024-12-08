@@ -18,6 +18,7 @@ namespace game::render
 	{
 		draggable = 0b0001,
 		match_image_ratio = 0b0010,
+		emissive = 0b0100,
 	};
 	constexpr quad_flag operator|(quad_flag lhs, quad_flag rhs)
 	{
