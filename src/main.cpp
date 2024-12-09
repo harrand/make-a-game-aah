@@ -64,6 +64,11 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
+			.name = "skeletal_archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
 			.name = "assassin"
 		},
 		game::card
