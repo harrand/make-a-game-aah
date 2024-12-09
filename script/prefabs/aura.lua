@@ -4,6 +4,7 @@ prefabs.aura =
 	movement_speed = 0.0,
 	has_tooltip = false,
 	combat = false,
+	emissive = true,
 	power = 1,
 	idle =
 	{
@@ -12,6 +13,10 @@ prefabs.aura =
 		frames =
 		{
 			"aura.png"
-		}
+		},
+		emissive_frames =
+		{
+			"aura.png"
+		},
 	}
 }

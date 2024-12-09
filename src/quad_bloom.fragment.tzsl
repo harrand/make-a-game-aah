@@ -9,6 +9,8 @@ input(id = 5, flat) uint alpha_clipping;
 output(id = 0) vec4 colour;
 output(id = 1) vec4 bloom_colour;
 
+const vec3 ambient_light = vec3(0.8f);
+
 struct quad_data
 {
 	mat4 model;
@@ -47,6 +49,7 @@ buffer(id = 3) const extra
 void main()
 {
 	vec4 frag_colour = vec4(tint, 0.0f);
+	frag_colour.xyz *= ambient_light;
 	vec4 bloom = vec4(tint, 0.0f);
 	if(texture_id0 != -1)
 	{

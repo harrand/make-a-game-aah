@@ -24,7 +24,7 @@ vec3 blur(vec2 uv)
     }
 
     result /= count; // average the color values	
-	return result * 8;
+	return result * 4;
 }
 
 void main()
