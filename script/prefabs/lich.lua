@@ -9,7 +9,7 @@ prefabs.lich =
 	power = 5,
 	emissive = true,
 	undead = true,
-	leeway_coefficient = 18.0,
+	leeway_coefficient = 13.0,
 	on_hit = function(me, victim)
 		local shadowbolt = create_entity("shadowbolt")
 		entity_set_is_player_aligned(shadowbolt, entity_is_player_aligned(me))

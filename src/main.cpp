@@ -58,7 +58,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
+			.name = "knight"
 		},
 		game::card
 		{
@@ -68,7 +68,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "skeletal_archer"
+			.name = "archer"
 		},
 		game::card
 		{

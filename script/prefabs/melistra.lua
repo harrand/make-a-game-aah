@@ -7,7 +7,7 @@ prefabs.melistra =
 	movement_speed = 0.4,
 	power = 5,
 	emissive = true,
-	leeway_coefficient = 18.0,
+	leeway_coefficient = 13.0,
 	on_hit = function(me, victim)
 		local firebolt = create_entity("firebolt")
 		entity_set_is_player_aligned(firebolt, entity_is_player_aligned(me))

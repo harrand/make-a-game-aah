@@ -9,7 +9,7 @@ prefabs.skeletal_archer =
 	power = 2,
 	emissive = true,
 	undead = true,
-	leeway_coefficient = 8.0,
+	leeway_coefficient = 15.0,
 	on_hit = function(me, victim)
 		local arrow = create_entity("arrow")
 		entity_set_is_player_aligned(arrow, entity_is_player_aligned(me))
