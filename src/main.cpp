@@ -38,6 +38,7 @@ int tz_main()
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
 	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
+	game::deck_add_card(game::player_deck(player), {.name = "lich"});
 	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
@@ -80,6 +81,11 @@ int tz_main()
 		{
 			.type = game::card_type::creature,
 			.name = "melistra"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "lich"
 		},
 	};
 	game::player_set_pool(player, player_cards);
