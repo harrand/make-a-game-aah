@@ -209,11 +209,11 @@ namespace game
 		}
 		const auto& player = players[p.peek()];
 
-		if(player.target_entity != tz::nullhand)
+		if(player.type == player_type::human && player.target_entity != tz::nullhand)
 		{
 			game::entity_set_target(ent, player.target_entity);
 		}
-		else if(player.target_location.has_value())
+		else if(player.type == player_type::human && player.target_location.has_value())
 		{
 			game::entity_set_target_location(ent, player.target_location.value());
 		}
@@ -231,7 +231,7 @@ namespace game
 					if(dst >= min_dist) {return;}
 					if(!entity_get_prefab(other).combat || !entity_get_prefab(other).attackable) {return;}
 
-					if(entity_is_player_aligned(other) != player.good)
+					if(entity_is_player_aligned(other) != player.good && entity_get_hp(other) > 0)
 					{
 						min_dist = dst;
 						nearest_enemy = other;

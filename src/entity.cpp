@@ -132,10 +132,8 @@ namespace game
 
 	void destroy_entity(entity_handle ent)
 	{
-		auto prefab = creatures[ent.peek()];
+		auto& prefab = creatures[ent.peek()];
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_destroy; if fn ~= nil then fn({}) end", prefab.name, ent.peek())));
-		impl_all_stop_targetting(ent);
-
 		entity_set_parent(ent, tz::nullhand);
 
 		auto children = childrens[ent.peek()];
@@ -144,7 +142,14 @@ namespace game
 			entity_set_parent(child, tz::nullhand);
 		}
 
+		auto free_list_iter = std::find(entity_free_list.begin(), entity_free_list.end(), ent);
+		if(free_list_iter != entity_free_list.end())
+		{
+			tz_error("double destroy on entity {} ({})", ent.peek(), creatures[ent.peek()].name);
+		}
+
 		entity_free_list.push_back(ent);
+		impl_all_stop_targetting(ent);
 		game::render::destroy_quad(quads[ent.peek()]);
 		if(tooltips[ent.peek()] != tz::nullhand)
 		{
@@ -517,7 +522,8 @@ namespace game
 		if(targets[ent.peek()] != tz::nullhand)
 		{
 			// if we already have a target, cancel this operation if its a taunt entity
-			if(creatures[targets[ent.peek()].peek()].taunt)
+			// unless of course you want to set target to null which case we do respect that.
+			if(creatures[targets[ent.peek()].peek()].taunt && tar != tz::nullhand)
 			{
 				return;
 			}
@@ -717,7 +723,6 @@ namespace game
 				ent_is_player = true;
 			}
 		});
-		impl_all_stop_targetting(ent);
 		if(!ent_is_player)
 		{
 			destroy_entity(ent);
@@ -758,10 +763,12 @@ namespace game
 				// was it player aligned?
 				// ok, then the player who is controlling it should now decide what it should do next.
 				player_handle p = game::try_get_player_that_controls_entity(ent);
+				volatile entity_handle not_this_one_please = dead_person;
 				entity_set_target(ent, tz::nullhand);
 				if(p != tz::nullhand)
 				{
 					game::player_control_entity(p, ent);
+					tz_assert(entity_get_target(ent) != dead_person, "player made entity target a previous target instantly (said target destroyed: {})", impl_entity_destroyed(dead_person));
 				}
 			}
 		});

@@ -4,6 +4,7 @@ prefabs.aura =
 	movement_speed = 0.0,
 	has_tooltip = false,
 	combat = false,
+	attackable = false,
 	emissive = true,
 	power = 1,
 	idle =
