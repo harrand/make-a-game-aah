@@ -34,10 +34,10 @@ namespace game
 		auto has_anim = tz_must(tz::lua_get_bool("has_anim"));
 		if(has_anim)
 		{
-			tz::lua_execute(std::format(R"(
+			tz_must(tz::lua_execute(std::format(R"(
 			anim = c.{}
 			_count = #anim.frames
-			)", animation_name));
+			)", animation_name)));
 			int frame_count = tz_must(tz::lua_get_int("_count"));
 			int fps = tz_must(tz::lua_get_int("anim.fps"));
 			bool loop = tz_must(tz::lua_get_bool("anim.loop"));
@@ -45,9 +45,15 @@ namespace game
 			flipbook = game::render::create_flipbook(fps, loop);
 			for(std::size_t i = 0; i < frame_count; i++)
 			{
-				tz::lua_execute(std::format("_tmp = _internal_index(anim.frames, {})", i + 1));
+				tz_must(tz::lua_execute(std::format("_tmp = _internal_index(anim.frames, {})", i + 1)));
+				tz::error_code err = tz::lua_execute(std::format("_tmp_emissive = _internal_index(anim.emissive_frames, {})", i + 1));
+				std::string emissive_path = "./res/images/transparent1x1.png";
+				if(err == tz::error_code::success)
+				{
+					emissive_path = std::format("./res/images/{}", tz_must(tz::lua_get_string("_tmp_emissive")));
+				}
 				std::string path = std::format("./res/images/{}", tz_must(tz::lua_get_string("_tmp")));
-				game::render::flipbook_add_frame(flipbook, game::render::create_image_from_file(path));
+				game::render::flipbook_add_frame(flipbook, game::render::create_image_from_file(path), game::render::create_image_from_file(emissive_path));
 			}
 		}
 	}

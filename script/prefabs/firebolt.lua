@@ -30,6 +30,17 @@ prefabs.firebolt =
 			"spell/sparkle/5.png",
 			"spell/sparkle/6.png",
 			"spell/sparkle/7.png",
+		},
+		emissive_frames =
+		{
+			"spell/sparkle/0.png",
+			"spell/sparkle/1.png",
+			"spell/sparkle/2.png",
+			"spell/sparkle/3.png",
+			"spell/sparkle/4.png",
+			"spell/sparkle/5.png",
+			"spell/sparkle/6.png",
+			"spell/sparkle/7.png",
 		}
 	},
 	on_update = function(me, delta)

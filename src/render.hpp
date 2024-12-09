@@ -44,16 +44,18 @@ namespace game::render
 	void quad_set_scale(handle q, tz::v2f scale);
 	tz::v3f quad_get_colour(handle q);
 	void quad_set_colour(handle q, tz::v3f colour);
-	void quad_set_texture(handle q, std::uint32_t texture);
+	void quad_set_texture0(handle q, std::uint32_t texture);
+	void quad_set_texture1(handle q, std::uint32_t texture);
 	void quad_set_flipbook(handle q, flipbook_handle flipbook);
 
 	bool quad_is_held(handle q);
 	bool quad_is_mouseover(handle q);
 
 	flipbook_handle create_flipbook(unsigned int fps, bool repeat);
-	void flipbook_add_frame(flipbook_handle flipbook, texture_id tex);
+	void flipbook_add_frame(flipbook_handle flipbook, texture_id tex, texture_id emissive_tex = -1);
 
 	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook);
+	std::span<const std::uint32_t> flipbook_get_emissive_frames(flipbook_handle flipbook);
 
 	namespace detail{struct text_t{};}
 	using text_handle = tz::handle<detail::text_t>;

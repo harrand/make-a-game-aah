@@ -51,6 +51,7 @@ namespace game::render
 		unsigned int fps;
 		bool repeat;
 		std::vector<texture_id> frames = {};
+		std::vector<texture_id> emissive_frames = {};
 	};
 	std::vector<flipbook_data> flipbooks = {};
 	struct texture_info
@@ -162,7 +163,7 @@ namespace game::render
 			}));
 
 			bgimg = create_image_from_file("./res/images/bgforest.png");
-			background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id = bgimg, .layer = -90}, quad_flag::match_image_ratio);
+			background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id0 = bgimg, .layer = -90}, quad_flag::match_image_ratio);
 
 			cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
 		}
@@ -200,11 +201,12 @@ namespace game::render
 				}
 				int flipbook_cursor = (quadpriv.flipbook_timer / flipbook_time_secs) * flipbook.frames.size();
 				flipbook_cursor = std::clamp(flipbook_cursor, 0, static_cast<int>(flipbook.frames.size()) - 1);
-				quad_set_texture(q, flipbook.frames[flipbook_cursor]);
+				quad_set_texture0(q, flipbook.frames[flipbook_cursor]);
+				quad_set_texture1(q, flipbook.emissive_frames[flipbook_cursor]);
 			}
 			if(quadpriv.flags & quad_flag::match_image_ratio)
 			{
-				std::uint32_t texid = tz::ren::get_quad_texture(ren, q);
+				std::uint32_t texid = tz::ren::get_quad_texture0(ren, q);
 				const texture_info& tex = texture_cache[texture_infos[texid]];
 				float aspect_ratio = static_cast<float>(tex.hdr.width) / tex.hdr.height;
 				tz::v2f scale = tz::ren::get_quad_scale(ren, q);
@@ -342,9 +344,14 @@ namespace game::render
 		tz::ren::set_quad_colour(ren, q, colour);
 	}
 
-	void quad_set_texture(handle q, std::uint32_t texture)
+	void quad_set_texture0(handle q, std::uint32_t texture)
 	{
-		tz::ren::set_quad_texture(ren, q, texture);
+		tz::ren::set_quad_texture0(ren, q, texture);
+	}
+
+	void quad_set_texture1(handle q, std::uint32_t texture)
+	{
+		tz::ren::set_quad_texture1(ren, q, texture);
 	}
 
 	void quad_set_flipbook(handle q, flipbook_handle flipbook)
@@ -360,7 +367,7 @@ namespace game::render
 		const auto& flipbook_data = flipbooks[flipbook.peek()];
 		if(flipbook_data.frames.size())
 		{
-			quad_set_texture(q, flipbook_data.frames.front());
+			quad_set_texture0(q, flipbook_data.frames.front());
 		}
 	}
 
@@ -383,15 +390,21 @@ namespace game::render
 		return static_cast<tz::hanval>(id);
 	}
 
-	void flipbook_add_frame(flipbook_handle flipbookh, texture_id tex)
+	void flipbook_add_frame(flipbook_handle flipbookh, texture_id tex, texture_id emissive_tex)
 	{
 		auto& flipbook = flipbooks[flipbookh.peek()];
 		flipbook.frames.push_back(tex);
+		flipbook.emissive_frames.push_back(emissive_tex);
 	}
 
 	std::span<const std::uint32_t> flipbook_get_frames(flipbook_handle flipbook)
 	{
 		return flipbooks[flipbook.peek()].frames;
+	}
+
+	std::span<const std::uint32_t> flipbook_get_emissive_frames(flipbook_handle flipbook)
+	{
+		return flipbooks[flipbook.peek()].emissive_frames;
 	}
 
 	text_handle create_text(const char* font_name, std::string_view text, tz::v2f position, tz::v2f scale, tz::v3f colour)
@@ -446,7 +459,7 @@ namespace game::render
 			({
 				.position = pos,
 				.scale = scale,
-				.texture_id = texid,
+				.texture_id0 = texid,
 				.colour = colour,
 				.layer = 95
 			}));

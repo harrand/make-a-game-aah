@@ -76,7 +76,7 @@ namespace game
 			flags = flags | game::render::quad_flag::draggable;
 		}
 
-		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = card_layer}, flags);
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id0 = card_img, .colour = {1.0f, 1.0f, 1.0f}, .layer = card_layer}, flags);
 	}
 
 	render::handle create_card_sprite_facedown(card c, bool draggable)
@@ -89,7 +89,7 @@ namespace game
 
 		tz::v3f card_colour = impl_card_colour(game::get_prefab(c.name).power);
 
-		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id = facedown_card_sprite, .colour = card_colour, .layer = card_layer}, flags);
+		return render::create_quad({.scale = tz::v2f::filled(0.2f), .texture_id0 = facedown_card_sprite, .colour = card_colour, .layer = card_layer}, flags);
 	}
 
 	std::string card_get_name(card c)
