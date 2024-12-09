@@ -8,6 +8,7 @@ prefabs.warbear =
 	base_damage = 3,
 	power = 5,
 	taunt = true,
+	undead_variant = "undead_bear",
 	idle =
 	{
 		fps = 1,

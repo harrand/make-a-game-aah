@@ -40,6 +40,8 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
 	game::deck_add_card(game::player_deck(player), {.name = "lich"});
 	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
+	game::deck_add_card(game::player_deck(player), {.name = "undead_bear"});
+	game::deck_add_card(game::player_deck(player), {.name = "bear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
 
@@ -86,7 +88,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "lich"
+			.name = "general"
 		},
 	};
 	game::player_set_pool(player, player_cards);
@@ -116,7 +118,7 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "general"
+			.name = "lich"
 		},
 	};
 	game::player_set_pool(enemy, enemy_cards);

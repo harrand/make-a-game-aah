@@ -20,7 +20,9 @@ prefabs.lich =
 	on_kill = function(me, victim)
 		-- spawn a skeletal warrior at the victims position	
 		local x, y = entity_get_position(victim)
-		local skel = create_entity("skeletal_warrior")
+		local victim_prefab = entity_get_prefab(victim)
+		local undead_prefab = prefabs[victim_prefab].undead_variant or "skeletal_warrior"
+		local skel = create_entity(undead_prefab)
 		entity_set_position(skel, x, y)
 		entity_set_is_player_aligned(skel, entity_is_player_aligned(me))
 		entity_set_owner(skel, entity_get_owner(me))

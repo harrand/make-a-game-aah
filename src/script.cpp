@@ -71,6 +71,13 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_get_prefab", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			tz::lua_push_string(game::entity_get_prefab(static_cast<tz::hanval>(ent)).name);
+			return 1;
+		});
+
 		tz::lua_define_function("entity_get_position", []()
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();

@@ -362,7 +362,8 @@ namespace game
 			game::iterate_entities([&closest_enemy, &mindist, click_pos, reticule = reticule](entity_handle ent)
 			{
 				float dist = (click_pos - game::entity_get_position(ent)).length();
-				if(ent == reticule)
+				auto prefab = entity_get_prefab(ent);
+				if(ent == reticule || !prefab.combat || !prefab.attackable)
 				{
 					return;
 				}

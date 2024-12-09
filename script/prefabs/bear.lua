@@ -8,6 +8,7 @@ prefabs.bear =
 	base_damage = 3,
 	taunt = true,
 	power = 4,
+	undead_variant = "undead_bear",
 	idle =
 	{
 		fps = 1,
