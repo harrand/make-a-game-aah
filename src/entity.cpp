@@ -44,6 +44,7 @@ namespace game
 
 	void impl_melee_attack(entity_handle lhs, entity_handle rhs);
 	void impl_on_death(entity_handle ent);
+	void impl_on_kill(entity_handle ent, entity_handle victim);
 	bool impl_entity_destroyed(entity_handle ent);
 	void impl_all_stop_targetting(entity_handle ent);
 
@@ -91,6 +92,7 @@ namespace game
 		auto& prefab = creatures[ret.peek()];
 		prefab = game::get_prefab(info.prefab_name);
 
+		speeds[ret.peek()] = prefab.movement_speed;
 		hps[ret.peek()] = info.hp == -1u ? prefab.base_health : info.hp;
 
 		player_aligneds[ret.peek()] = info.player_aligned;
@@ -100,25 +102,25 @@ namespace game
 		cooldowns[ret.peek()] = 0.0f;
 		damages[ret.peek()] = prefab.base_damage;
 		leeway_coefficients[ret.peek()] = prefab.leeway_coefficient;
+		parents[ret.peek()] = tz::nullhand;
+		owners[ret.peek()] = tz::nullhand;
 		userdatas[ret.peek()] = info.userdata;
 		patrols[ret.peek()] = {};
 		patrol_cursors[ret.peek()] = 0;
-		parents[ret.peek()] = tz::nullhand;
-		owners[ret.peek()] = tz::nullhand;
-		childrens[ret.peek()] = {};
-		busys[ret.peek()] = false;
-		targets[ret.peek()] = tz::nullhand;
-		target_locations[ret.peek()] = std::nullopt;
-
-		speeds[ret.peek()] = prefab.movement_speed;
 
 		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale, .colour = prefab.colour_tint},
 				prefab.emissive ? render::quad_flag::emissive : static_cast<render::quad_flag>(0));
-
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
 		move_dirs[ret.peek()] = tz::v2f::zero();
-
+		target_locations[ret.peek()] = std::nullopt;
+		targets[ret.peek()] = tz::nullhand;
+		childrens[ret.peek()] = {};
+		tz_assert(tooltips[ret.peek()] == tz::nullhand, "tooltip not cleared when creating new entity");
+		tooltips[ret.peek()] = tz::nullhand;
+		tz_assert(healthbars[ret.peek()] == tz::nullhand, "tooltip not cleared when creating new entity");
+		healthbars[ret.peek()] = tz::nullhand;
 		healthbar_timeouts[ret.peek()] = 0.0f;
+		busys[ret.peek()] = false;
 
 		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_create; if fn ~= nil then fn({}) end", prefab.name, ret.peek())));
 		if(info.parent != tz::nullhand)
@@ -643,6 +645,16 @@ namespace game
 				if(victim_hp <= dmg)
 				{
 					victim_hp = 0;
+
+					entity_handle retaliation_target = lhs;
+					while(owners[retaliation_target.peek()] != tz::nullhand && !creatures[retaliation_target.peek()].attackable)
+					{
+						retaliation_target = owners[retaliation_target.peek()];
+					}
+					if(!impl_entity_destroyed(retaliation_target))
+					{
+						impl_on_kill(retaliation_target, rhs);
+					}
 					impl_on_death(rhs);
 				}
 				else if(dmg > 0)
@@ -705,11 +717,17 @@ namespace game
 				ent_is_player = true;
 			}
 		});
+		impl_all_stop_targetting(ent);
 		if(!ent_is_player)
 		{
 			destroy_entity(ent);
 		}
-		impl_all_stop_targetting(ent);
+	}
+
+	void impl_on_kill(entity_handle ent, entity_handle victim)
+	{
+		auto prefab = creatures[ent.peek()];
+		tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_kill; if fn ~= nil then fn({}, {}) end", prefab.name, ent.peek(), victim.peek())));
 	}
 
 	bool impl_entity_destroyed(entity_handle ent)

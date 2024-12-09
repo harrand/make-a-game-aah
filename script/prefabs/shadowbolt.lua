@@ -58,6 +58,6 @@ prefabs.shadowbolt =
 	end,
 	on_hit = function(me, victim)
 		destroy_entity(me)
-	end
+	end,
 }
 prefabs.shadowbolt.move_horizontal = prefabs.shadowbolt.idle

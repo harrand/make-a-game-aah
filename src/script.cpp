@@ -202,6 +202,22 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_get_owner", []()
+		{
+			auto [ent] = tz::lua_parse_args<std::int64_t>();
+			entity_handle owner = game::entity_get_owner(static_cast<tz::hanval>(ent));
+			if(owner == tz::nullhand)
+			{
+				tz::lua_push_nil();
+			}
+			else
+			{
+				tz::lua_push_int(owner.peek());
+			}
+
+			return 1;
+		});
+
 		tz::lua_define_function("entity_set_owner", []()
 		{
 			auto [ent, owner] = tz::lua_parse_args<std::int64_t, std::int64_t>();

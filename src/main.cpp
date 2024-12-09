@@ -43,6 +43,7 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
 
+	game::deck_add_card(game::player_deck(enemy), {.name = "knight"});
 	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
 	game::card player_cards[] =
