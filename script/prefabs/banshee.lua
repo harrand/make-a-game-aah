@@ -6,6 +6,7 @@ prefabs.banshee =
 	base_cooldown = 0.7,
 	movement_speed = 0.4,
 	power = 3,
+	undead = true,
 	on_hit = function(me, victim)
 		entity_set_is_player_aligned(victim, entity_is_player_aligned(me))
 		destroy_entity(me)

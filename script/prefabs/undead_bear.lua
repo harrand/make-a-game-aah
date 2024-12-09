@@ -8,6 +8,7 @@ prefabs.undead_bear =
 	base_damage = 3,
 	taunt = true,
 	emissive = true,
+	undead = true,
 	power = 4,
 	idle =
 	{

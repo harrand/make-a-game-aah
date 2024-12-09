@@ -8,6 +8,7 @@ prefabs.skeletal_archer =
 	movement_speed = 0.5,
 	power = 2,
 	emissive = true,
+	undead = true,
 	leeway_coefficient = 8.0,
 	on_hit = function(me, victim)
 		local arrow = create_entity("arrow")

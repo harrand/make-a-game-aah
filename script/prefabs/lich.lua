@@ -8,6 +8,7 @@ prefabs.lich =
 	movement_speed = 0.4,
 	power = 5,
 	emissive = true,
+	undead = true,
 	leeway_coefficient = 18.0,
 	on_hit = function(me, victim)
 		local shadowbolt = create_entity("shadowbolt")
@@ -20,8 +21,11 @@ prefabs.lich =
 	on_kill = function(me, victim)
 		-- spawn a skeletal warrior at the victims position	
 		local x, y = entity_get_position(victim)
-		local victim_prefab = entity_get_prefab(victim)
-		local undead_prefab = prefabs[victim_prefab].undead_variant or "skeletal_warrior"
+		local victim_prefab_name = entity_get_prefab(victim)
+		local victim_prefab = prefabs[victim_prefab_name]
+		if victim_prefab.undead == true then return end
+
+		local undead_prefab = victim_prefab.undead_variant or "skeletal_warrior"
 		local skel = create_entity(undead_prefab)
 		entity_set_position(skel, x, y)
 		entity_set_is_player_aligned(skel, entity_is_player_aligned(me))

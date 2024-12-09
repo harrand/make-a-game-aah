@@ -7,6 +7,7 @@ prefabs.skeletal_warrior =
 	movement_speed = 1.0,
 	power = 2,
 	emissive = true,
+	undead = true,
 	taunt = true,
 	idle =
 	{
