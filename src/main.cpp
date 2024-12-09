@@ -40,6 +40,7 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
 	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
+	game::deck_add_card(game::player_deck(player), {.name = "skeleton"});
 
 	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
