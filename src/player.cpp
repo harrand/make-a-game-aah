@@ -152,6 +152,7 @@ namespace game
 		float yoffset = bg_scale[1] - (bg_scale[1] / (1.0f + mana_bar_margin));
 
 		tz::v2f pos = player.mana_bar_pos;
+		pos[1] *= (player.good ? 1.0f : -1.0f);
 		pos[0] += (manapct * player.mana_bar_dimensions[0]) - bg_scale[0] + yoffset;
 		game::render::quad_set_position(player.mana_bar, pos);
 	}
@@ -448,8 +449,10 @@ namespace game
 		tz::v2f mana_bar_background_dimensions = player.mana_bar_dimensions;
 		mana_bar_background_dimensions[1] *= (1.0f + mana_bar_margin);
 		mana_bar_background_dimensions[0] += (mana_bar_background_dimensions[1] - player.mana_bar_dimensions[1]);
-		player.mana_bar_background = game::render::create_quad({.position = player.mana_bar_pos, .scale = mana_bar_background_dimensions, .layer = 2});
-		player.mana_bar = game::render::create_quad({.position = player.mana_bar_pos, .scale = player.mana_bar_dimensions, .colour = config_mana_bar_colour, .layer = 3});
+		tz::v2f bar_pos = player.mana_bar_pos;
+		bar_pos[1] *= (player.good ? 1.0f : -1.0f);
+		player.mana_bar_background = game::render::create_quad({.position = bar_pos, .scale = mana_bar_background_dimensions, .layer = 2});
+		player.mana_bar = game::render::create_quad({.position = bar_pos, .scale = player.mana_bar_dimensions, .colour = config_mana_bar_colour, .layer = 3});
 
 		pos[0] *= (static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height());
 

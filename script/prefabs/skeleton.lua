@@ -2,7 +2,7 @@ prefabs.skeletal_warrior =
 {
 	display_name = "Skeletal Warrior",
 	description = "A durable undead warrior. Taunt.",
-	base_health = 35,
+	base_health = 27,
 	base_cooldown = 0.75,
 	movement_speed = 1.0,
 	power = 2,
