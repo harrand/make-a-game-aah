@@ -534,8 +534,21 @@ namespace game
 						// but was last frame. i.e we've just let go of it.
 						// play it
 						entity_handle ent = game::deck_play_card(player.deck, i, true);
+						auto player_pos = game::entity_get_position(player.avatar);
+						game::entity_set_position(ent, player_pos);
+						tz::v2f click_pos = render::quad_get_position(render::get_cursor());
+						// so every entity has a leeway amount meaning it wont exactly go to the card play location.
+						// so we manually calculate the target position such that it ends up at the card play location.
+						tz::v2f dir = (click_pos - player_pos);
+						float dst = dir.length();
+						if(dst > 0)
+						{
+							dir /= dir.length();
+						}
+						const float leeway = config_global_speed_multiplier * game::entity_get_prefab(ent).movement_speed * config_global_leeway_dist * prefab.leeway_coefficient;
+
 						game::entity_set_owner(ent, player.avatar);
-						player_control_entity(p, ent);
+						game::entity_set_target_location(ent, player_pos + (dir * (dst + leeway)));
 						// this will destroy the card, so fix up our deck hold array
 						player.deck_hold_array.erase(player.deck_hold_array.begin() + i);
 
