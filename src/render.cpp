@@ -162,7 +162,7 @@ namespace game::render
 				.extra_data_per_quad = sizeof(quad_extra_shader_data),
 			}));
 
-			bgimg = create_image_from_file("./res/images/bgcourtyard.png");
+			bgimg = create_image_from_file("./res/images/bgbridgeentrance.png");
 			background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id0 = bgimg, .layer = -90}, quad_flag::match_image_ratio);
 
 			cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});
