@@ -11,6 +11,7 @@ namespace game
 		std::string display_name = "";
 		std::string description = "";
 		std::uint32_t background_image = -1;
+		std::string player_prefab = "";
 	};
 
 	void level_setup();

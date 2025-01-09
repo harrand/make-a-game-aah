@@ -34,7 +34,6 @@ int tz_main()
 	game::load_level(game::get_level("forest"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
-	auto enemy = game::load_player_prefab(game::get_player_prefab("superlich"), true, false);
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));

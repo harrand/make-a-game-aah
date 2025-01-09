@@ -1,6 +1,7 @@
 #include "level.hpp"
 #include "render.hpp"
 #include "entity.hpp"
+#include "player.hpp"
 #include "tz/core/lua.hpp"
 #include <unordered_map>
 
@@ -73,14 +74,19 @@ namespace game
 		impl_collect_level_data(level_name, "description", data.description);
 		std::string background_image_path;
 		impl_collect_level_data(level_name, "background_image", background_image_path);
+		impl_collect_level_data(level_name, "player_prefab", data.player_prefab);
 		data.background_image = render::create_image_from_file(background_image_path);
 		return 0;
 	}
 
 	void load_level(const level& l)
 	{
-		render::quad_set_texture0(render::get_background(), l.background_image);
 		clear_entities();
+		render::quad_set_texture0(render::get_background(), l.background_image);
+		if(l.player_prefab.size())
+		{
+			game::load_player_prefab(game::get_player_prefab(l.player_prefab));
+		}
 	}
 
 }
