@@ -26,6 +26,7 @@ namespace game
 
 	entity_handle create_entity(entity_info info);
 	void destroy_entity(entity_handle ent);
+	void clear_entities();
 	void iterate_entities(std::function<void(entity_handle)> callback);
 	void entity_update(float delta_seconds);
 

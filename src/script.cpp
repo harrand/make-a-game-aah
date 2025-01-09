@@ -29,6 +29,7 @@ namespace game
 	void impl_local_script_init()
 	{
 		tz::lua_execute("prefabs = {}; prefabs.empty = {has_tooltip = false, combat = false, attackable = false}");
+		tz::lua_execute("levels = {};");
 		for(const auto& entry : std::filesystem::recursive_directory_iterator("./script"))
 		{
 			if(entry.path().has_extension() && entry.path().extension() == ".lua")

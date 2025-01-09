@@ -8,6 +8,7 @@
 #include "player.hpp"
 #include "prefab.hpp"
 #include "entity.hpp"
+#include "level.hpp"
 #include "render.hpp"
 #include "script.hpp"
 
@@ -27,6 +28,9 @@ int tz_main()
 	game::script_initialise();
 	game::prefab_setup();
 	game::card_setup();
+	game::level_setup();
+
+	game::load_level(game::get_level("forest"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 	auto enemy = game::create_player(game::player_type::cpu, false, game::get_prefab("general"));

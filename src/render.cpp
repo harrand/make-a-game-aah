@@ -149,7 +149,7 @@ namespace game::render
 
 			ren = tz_must(tz::ren::create_quad_renderer
 			({
-				.clear_colour = {0.3f, 0.3f, 0.3f, 1.0f},
+				.clear_colour = {0.0f, 0.0f, 0.0f, 1.0f},
 				.colour_targets = colour_targets,
 				.post_render = bloom_blur_graph,
 				.flags =
@@ -162,7 +162,7 @@ namespace game::render
 				.extra_data_per_quad = sizeof(quad_extra_shader_data),
 			}));
 
-			bgimg = create_image_from_file("./res/images/bgacademyhall2.png");
+			bgimg = create_image_from_file("./res/images/transparent1x1.png");
 			background = create_quad({.scale = tz::v2f::filled(1.0f), .texture_id0 = bgimg, .layer = -90}, quad_flag::match_image_ratio);
 
 			cursor = create_quad({.scale = tz::v2f::filled(0.02f), .colour = tz::v3f::zero(), .layer = -85});

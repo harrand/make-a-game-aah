@@ -163,6 +163,14 @@ namespace game
 		}
 	}
 
+	void clear_entities()
+	{
+		iterate_entities([](entity_handle ent)
+				{
+					destroy_entity(ent);
+				});
+	}
+
 	void iterate_entities(std::function<void(entity_handle)> callback)
 	{
 		for(std::size_t i = 0; i < entity_count; i++)
