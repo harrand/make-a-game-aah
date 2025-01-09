@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include "config.hpp"
 #include "tz/topaz.hpp"
+#include "tz/core/lua.hpp"
 #include "tz/os/window.hpp"
 #include "tz/os/input.hpp"
 #include <algorithm>
@@ -650,5 +651,117 @@ namespace game
 			}
 		}
 		return false;
+	}
+
+	int impl_get_player_prefab_data();
+	std::unordered_map<std::string, player_prefab> player_prefab_data;
+
+	void player_setup()
+	{
+		tz::lua_define_function("callback_player_prefab", impl_get_player_prefab_data);
+		tz::lua_execute(R"(
+			for k, v in pairs(players) do
+				callback_player_prefab(k)
+			end
+		)");
+	}
+
+	const player_prefab& get_player_prefab(const std::string& name)
+	{
+		return player_prefab_data[name];
+	}
+
+	// impl bits
+	void impl_collect_prefab_deck(std::string_view prefab_name, std::vector<std::string>& deck)
+	{
+		deck.clear();
+		tz::lua_execute(std::format(R"(
+		c = players.{}
+		has_deck = c.deck ~= nil
+		)", prefab_name));
+		auto has_deck = tz_must(tz::lua_get_bool("has_deck"));
+		if(has_deck)
+		{
+			tz_must(tz::lua_execute(R"(
+			d = c.deck
+			_count = #d
+			)"));
+			int deck_size = tz_must(tz::lua_get_int("_count"));
+			deck.reserve(deck_size);
+			for(std::size_t i = 0; i < deck_size; i++)
+			{
+				tz_must(tz::lua_execute(std::format("_tmp = _internal_index(d, {})", i + 1)));
+				std::string card_name = tz_must(tz::lua_get_string("_tmp"));
+				deck.push_back(card_name);
+			}
+		}
+	}
+
+	template<typename T>
+	bool impl_collect_player_prefab_data(std::string_view player_prefab_name, const char* data_name, T& data)
+	{
+		tz_must(tz::lua_execute(std::format(R"(
+			myval = players.{}.{}
+			myval_nil = myval == nil
+			--if myval == nil then error("\"players.{}.{}\" expected to be non-nil, but it's nil") end
+		)", player_prefab_name, data_name, player_prefab_name, data_name)));
+		bool is_nil = tz_must(tz::lua_get_bool("myval_nil"));
+		if(is_nil)
+		{
+			return false;
+		}
+		if constexpr(std::is_same_v<T, bool>)
+		{
+			data = tz_must(tz::lua_get_bool("myval"));
+		}
+		else if constexpr(std::numeric_limits<T>::is_integer)
+		{
+			data = tz_must(tz::lua_get_int("myval"));
+		}
+		else if constexpr(std::is_floating_point_v<T>)
+		{
+			data = tz_must(tz::lua_get_number("myval"));
+		}
+		else if constexpr(std::is_same_v<T, std::string>)
+		{
+			data = tz_must(tz::lua_get_string("myval"));
+		}
+		else
+		{
+			static_assert(false, "woops");
+		}
+		return true;
+	}
+
+	int impl_get_player_prefab_data()
+	{
+		auto [player_prefab_name] = tz::lua_parse_args<std::string>();
+		player_prefab& data = player_prefab_data[player_prefab_name];
+		tz::lua_execute(std::format(R"(
+			_internal_index = function(arr, idx) return arr[idx] end
+			c = player_prefabs.{}
+		)", player_prefab_name));
+		data.name = player_prefab_name;
+		impl_collect_player_prefab_data(player_prefab_name, "avatar", data.avatar_prefab);
+		impl_collect_prefab_deck(player_prefab_name, data.deck);
+		return 0;
+	}
+
+	player_handle load_player_prefab(const player_prefab& prefab, bool cpu, bool player_aligned)
+	{
+		player_handle ret = game::create_player(cpu ? game::player_type::cpu : game::player_type::human, player_aligned, game::get_prefab(prefab.avatar_prefab));
+		std::vector<game::card> cards(prefab.deck.size());
+		std::transform(prefab.deck.begin(), prefab.deck.end(), cards.begin(),
+			[](const std::string& card)->game::card
+			{
+				return {.type = game::card_type::creature, .name = card};
+			});
+		game::player_set_pool(ret, cards);
+		auto initial_hand_size = std::min(cards.size(), static_cast<std::size_t>(4));
+		for(std::size_t i = 0; i < initial_hand_size; i++)
+		{
+			game::deck_add_card(game::player_deck(ret), {.name = prefab.deck[i]});
+		}
+		return ret;
 	}
 }

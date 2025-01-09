@@ -48,6 +48,18 @@ namespace game
 	std::optional<tz::v2f> player_get_target_location(player_handle p);
 
 	bool player_try_spend_mana(player_handle p, unsigned int cost);
+
+	struct player_prefab
+	{
+		std::string name;
+		std::string avatar_prefab;
+		std::vector<std::string> deck;
+	};
+
+	void player_setup();
+
+	const player_prefab& get_player_prefab(const std::string& name);
+	player_handle load_player_prefab(const player_prefab& prefab, bool cpu = true, bool player_aligned = false);
 }
 
 #endif // GAME_PLAYER_HPP

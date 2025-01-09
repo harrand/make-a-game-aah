@@ -29,11 +29,12 @@ int tz_main()
 	game::prefab_setup();
 	game::card_setup();
 	game::level_setup();
+	game::player_setup();
 
 	game::load_level(game::get_level("forest"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
-	auto enemy = game::create_player(game::player_type::cpu, false, game::get_prefab("general"));
+	auto enemy = game::load_player_prefab(game::get_player_prefab("superlich"), true, false);
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
@@ -48,9 +49,6 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "bear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
-
-	game::deck_add_card(game::player_deck(enemy), {.name = "knight"});
-	game::deck_add_card(game::player_deck(enemy), {.name = "general"});
 
 	game::card player_cards[] =
 	{
@@ -96,96 +94,6 @@ int tz_main()
 		},
 	};
 	game::player_set_pool(player, player_cards);
-
-	game::card enemy_cards[] =
-	{
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "lich"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_warrior"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_archer"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "skeletal_archer"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "undead_bear"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "lich"
-		},
-	};
-	game::player_set_pool(enemy, enemy_cards);
 
 	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())

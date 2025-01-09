@@ -29,7 +29,10 @@ prefabs.lich =
 		local skel = create_entity(undead_prefab)
 		entity_set_position(skel, x, y)
 		entity_set_is_player_aligned(skel, entity_is_player_aligned(me))
-		entity_set_owner(skel, entity_get_owner(me))
+		local owner = entity_get_owner(me)
+		-- if i dont have an owner then i assume i am a player and thus I shall own the victim.
+		if owner == nil then owner = me end
+		entity_set_owner(skel, owner)
 	end,
 	idle =
 	{
