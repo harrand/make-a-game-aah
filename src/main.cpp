@@ -98,22 +98,82 @@ int tz_main()
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "peasant"
+			.name = "skeletal_warrior"
 		},
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "archer"
+			.name = "skeletal_warrior"
 		},
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "knight"
+			.name = "skeletal_warrior"
 		},
 		game::card
 		{
 			.type = game::card_type::creature,
-			.name = "warbear"
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "lich"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_warrior"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "skeletal_archer"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "undead_bear"
 		},
 		game::card
 		{
@@ -122,9 +182,6 @@ int tz_main()
 		},
 	};
 	game::player_set_pool(enemy, enemy_cards);
-
-	game::player_set_mana(player, 999);
-	game::player_set_mps(player, 10.0f);
 
 	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())

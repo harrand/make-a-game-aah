@@ -214,7 +214,8 @@ namespace game
 			auto pos = game::render::quad_get_position(quads[i]);
 			auto maybe_tarloc = target_locations[i];
 			entity_handle tar = targets[i];
-			const float leeway = config_global_speed_multiplier * speeds[i] * config_global_leeway_dist * leeway_coefficients[i];
+			const float default_speed = entity_get_prefab(ent).movement_speed;
+			const float leeway = config_global_speed_multiplier * default_speed * config_global_leeway_dist * leeway_coefficients[i];
 			// if we dont have a target location but we do have a target entity, set tarloc (or attack if we're in range)
 			if(!maybe_tarloc.has_value() && tar != tz::nullhand)
 			{
@@ -233,7 +234,7 @@ namespace game
 				}
 			}
 			// do we have a target location?
-			if(maybe_tarloc.has_value())
+			if(maybe_tarloc.has_value() && speeds[ent.peek()] > 0.0f)
 			{
 				if((maybe_tarloc.value() - pos).length() > leeway)
 				{
@@ -440,6 +441,16 @@ namespace game
 	void entity_move(entity_handle ent, tz::v2f dir)
 	{
 		move_dirs[ent.peek()] += dir;
+	}
+
+	float entity_get_movement_speed(entity_handle ent)
+	{
+		return speeds[ent.peek()];
+	}
+
+	void entity_set_movement_speed(entity_handle ent, float movement_speed)
+	{
+		speeds[ent.peek()] = movement_speed;
 	}
 
 	void entity_set_cooldown(entity_handle ent, float cooldown)
@@ -677,16 +688,7 @@ namespace game
 					{
 						retaliation_target = owners[retaliation_target.peek()];
 					}
-					// if rhs is a player avatar, well they never target anything, so dont bother.
-					bool rhs_is_player = false;
-					iterate_players([&rhs_is_player, rhs](player_handle p)
-					{
-						if(player_get_avatar(p) == rhs)
-						{
-							rhs_is_player = true;
-						}
-					});
-					if(!rhs_is_player && !impl_entity_destroyed(retaliation_target))
+					if(!impl_entity_destroyed(retaliation_target))
 					{
 						entity_set_target(rhs, retaliation_target);
 					}

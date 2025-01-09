@@ -4,6 +4,7 @@
 #include "tz/os/window.hpp"
 #include "tz/os/input.hpp"
 #include <algorithm>
+#include <cstdlib>
 
 namespace game
 {
@@ -188,6 +189,7 @@ namespace game
 
 	bool player_owns(player_handle p, entity_handle e)
 	{
+		if(players[p.peek()].avatar == e) return true;
 		entity_handle par = game::entity_get_owner(e);
 		while(par != tz::nullhand)
 		{
@@ -273,6 +275,12 @@ namespace game
 		{
 			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
 			game::render::create_text("kongtext", "YOU DIED :(", {-x, 0.0f}, tz::v2f::filled(0.3f), {1.0f, 0.0f, 0.0f});
+		}
+		else
+		{
+			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
+			game::render::create_text("kongtext", "poggers!!", {-x, 0.0f}, tz::v2f::filled(0.3f), {0.0f, 0.0f, 1.0f});
+
 		}
 	}
 
@@ -461,6 +469,8 @@ namespace game
 			game::destroy_entity(player.avatar);
 		}
 		player.avatar = game::create_entity({.prefab_name = prefab.name, .player_aligned = player.good, .position = pos, .scale = config_avatar_scale});
+		// player avatar cannot move by default.
+		game::entity_set_movement_speed(player.avatar, 0.0f);
 		if(player.good)
 		{
 			game::entity_face_right(player.avatar);
@@ -468,10 +478,6 @@ namespace game
 		else
 		{
 			game::entity_face_left(player.avatar);
-		}
-		if(prefab.cast != tz::nullhand)
-		{
-			game::entity_start_casting(player.avatar);
 		}
 
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = player.good, .position = tz::v2f::zero(), .parent = player.avatar});
@@ -614,6 +620,17 @@ namespace game
 				player.cpu_play_timer = 0.0f;
 
 				game::entity_set_owner(ent, player.avatar);
+				// set it to wander to any location between the avatar and the middle of the screen.
+				tz::v2f mid = tz::v2f::zero();
+				tz::v2f avatar_pos = game::entity_get_position(player.avatar);
+				float dist = (mid - avatar_pos).length();
+
+				tz::v2f midpoint = (mid + avatar_pos) / 2.0f;
+				
+				tz::v2f target_loc = midpoint;
+				target_loc[0] += dist * ((static_cast<float>(std::rand()) / RAND_MAX) - 0.5f);
+				target_loc[1] += dist * ((static_cast<float>(std::rand()) / RAND_MAX) - 0.5f);
+				game::entity_set_target_location(ent, target_loc);
 				player_control_entity(p, ent);
 				
 				// draw a new card?

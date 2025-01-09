@@ -56,6 +56,9 @@ namespace game
 	void entity_stop_casting(entity_handle ent);
 	void entity_move(entity_handle ent, tz::v2f dir);
 
+	float entity_get_movement_speed(entity_handle ent);
+	void entity_set_movement_speed(entity_handle ent, float movement_speed);
+
 	void entity_set_cooldown(entity_handle ent, float cooldown);
 	entity_handle entity_get_owner(entity_handle ent);
 	void entity_set_owner(entity_handle ent, entity_handle owner);
