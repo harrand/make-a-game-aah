@@ -31,7 +31,7 @@ int tz_main()
 	game::level_setup();
 	game::player_setup();
 
-	game::load_level(game::get_level("forest"));
+	game::load_level(game::get_level("academyhall2"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 
@@ -42,6 +42,7 @@ int tz_main()
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
 
 	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
+	game::deck_add_card(game::player_deck(player), {.name = "marksman"});
 	game::deck_add_card(game::player_deck(player), {.name = "lich"});
 	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
 	game::deck_add_card(game::player_deck(player), {.name = "undead_bear"});
