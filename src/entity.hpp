@@ -49,7 +49,7 @@ namespace game
 	void entity_set_hp(entity_handle ent, unsigned int hp);
 	unsigned int entity_get_max_hp(entity_handle ent);
 
-	game::prefab entity_get_prefab(entity_handle ent);
+	const game::prefab& entity_get_prefab(entity_handle ent);
 
 	void entity_face_left(entity_handle ent);
 	void entity_face_right(entity_handle ent);

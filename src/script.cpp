@@ -161,6 +161,14 @@ namespace game
 			return 0;
 		});
 
+		tz::lua_define_function("entity_set_display_name", []()
+		{
+			auto [ent, name] = tz::lua_parse_args<std::int64_t, std::string>();
+			// this is definitely extremely evil but i cba to extend the API for this.
+			const_cast<game::prefab&>(game::entity_get_prefab(static_cast<tz::hanval>(ent))).display_name = name;
+			return 0;
+		});
+
 		tz::lua_define_function("entity_get_hp", []()
 		{
 			auto [ent] = tz::lua_parse_args<std::int64_t>();

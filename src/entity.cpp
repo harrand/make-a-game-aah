@@ -417,7 +417,7 @@ namespace game
 		return creatures[ent.peek()].base_health;
 	}
 
-	game::prefab entity_get_prefab(entity_handle ent)
+	const game::prefab& entity_get_prefab(entity_handle ent)
 	{
 		return creatures[ent.peek()];
 	}
