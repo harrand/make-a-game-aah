@@ -18,7 +18,7 @@ namespace game
 	std::vector<float> rotations = {};
 	std::vector<tz::v2f> scales = {};
 	std::vector<float> cooldowns = {};
-	std::vector<unsigned int> damages = {};
+	std::vector<int> damages = {};
 	std::vector<float> leeway_coefficients = {};
 	std::vector<entity_handle> parents = {};
 	std::vector<entity_handle> owners = {};
@@ -654,7 +654,7 @@ namespace game
 			}
 			game::render::quad_set_flipbook(quads[lhs.peek()], flipbook);
 
-			auto& victim_hp = hps[rhs.peek()];
+			auto victim_hp = hps[rhs.peek()];
 			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then _tmpret = fn({}, {}); end if _tmpret == nil then _tmpret = false end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
 			bool cancel = tz_must(tz::lua_get_bool("_tmpret"));
 			if(cancel)
@@ -666,10 +666,10 @@ namespace game
 			// its possible on_hit leads to either entity being destroyed.
 			if(!impl_entity_destroyed(rhs))
 			{
-				unsigned int dmg = damages[lhs.peek()];
-				if(victim_hp <= dmg)
+				int dmg = damages[lhs.peek()];
+				if(static_cast<int>(victim_hp) <= dmg)
 				{
-					victim_hp = 0;
+					hps[rhs.peek()] = 0;
 
 					entity_handle retaliation_target = lhs;
 					while(owners[retaliation_target.peek()] != tz::nullhand && !creatures[retaliation_target.peek()].attackable)
@@ -682,23 +682,26 @@ namespace game
 					}
 					impl_on_death(rhs);
 				}
-				else if(dmg > 0)
+				else if(dmg != 0)
 				{
-					victim_hp -= dmg;
+					hps[rhs.peek()] = std::clamp(victim_hp - dmg, 0u, creatures[rhs.peek()].base_health);
 					// rhs got hurt
 
 					// so by default we should have the victim target the attacker.
 					// but what if the victim is struck by an arrow? they shouldnt hit the arrow, they should go for its owner
 					// however, if you always target the owner, then if a knight attacks you, the retaliation target will be its owner i.e beeline straight for the player who summoned that knight.
 					//
-					entity_handle retaliation_target = lhs;
-					while(owners[retaliation_target.peek()] != tz::nullhand && !creatures[retaliation_target.peek()].attackable)
+					if(dmg > 0)
 					{
-						retaliation_target = owners[retaliation_target.peek()];
-					}
-					if(!impl_entity_destroyed(retaliation_target))
-					{
-						entity_set_target(rhs, retaliation_target);
+						entity_handle retaliation_target = lhs;
+						while(owners[retaliation_target.peek()] != tz::nullhand && !creatures[retaliation_target.peek()].attackable)
+						{
+							retaliation_target = owners[retaliation_target.peek()];
+						}
+						if(!impl_entity_destroyed(retaliation_target))
+						{
+							entity_set_target(rhs, retaliation_target);
+						}
 					}
 					if(healthbars[rhs.peek()] == tz::nullhand)
 					{
