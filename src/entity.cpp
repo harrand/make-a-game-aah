@@ -662,8 +662,17 @@ namespace game
 			game::render::quad_set_flipbook(quads[lhs.peek()], flipbook);
 
 			auto victim_hp = hps[rhs.peek()];
-			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then _tmpret = fn({}, {}); end if _tmpret == nil then _tmpret = false end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_struck; if fn ~= nil then _tmpret = fn({}, {}); end if _tmpret == nil then _tmpret = false end", creatures[rhs.peek()].name, rhs.peek(), lhs.peek())));
 			bool cancel = tz_must(tz::lua_get_bool("_tmpret"));
+			if(cancel)
+			{
+				tz_must(tz::lua_execute("_tmpret = false"));
+				busys[lhs.peek()] = false;
+				return;
+			}
+
+			tz_must(tz::lua_execute(std::format("local fn = prefabs.{}.on_hit; if fn ~= nil then _tmpret = fn({}, {}); end if _tmpret == nil then _tmpret = false end", creatures[lhs.peek()].name, lhs.peek(), rhs.peek())));
+			cancel = tz_must(tz::lua_get_bool("_tmpret"));
 			if(cancel)
 			{
 				tz_must(tz::lua_execute("_tmpret = false"));

@@ -31,7 +31,7 @@ int tz_main()
 	game::level_setup();
 	game::player_setup();
 
-	game::load_level(game::get_level("academyhall2"));
+	game::load_level(game::get_level("forest"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 
@@ -45,7 +45,12 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "marksman"});
 	game::deck_add_card(game::player_deck(player), {.name = "lich"});
 	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
-	game::deck_add_card(game::player_deck(player), {.name = "undead_bear"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
+	game::deck_add_card(game::player_deck(player), {.name = "templar"});
 	game::deck_add_card(game::player_deck(player), {.name = "bear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
@@ -93,6 +98,26 @@ int tz_main()
 		{
 			.type = game::card_type::creature,
 			.name = "general"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "templar"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "templar"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "templar"
+		},
+		game::card
+		{
+			.type = game::card_type::creature,
+			.name = "templar"
 		},
 	};
 	game::player_set_pool(player, player_cards);
