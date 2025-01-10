@@ -31,7 +31,7 @@ int tz_main()
 	game::level_setup();
 	game::player_setup();
 
-	game::load_level(game::get_level("academyhall1"));
+	game::load_level(game::get_level("academyhall2"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 

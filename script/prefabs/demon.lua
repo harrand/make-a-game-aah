@@ -1,6 +1,6 @@
 prefabs.demon =
 {
-	display_name = "In'fesh Ja",
+	display_name = "Lord of Deceit",
 	base_health = 250,
 	base_cooldown = 1.17,
 	base_damage = 0,
@@ -12,7 +12,7 @@ prefabs.demon =
 	initial_scale_y = 2.0,
 	leeway_coefficient = 6.0,
 	on_hit = function(me, victim)
-		local firebolt = create_entity("shadowbolt")
+		local firebolt = create_entity("shadowblast")
 		entity_set_is_player_aligned(firebolt, entity_is_player_aligned(me))
 		entity_set_position(firebolt, entity_get_position(me))
 		entity_set_target(firebolt, victim)
@@ -27,8 +27,7 @@ prefabs.demon =
 		entity_set_is_player_aligned(thrall, entity_is_player_aligned(me))
 		entity_set_owner(thrall, me)
 		entity_set_colour_tint(thrall, 0.5, 0.2, 0.2)
-		local new_name = "Servant of " .. prefabs.demon.display_name
-		entity_set_display_name(thrall, new_name)
+		entity_set_display_name(thrall, "Demonic Thrall")
 
 	end,
 	idle =
