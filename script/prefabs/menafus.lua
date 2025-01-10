@@ -9,7 +9,7 @@ prefabs.menafus =
 	emissive = true,
 	leeway_coefficient = 13.0,
 	on_hit = function(me, victim)
-		local firebolt = create_entity("firebolt")
+		local firebolt = create_entity("leech_life")
 		entity_set_is_player_aligned(firebolt, entity_is_player_aligned(me))
 		entity_set_position(firebolt, entity_get_position(me))
 		entity_set_target(firebolt, victim)
