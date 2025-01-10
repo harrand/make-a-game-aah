@@ -31,7 +31,7 @@ int tz_main()
 	game::level_setup();
 	game::player_setup();
 
-	game::load_level(game::get_level("forest"));
+	game::load_level(game::get_level("bridge"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 
@@ -49,6 +49,7 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "bear"});
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
+	game::deck_add_card(game::player_deck(player), {.name = "menafus"});
 
 	game::card player_cards[] =
 	{
