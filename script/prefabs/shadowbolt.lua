@@ -10,6 +10,8 @@ prefabs.shadowbolt =
 	colour_tint_r = 0.42,
 	colour_tint_g = 0.0,
 	colour_tint_b = 1.0,
+	initial_scale_x = 0.3,
+	initial_scale_y = 0.3,
 	emissive = true,
 	face_move_direction = true,
 	spell_decoration = true,
@@ -52,9 +54,6 @@ prefabs.shadowbolt =
 		if tar == nil or (tar ~= usrdata) then
 			destroy_entity(me)
 		end
-	end,
-	on_create = function(me)
-		entity_set_scale(me, 0.6, 0.3)
 	end,
 	on_hit = function(me, victim)
 		destroy_entity(me)

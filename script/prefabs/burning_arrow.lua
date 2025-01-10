@@ -12,6 +12,8 @@ prefabs.burning_arrow =
 	emissive = true,
 	attackable = false,
 	require_target_entity_to_play = true,
+	initial_scale_x = 0.325,
+	initial_scale_y = 0.2,
 	power = 2,
 	idle =
 	{
@@ -35,9 +37,6 @@ prefabs.burning_arrow =
 		if tar == nil or (tar ~= usrdata) then
 			destroy_entity(me)
 		end
-	end,
-	on_create = function(me)
-		entity_set_scale(me, 0.3, 0.15)
 	end,
 	on_hit = function(me, victim)
 		destroy_entity(me)

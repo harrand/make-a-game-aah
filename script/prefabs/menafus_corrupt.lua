@@ -23,6 +23,11 @@ prefabs.menafus_corrupt =
 		local cleansed = create_entity("menafus")
 		entity_set_position(cleansed, entity_get_position(me))
 		entity_set_is_player_aligned(cleansed, not is_player_aligned)
+
+		local demon = create_entity("demon")
+		entity_set_position(demon, entity_get_position(me))
+		entity_set_is_player_aligned(demon, is_player_aligned)
+		entity_set_target_location(demon, 0, 0)
 	end,
 	idle =
 	{

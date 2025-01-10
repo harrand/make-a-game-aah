@@ -24,6 +24,7 @@ namespace game
 		bool spell_decoration = false;
 		bool require_target_entity_to_play = false;
 		bool require_target_location_to_play = false;
+		tz::v2f initial_scale = tz::v2f::filled(1.0f);
 		tz::v3f colour_tint = tz::v3f::filled(1.0f);
 		bool emissive = false;
 		game::render::flipbook_handle idle = tz::nullhand;

@@ -17,6 +17,7 @@ namespace game
 	std::string cardbase_spell_data;
 
 	std::uint32_t facedown_card_sprite;
+	constexpr tz::v2f sprite_scale_factor = {24.0f, 24.0f};
 
 	tz::v3f card_colours[] =
 	{
@@ -139,7 +140,7 @@ namespace game
 		tz::io::image_header first_imghdr = game::render::get_image_info(first_texture_id);
 		std::span<const std::byte> first_imgdata = game::render::get_image_data(first_texture_id);
 		// edit 'data' to have the new image data.
-		constexpr float prefab_scale_factor = 6.0f;
+		const float prefab_scale_factor = 6.0f * sprite_scale_factor[0] / first_imghdr.width;
 
 		// Calculate the top-left position to center the prefab on the card base
 		int offset_x = (header.width - (first_imghdr.width * prefab_scale_factor)) / 2;

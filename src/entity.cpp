@@ -92,13 +92,15 @@ namespace game
 		auto& prefab = creatures[ret.peek()];
 		prefab = game::get_prefab(info.prefab_name);
 
+		tz::v2f scale = info.scale * prefab.initial_scale;
+
 		speeds[ret.peek()] = prefab.movement_speed;
 		hps[ret.peek()] = info.hp == -1u ? prefab.base_health : info.hp;
 
 		player_aligneds[ret.peek()] = info.player_aligned;
 		positions[ret.peek()] = info.position;
 		rotations[ret.peek()] = info.rotation;
-		scales[ret.peek()] = info.scale;
+		scales[ret.peek()] = scale;
 		cooldowns[ret.peek()] = 0.0f;
 		damages[ret.peek()] = prefab.base_damage;
 		leeway_coefficients[ret.peek()] = prefab.leeway_coefficient;
@@ -108,7 +110,7 @@ namespace game
 		patrols[ret.peek()] = {};
 		patrol_cursors[ret.peek()] = 0;
 
-		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = info.scale, .colour = prefab.colour_tint},
+		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = scales[ret.peek()], .colour = prefab.colour_tint},
 				prefab.emissive ? render::quad_flag::emissive : static_cast<render::quad_flag>(0));
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
 		move_dirs[ret.peek()] = tz::v2f::zero();
@@ -127,6 +129,7 @@ namespace game
 		{
 			entity_set_parent(ret, info.parent);
 		}
+		entity_set_scale(ret, scale);
 		return ret;
 	}
 
@@ -364,7 +367,6 @@ namespace game
 	void entity_set_scale(entity_handle ent, tz::v2f scale)
 	{
 		scales[ent.peek()] = scale;
-		scale *= config_global_uniform_scale;
 		game::render::quad_set_scale(quads[ent.peek()], scale);
 	}
 

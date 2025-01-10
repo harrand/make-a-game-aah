@@ -50,6 +50,7 @@ int tz_main()
 	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
 	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
 	game::deck_add_card(game::player_deck(player), {.name = "menafus_corrupt"});
+	game::deck_add_card(game::player_deck(player), {.name = "demon"});
 
 	game::card player_cards[] =
 	{
