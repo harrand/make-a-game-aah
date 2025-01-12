@@ -12,7 +12,7 @@ namespace game
 	// how much mana does a lvl 1 noob regen in a second?
 	constexpr float config_default_mps = 5.0f;
 	// how much would it cost to play a power 1 card?
-	constexpr float config_mana_cost_per_power = 5.0f;
+	constexpr float config_mana_cost_per_power = 10.0f;
 
 	// leeway is how far away an entity can be from another but still be considered "touching". leeway is proportional to the speed of the entity, infact equal to a % of it - this value between 0 and 1
 	constexpr float config_global_leeway_dist = 0.5f;

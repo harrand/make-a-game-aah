@@ -23,6 +23,7 @@ topaz_add_executable(
 		src/prefab.cpp
 		src/render.cpp
 		src/script.cpp
+		src/ui.cpp
 	SHADERS
 		src/quad_bloom.fragment.tzsl
 		src/bloom_blur.vertex.tzsl

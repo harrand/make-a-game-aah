@@ -9,6 +9,7 @@ namespace game
 {
 	int impl_get_level_data();
 	std::unordered_map<std::string, level> level_data;
+	std::string loaded_level = "";
 
 	void level_setup()
 	{
@@ -81,12 +82,18 @@ namespace game
 
 	void load_level(const level& l)
 	{
+		loaded_level = l.name;
 		clear_entities();
 		render::quad_set_texture0(render::get_background(), l.background_image);
 		if(l.player_prefab.size())
 		{
 			game::load_player_prefab(game::get_player_prefab(l.player_prefab));
 		}
+	}
+
+	void reload_level()
+	{
+		load_level(get_level(loaded_level));
 	}
 
 }

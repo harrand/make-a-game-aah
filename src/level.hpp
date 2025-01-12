@@ -18,6 +18,7 @@ namespace game
 	const level& get_level(const std::string& name);
 
 	void load_level(const level& l);
+	void reload_level();
 }
 
 #endif // GAME_LEVEL_HPP

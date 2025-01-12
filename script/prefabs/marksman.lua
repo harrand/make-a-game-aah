@@ -3,7 +3,7 @@ prefabs.marksman =
 	display_name = "Marksman",
 	description = "A deadly ranged attacker.",
 	base_health = 15,
-	base_cooldown = 2.0,
+	base_cooldown = 3.0,
 	base_damage = 0,
 	movement_speed = 0.8,
 	power = 3,
@@ -42,7 +42,7 @@ prefabs.marksman =
 	},
 	attack =
 	{
-		fps = 5,
+		fps = 7.5,
 		loop = true,
 		frames =
 		{

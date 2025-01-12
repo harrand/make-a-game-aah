@@ -11,6 +11,7 @@
 #include "level.hpp"
 #include "render.hpp"
 #include "script.hpp"
+#include "ui.hpp"
 
 void render_setup();
 void collect_prefab_data();
@@ -30,8 +31,9 @@ int tz_main()
 	game::card_setup();
 	game::level_setup();
 	game::player_setup();
+	game::ui_setup();
 
-	game::load_level(game::get_level("forest"));
+	game::load_level(game::get_level("academyhall2"));
 
 	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 
@@ -129,14 +131,32 @@ int tz_main()
 		float delta_seconds = (now - time) / 1000000000.0f;
 		time = now;
 
+		bool paused = game::ui_pause_menu_opened();
+		if(paused)
+		{
+			delta_seconds = 0;
+		}
+
 		game::render::update(delta_seconds);
 		game::entity_update(delta_seconds);
 		game::player_update(delta_seconds);
 		game::deck_update(delta_seconds);
+		game::ui_advance();
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
 			break;
+		}
+		if(tz::os::is_key_pressed(tz::os::key::q))
+		{
+			if(paused)
+			{
+				game::ui_close_pause_menu();
+			}
+			else
+			{
+				game::ui_open_pause_menu();
+			}
 		}
 		if(tz::os::is_key_pressed(tz::os::key::z))
 		{
