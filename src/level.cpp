@@ -26,6 +26,14 @@ namespace game
 		return level_data[name];
 	}
 
+	void iterate_levels(std::function<void(std::string_view, const level&)> callback)
+	{
+		for(const auto& [name, data] : level_data)
+		{
+			callback(name, data);
+		}
+	}
+
 	template<typename T>
 	bool impl_collect_level_data(std::string_view level_name, const char* data_name, T& data)
 	{

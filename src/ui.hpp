@@ -13,8 +13,11 @@ namespace game
 
 	void ui_close_pause_menu();
 	void ui_open_pause_menu();
-
 	bool ui_pause_menu_opened();
+
+	void ui_open_level_select();
+	void ui_close_level_select();
+	bool ui_level_select_open();
 
 	void ui_setup();
 	void ui_advance();

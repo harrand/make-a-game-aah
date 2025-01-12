@@ -145,10 +145,6 @@ int tz_main()
 		tz::os::window_update();
 		if(tz::os::is_key_pressed(tz::os::key::escape))
 		{
-			break;
-		}
-		if(tz::os::is_key_pressed(tz::os::key::q))
-		{
 			if(paused)
 			{
 				game::ui_close_pause_menu();
