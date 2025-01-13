@@ -12,6 +12,7 @@
 #include "render.hpp"
 #include "script.hpp"
 #include "ui.hpp"
+#include "save.hpp"
 
 void render_setup();
 void collect_prefab_data();
@@ -30,99 +31,17 @@ int tz_main()
 	game::prefab_setup();
 	game::card_setup();
 	game::level_setup();
+	game::load_save();
 	game::player_setup();
 	game::ui_setup();
 
 	game::load_level(game::get_level("academyhall2"));
-
-	auto player = game::create_player(game::player_type::human, true, game::get_prefab("melistra"));
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassv.png"));
 	game::render::flipbook_add_frame(hourglass, game::render::create_image_from_file("./res/images/hourglassh.png"));
 
 	game::render::quad_set_flipbook(game::render::get_cursor(), hourglass);
-
-	game::deck_add_card(game::player_deck(player), {.name = "melistra"});
-	game::deck_add_card(game::player_deck(player), {.name = "marksman"});
-	game::deck_add_card(game::player_deck(player), {.name = "lich"});
-	game::deck_add_card(game::player_deck(player), {.name = "warbear"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "templar"});
-	game::deck_add_card(game::player_deck(player), {.name = "bear"});
-	game::deck_add_card(game::player_deck(player), {.name = "peasant"});
-	game::deck_add_card(game::player_deck(player), {.name = "skeletal_warrior"});
-	game::deck_add_card(game::player_deck(player), {.name = "menafus_corrupt"});
-	game::deck_add_card(game::player_deck(player), {.name = "demon"});
-
-	game::card player_cards[] =
-	{
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "peasant"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "knight"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "archer"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "archer"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "assassin"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "knight"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "melistra"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "general"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "templar"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "templar"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "templar"
-		},
-		game::card
-		{
-			.type = game::card_type::creature,
-			.name = "templar"
-		},
-	};
-	game::player_set_pool(player, player_cards);
 
 	std::uint64_t time = tz::time_nanos();
 	while(tz::os::window_is_open())
@@ -142,10 +61,7 @@ int tz_main()
 		game::deck_update(delta_seconds);
 		game::ui_advance();
 		tz::os::window_update();
-		if(tz::os::is_key_pressed(tz::os::key::z))
-		{
-			game::deck_swap_cards(game::player_deck(player), 0, 1);
-		}
 	}
+	game::save({.avatar = "melistra", .cards = {"templar"}});
 	tz::terminate();
 }

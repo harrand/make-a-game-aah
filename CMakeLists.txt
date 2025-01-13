@@ -24,6 +24,7 @@ topaz_add_executable(
 		src/render.cpp
 		src/script.cpp
 		src/ui.cpp
+		src/save.cpp
 	SHADERS
 		src/quad_bloom.fragment.tzsl
 		src/bloom_blur.vertex.tzsl

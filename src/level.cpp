@@ -98,6 +98,8 @@ namespace game
 		{
 			game::load_player_prefab(game::get_player_prefab(l.player_prefab));
 		}
+
+		game::load_player_prefab(game::get_player_prefab("player"), false, true);
 	}
 
 	void reload_level()
