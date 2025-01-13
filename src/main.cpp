@@ -131,8 +131,7 @@ int tz_main()
 		float delta_seconds = (now - time) / 1000000000.0f;
 		time = now;
 
-		bool paused = game::ui_pause_menu_opened();
-		if(paused)
+		if(game::ui_pause_menu_opened())
 		{
 			delta_seconds = 0;
 		}
@@ -143,17 +142,6 @@ int tz_main()
 		game::deck_update(delta_seconds);
 		game::ui_advance();
 		tz::os::window_update();
-		if(tz::os::is_key_pressed(tz::os::key::escape))
-		{
-			if(paused)
-			{
-				game::ui_close_pause_menu();
-			}
-			else
-			{
-				game::ui_open_pause_menu();
-			}
-		}
 		if(tz::os::is_key_pressed(tz::os::key::z))
 		{
 			game::deck_swap_cards(game::player_deck(player), 0, 1);

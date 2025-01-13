@@ -21,6 +21,8 @@ namespace game
 
 	void ui_setup();
 	void ui_advance();
+
+	bool ui_covers_mouse();
 }
 
 #endif // GAME_UI_HPP

@@ -3,6 +3,7 @@
 #include "prefab.hpp"
 #include "config.hpp"
 #include "player.hpp"
+#include "ui.hpp"
 #include "tz/core/lua.hpp"
 #include <vector>
 
@@ -577,7 +578,7 @@ namespace game
 
 	void entity_display_tooltip(entity_handle ent)
 	{
-		if(!creatures[ent.peek()].has_tooltip)
+		if(!creatures[ent.peek()].has_tooltip || ui_covers_mouse())
 		{
 			return;
 		}

@@ -1,6 +1,7 @@
 #include "deck.hpp"
 #include "entity.hpp"
 #include "config.hpp"
+#include "ui.hpp"
 #include <optional>
 
 namespace game
@@ -247,7 +248,7 @@ namespace game
 	void deck_card_display_tooltip(deck_handle deck, std::size_t id)
 	{
 		auto& d = decks[deck.peek()];
-		if(!d.render.has_value())
+		if(!d.render.has_value() || ui_covers_mouse())
 		{
 			return;
 		}

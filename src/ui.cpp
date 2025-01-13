@@ -11,6 +11,8 @@ namespace game
 	constexpr short ui_base_layer = 32;
 	constexpr short ui_fg_layer = ui_base_layer * 2;
 	constexpr tz::v3f quit_button_colour{1.0f, 0.7f, 0.6f};
+	bool wait_for_next_mouse_release = false;
+	bool wait_for_next_escape = false;
 
 	struct ui_element
 	{
@@ -43,14 +45,24 @@ namespace game
 
 		void add_button(std::string name, tz::v2f position, bool small, std::function<bool(std::string_view)> on_click = nullptr)
 		{
-			auto handle = game::render::create_quad({.position = position, .scale = small ? tz::v2f{0.15f, 0.04f} : tz::v2f{0.15f, 0.065f}, .layer = ui_fg_layer});
+			tz::v2f scale = small ? tz::v2f{0.15f, 0.04f} : tz::v2f{0.15f, 0.065f};
+			auto handle = game::render::create_quad({.position = position, .scale = scale, .layer = ui_fg_layer});
 			this->contents[std::format("button_{}", name)]  = handle;
-			this->texts[std::format("button_{}", name)] = game::render::create_text("kongtext", name, position, tz::v2f::filled(0.02f));
+			tz::v2f text_offset = {0.0f, 0.0f};
+			text_offset[0] = -scale[0] * 0.5f;
+			this->texts[std::format("button_{}", name)] = game::render::create_text("kongtext", name, position + text_offset, tz::v2f::filled(0.02f));
 			this->on_clicks[handle.peek()] = on_click;
 		}
 
-		void update()
+		bool update()
 		{
+			bool retval = false;
+			auto maybe_wnd = this->contents.find("panel");
+			if(maybe_wnd != this->contents.end())
+			{
+				retval = game::render::quad_is_mouseover(maybe_wnd->second);
+			}
+
 			constexpr char button_prefix[] = "button_";
 			auto button_prefix_len = std::strlen(button_prefix);
 			for(const auto& [name, handle] : this->contents)
@@ -63,6 +75,7 @@ namespace game
 
 					if(moused_over && tz::os::is_mouse_clicked(tz::os::mouse_button::left))
 					{
+						wait_for_next_mouse_release = true;
 						if(this->on_clicks.at(handle.peek())(name.substr(button_prefix_len)))
 						{
 							break;
@@ -70,6 +83,7 @@ namespace game
 					}
 				}
 			}
+			return retval;
 		}
 	};
 
@@ -165,15 +179,56 @@ namespace game
 
 	}
 
+	bool ui_mouse = false;
+
 	void ui_advance()
 	{
-		if(opened_pause_menu.has_value())
+		ui_mouse = false;
+		const bool escape_down = tz::os::is_key_pressed(tz::os::key::escape);
+		if(wait_for_next_escape)
 		{
-			opened_pause_menu->update();
+			if(!escape_down)
+			{
+				wait_for_next_escape = false;
+			}
 		}
-		if(opened_level_select.has_value())
+		else
 		{
-			opened_level_select->update();
+			if(escape_down)
+			{
+				if(ui_pause_menu_opened())
+				{
+					ui_close_pause_menu();
+				}
+				else
+				{
+					ui_open_pause_menu();
+				}
+				wait_for_next_escape = true;
+			}
 		}
+		if(wait_for_next_mouse_release)
+		{
+			if(!tz::os::is_mouse_clicked(tz::os::mouse_button::left))
+			{
+				wait_for_next_mouse_release = false;
+			}
+		}
+		else
+		{
+			if(opened_pause_menu.has_value())
+			{
+				ui_mouse = ui_mouse || opened_pause_menu->update();
+			}
+			if(opened_level_select.has_value())
+			{
+				ui_mouse = ui_mouse || opened_level_select->update();
+			}
+		}
+	}
+
+	bool ui_covers_mouse()
+	{
+		return ui_mouse;
 	}
 }
