@@ -19,6 +19,7 @@ namespace game
 	const level& get_level(const std::string& name);
 	void iterate_levels(std::function<void(std::string_view, const level&)> callback);
 
+	void clear_level();
 	void load_level(const level& l);
 	void reload_level();
 }

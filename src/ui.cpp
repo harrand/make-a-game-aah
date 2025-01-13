@@ -154,6 +154,7 @@ namespace game
 		opened_pause_menu->add_button("Main Menu", {0.0f, -0.1f}, button_size::medium, [](auto _)
 				{
 					ui_close_pause_menu();
+					game::clear_level();
 					ui_open_level_select();
 					return true;
 				});

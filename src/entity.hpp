@@ -30,6 +30,8 @@ namespace game
 	void iterate_entities(std::function<void(entity_handle)> callback);
 	void entity_update(float delta_seconds);
 
+	bool entity_exists(entity_handle e);
+
 	tz::v2f entity_get_position(entity_handle ent);
 	void entity_set_position(entity_handle ent, tz::v2f pos);
 

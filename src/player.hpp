@@ -61,7 +61,7 @@ namespace game
 
 	void player_setup();
 
-	const player_prefab& get_player_prefab(const std::string& name);
+	player_prefab& get_player_prefab(const std::string& name);
 	player_handle load_player_prefab(const player_prefab& prefab, bool cpu = true, bool player_aligned = false);
 }
 

@@ -162,7 +162,10 @@ namespace game
 		}
 		if(healthbars[ent.peek()] != tz::nullhand)
 		{
-			destroy_entity(healthbars[ent.peek()]);
+			if(entity_exists(healthbars[ent.peek()]))
+			{
+				destroy_entity(healthbars[ent.peek()]);
+			}
 			healthbars[ent.peek()] = tz::nullhand;
 		}
 	}
@@ -214,7 +217,10 @@ namespace game
 				float& timeout = healthbar_timeouts[ent.peek()];
 				if((timeout -= delta_seconds) <= 0.0f)
 				{
-					destroy_entity(healthbars[ent.peek()]);
+					if(entity_exists(healthbars[ent.peek()]))
+					{
+						destroy_entity(healthbars[ent.peek()]);
+					}
 					healthbars[ent.peek()] = tz::nullhand;
 				}
 			}
@@ -332,6 +338,11 @@ namespace game
 
 			move_dirs[i] = tz::v2f::zero();
 		});
+	}
+
+	bool entity_exists(entity_handle e)
+	{
+		return std::find(entity_free_list.begin(), entity_free_list.end(), e) == entity_free_list.end();
 	}
 
 	tz::v2f entity_get_position(entity_handle ent)

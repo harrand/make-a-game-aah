@@ -1,17 +1,15 @@
 #ifndef GAME_SAVE_HPP
 #define GAME_SAVE_HPP
-#include <string>
-#include <vector>
+#include "player.hpp"
 
 namespace game
 {
 	struct save_data
 	{
-		std::string avatar;
-		std::vector<std::string> cards = {};
+		player_prefab prefab;
 	};
 
-	void save(save_data s);
+	void save();
 
 	void load_save();
 }

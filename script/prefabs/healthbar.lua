@@ -19,7 +19,9 @@ prefabs.healthbar =
 	end,
 	on_destroy = function(ent)
 		local child = entity_get_userdata(ent)
-		destroy_entity(child)
+		if entity_exists(child) then
+			destroy_entity(child)
+		end
 	end,
 	on_update = function(ent, delta_seconds)
 		-- remember: userdata is the child bar

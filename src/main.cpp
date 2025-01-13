@@ -62,6 +62,6 @@ int tz_main()
 		game::ui_advance();
 		tz::os::window_update();
 	}
-	game::save({.avatar = "melistra", .cards = {"templar"}});
+	game::save();
 	tz::terminate();
 }

@@ -1,5 +1,6 @@
 #include "player.hpp"
 #include "config.hpp"
+#include "save.hpp"
 #include "tz/topaz.hpp"
 #include "tz/core/lua.hpp"
 #include "tz/os/window.hpp"
@@ -322,13 +323,16 @@ namespace game
 		if(player.good)
 		{
 			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
-			game::render::create_text("kongtext", "YOU DIED :(", {-x, 0.0f}, tz::v2f::filled(0.3f), {1.0f, 0.0f, 0.0f});
+			game::render::create_text("kongtext", "YOU DIED :(", {-x, 0.0f}, tz::v2f::filled(0.03f), {1.0f, 0.0f, 0.0f});
 		}
 		else
 		{
+			card c = player.card_pool[std::rand() % player.card_pool.size()];
 			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
-			game::render::create_text("kongtext", "poggers!!", {-x, 0.0f}, tz::v2f::filled(0.3f), {0.0f, 0.0f, 1.0f});
-
+			std::string wintext = std::format("you have won a \"{}\"", c.name);
+			game::render::create_text("kongtext", wintext, {-x, 0.0f}, tz::v2f::filled(0.03f), {0.0f, 0.0f, 1.0f});
+			game::get_player_prefab("player").deck.push_back(c.name);
+			game::save();
 		}
 	}
 
@@ -537,7 +541,7 @@ namespace game
 	{
 		return std::none_of(players.begin(), players.end(), [](const player_data& p)->bool
 			{
-				return p.type == player_type::human;
+				return p.valid && p.type == player_type::human;
 			});
 	}
 
@@ -713,7 +717,7 @@ namespace game
 		)");
 	}
 
-	const player_prefab& get_player_prefab(const std::string& name)
+	player_prefab& get_player_prefab(const std::string& name)
 	{
 		return player_prefab_data[name];
 	}
@@ -807,7 +811,8 @@ namespace game
 		auto initial_hand_size = std::min(cards.size(), static_cast<std::size_t>(4));
 		for(std::size_t i = 0; i < initial_hand_size; i++)
 		{
-			game::deck_add_card(game::player_deck(ret), {.name = prefab.deck[i]});
+			auto idx = std::rand() % prefab.deck.size();
+			game::deck_add_card(game::player_deck(ret), {.name = prefab.deck[idx]});
 		}
 		return ret;
 	}
