@@ -18,6 +18,9 @@ namespace game
 	void iterate_players_if(std::function<void(player_handle)> callback, std::function<bool(player_handle)> predicate);
 	
 	player_handle create_player(player_type type, bool good, game::prefab prefab);
+	void destroy_player(player_handle p);
+	void clear_players();
+
 	void player_update(float delta_seconds);
 	bool player_is_good(player_handle p);
 	bool player_is_human(player_handle p);

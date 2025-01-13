@@ -14,6 +14,16 @@ namespace game
 	bool wait_for_next_mouse_release = false;
 	bool wait_for_next_escape = false;
 
+	enum class button_size
+	{
+		small,
+		smallwide,
+		medium,
+		mediumwide,
+		large,
+		largewide
+	};
+
 	struct ui_element
 	{
 		std::unordered_map<std::string, render::handle> contents = {};
@@ -39,18 +49,52 @@ namespace game
 
 		void set_window(std::string name, tz::v2f size, tz::v3f colour = {0.5f, 0.5f, 1.0f})
 		{
+			constexpr float default_big_text_size = 0.1f;
+			float big_text_size = default_big_text_size;
+			float ideal_text_size = size[0] / (name.size() * 0.7f);
+			if(big_text_size > ideal_text_size)
+			{
+				big_text_size = ideal_text_size;
+			}
 			this->contents["panel"] = game::render::create_quad({.scale = size, .colour = colour, .layer = ui_base_layer});
-			this->texts["panel"] = game::render::create_text("kongtext", name, {-size[0] * 0.5f, size[1] * 0.8f}, tz::v2f::filled(0.1f));
+			tz::v2f text_offset = {0.0f, 0.0f};
+			text_offset[0] = -0.5f * big_text_size * name.size();
+			text_offset[1] = size[1] * 0.8f;
+			this->texts["panel"] = game::render::create_text("kongtext", name, text_offset, tz::v2f::filled(big_text_size));
 		}
 
-		void add_button(std::string name, tz::v2f position, bool small, std::function<bool(std::string_view)> on_click = nullptr)
+		void add_button(std::string name, tz::v2f position, button_size size = button_size::medium, std::function<bool(std::string_view)> on_click = nullptr)
 		{
-			tz::v2f scale = small ? tz::v2f{0.15f, 0.04f} : tz::v2f{0.15f, 0.065f};
+			constexpr float text_size = 0.02f;
+			tz::v2f scale;
+			tz::v2f panel_scale = game::render::quad_get_scale(this->contents.at("panel")) * 0.9f;
+			switch(size)
+			{
+				case button_size::small:
+					scale = {0.15f, 0.04f};
+				break;
+				case button_size::smallwide:
+					scale = {panel_scale[0], 0.04f};
+				break;
+				case button_size::medium:
+					scale = {0.2f, 0.065f};
+				break;
+				case button_size::mediumwide:
+					scale = {panel_scale[0], 0.065f};
+				break;
+				case button_size::large:
+					scale = {0.3f, 0.1f};
+				break;
+				case button_size::largewide:
+					scale = {panel_scale[0], 0.1f};
+				break;
+			}
+					//scale = game::render::quad_get_scale(this->contents.at("panel")) * 0.85f;
 			auto handle = game::render::create_quad({.position = position, .scale = scale, .layer = ui_fg_layer});
 			this->contents[std::format("button_{}", name)]  = handle;
 			tz::v2f text_offset = {0.0f, 0.0f};
-			text_offset[0] = -scale[0] * 0.5f;
-			this->texts[std::format("button_{}", name)] = game::render::create_text("kongtext", name, position + text_offset, tz::v2f::filled(0.02f));
+			text_offset[0] = -0.5f * text_size * name.size();
+			this->texts[std::format("button_{}", name)] = game::render::create_text("kongtext", name, position + text_offset, tz::v2f::filled(text_size));
 			this->on_clicks[handle.peek()] = on_click;
 		}
 
@@ -96,24 +140,24 @@ namespace game
 		opened_pause_menu = ui_element{};
 
 		opened_pause_menu->set_window("Paused", {0.5f, 0.7f});
-		opened_pause_menu->add_button("Resume", {0.0f, 0.3f}, false, [](auto _)
+		opened_pause_menu->add_button("Resume", {0.0f, 0.3f}, button_size::medium, [](auto _)
 				{
 					ui_close_pause_menu();
 					return true;
 				});
-		opened_pause_menu->add_button("Restart", {0.0f, 0.1f}, false, [](auto _)
+		opened_pause_menu->add_button("Restart", {0.0f, 0.1f}, button_size::medium, [](auto _)
 				{
 					ui_close_pause_menu();
 					reload_level();
 					return true;
 				});
-		opened_pause_menu->add_button("Main Menu", {0.0f, -0.1f}, false, [](auto _)
+		opened_pause_menu->add_button("Main Menu", {0.0f, -0.1f}, button_size::medium, [](auto _)
 				{
 					ui_close_pause_menu();
 					ui_open_level_select();
 					return true;
 				});
-		opened_pause_menu->add_button("Exit Game", {0.0f, -0.3f}, false, [](auto _)
+		opened_pause_menu->add_button("Exit Game", {0.0f, -0.3f}, button_size::medium, [](auto _)
 				{
 					ui_close_pause_menu();
 					tz::os::close_window();
@@ -145,7 +189,7 @@ namespace game
 		{
 			float y = 0.3f - (count++ * 0.14f);
 			std::string name{level_name};
-			opened_level_select->add_button(name, {0.0f, y}, true, [](std::string_view name)
+			opened_level_select->add_button(name, {0.0f, y}, button_size::smallwide, [](std::string_view name)
 				{
 					ui_close_level_select();
 					game::load_level(game::get_level(std::string{name}));
@@ -154,7 +198,7 @@ namespace game
 		});
 
 		float closey = 0.3f - (count * 0.14f);
-		opened_level_select->add_button("Close", {0.0f, closey}, true, [](auto _)
+		opened_level_select->add_button("Close", {0.0f, closey}, button_size::medium, [](auto _)
 			{
 				ui_close_level_select();
 				return true;

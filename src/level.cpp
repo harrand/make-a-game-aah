@@ -91,6 +91,7 @@ namespace game
 	void load_level(const level& l)
 	{
 		loaded_level = l.name;
+		clear_players();
 		clear_entities();
 		render::quad_set_texture0(render::get_background(), l.background_image);
 		if(l.player_prefab.size())

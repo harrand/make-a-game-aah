@@ -14,6 +14,7 @@ namespace game
 
 	struct player_data
 	{
+		bool valid = true;
 		player_type type;
 		bool good;
 		entity_handle avatar = tz::nullhand;
@@ -22,8 +23,8 @@ namespace game
 		float mana = 0;
 		float mana_regen = config_default_mps;
 
-		const tz::v2f mana_bar_pos = {-0.5f, -0.9f};
-		const tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
+		static constexpr tz::v2f mana_bar_pos = {-0.5f, -0.9f};
+		static constexpr tz::v2f mana_bar_dimensions = {1.0f, 0.04f};
 		game::render::handle mana_bar = tz::nullhand;
 		game::render::handle mana_bar_background = tz::nullhand;
 		std::vector<bool> deck_hold_array = {};
@@ -74,7 +75,16 @@ namespace game
 
 	player_handle create_player(player_type type, bool good, game::prefab prefab)
 	{
+		bool recycled = false;
 		player_handle ret = static_cast<tz::hanval>(players.size());
+		for(std::size_t i = 0; i < players.size(); i++)
+		{
+			if(!players[i].valid)
+			{
+				ret = static_cast<tz::hanval>(i);
+				recycled = true;
+			}
+		}
 
 		if(type == player_type::human)
 		{
@@ -82,18 +92,51 @@ namespace game
 			human_player = ret;
 		}
 
-		players.push_back({.type = type, .good = good});
+		if(!recycled)
+		{
+			players.push_back({.type = type, .good = good});
+		}
+		else
+		{
+			players[ret.peek()].type = type;
+			players[ret.peek()].good = good;
+			players[ret.peek()].valid = true;
+		}
 		impl_setup_player(ret, prefab);
 
 		return ret;
 	}
 
+	void destroy_player(player_handle p)
+	{
+		auto& pl = players[p.peek()];
+		game::destroy_deck(pl.deck);
+		game::render::destroy_quad(pl.mana_bar_background);
+		game::render::destroy_quad(pl.mana_bar);
+		game::destroy_entity(pl.avatar);
+		pl = {};
+		pl.valid = false;
+	}
+
+	void clear_players()
+	{
+		for(std::size_t i = 0; i < players.size(); i++)
+		{
+			if(players[i].valid)
+			{
+				destroy_player(static_cast<tz::hanval>(i));
+			}
+		}
+	}
 
 	void player_update(float delta_seconds)
 	{
 		for(std::size_t i = 0; i < players.size(); i++)
 		{
-			impl_update_single_player(static_cast<tz::hanval>(i), delta_seconds);
+			if(players[i].valid)
+			{
+				impl_update_single_player(static_cast<tz::hanval>(i), delta_seconds);
+			}
 		}
 	}
 
@@ -212,6 +255,10 @@ namespace game
 			return;
 		}
 		const auto& player = players[p.peek()];
+		if(!player.valid)
+		{
+			return;
+		}
 
 		if(player.type == player_type::human && player.target_entity != tz::nullhand)
 		{
