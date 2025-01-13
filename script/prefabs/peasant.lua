@@ -3,6 +3,7 @@ prefabs.peasant =
 	display_name = "Peasant",
 	description = "An angry man with a rusty pitchfork.",
 	base_health = 5,
+	base_cooldown = 0.5,
 	movement_speed = 1.2,
 	power = 1,
 	idle =
@@ -29,12 +30,16 @@ prefabs.peasant =
 	},
 	attack =
 	{
-		fps = 5,
+		fps = 12,
 		loop = true,
 		frames =
 		{
 			"creature/peasant/attack0.png",
-			"creature/peasant/attack1.png"
+			"creature/peasant/attack1.png",
+			"creature/peasant/attack2.png",
+			"creature/peasant/attack2.png",
+			"creature/peasant/attack1.png",
+			"creature/peasant/attack0.png",
 		}
 	}
 }

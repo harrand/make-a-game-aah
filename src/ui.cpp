@@ -1,5 +1,9 @@
 #include "ui.hpp"
 #include "level.hpp"
+#include "prefab.hpp"
+#include "player.hpp"
+#include "save.hpp"
+#include "config.hpp"
 #include "tz/topaz.hpp"
 #include "tz/os/input.hpp"
 #include "tz/os/window.hpp"
@@ -63,9 +67,16 @@ namespace game
 			this->texts["panel"] = game::render::create_text("kongtext", name, text_offset, tz::v2f::filled(big_text_size));
 		}
 
+		static constexpr float text_size = 0.02f;
+		void add_text(std::string text, tz::v2f position)
+		{
+			tz::v2f text_offset = {0.0f, 0.0f};
+			text_offset[0] = -0.5f * text_size * text.size();
+			this->texts[std::format("text_{}", text)] = game::render::create_text("kongtext", text, position + text_offset, tz::v2f::filled(text_size));
+		}
+
 		void add_button(std::string name, tz::v2f position, button_size size = button_size::medium, std::function<bool(std::string_view)> on_click = nullptr)
 		{
-			constexpr float text_size = 0.02f;
 			tz::v2f scale;
 			tz::v2f panel_scale = game::render::quad_get_scale(this->contents.at("panel")) * 0.9f;
 			switch(size)
@@ -135,6 +146,8 @@ namespace game
 	std::optional<ui_element> opened_pause_menu = std::nullopt;
 	std::optional<ui_element> opened_level_select = std::nullopt;
 	std::optional<ui_element> opened_deck_configure = std::nullopt;
+	std::optional<ui_element> opened_win_screen = std::nullopt;
+	std::optional<ui_element> opened_defeat_screen = std::nullopt;
 
 	void ui_close_all()
 	{
@@ -154,20 +167,36 @@ namespace game
 		{
 			ui_close_deck_configure();
 		}
+		if(opened_win_screen.has_value())
+		{
+			ui_close_win_screen();
+		}
+		if(opened_defeat_screen.has_value())
+		{
+			ui_close_defeat_screen();
+		}
 	}
 
 	void ui_open_main_menu()
 	{
+		game::clear_level();
 		tz_assert(!opened_main_menu.has_value(), "main menu already open!");
 		opened_main_menu = ui_element{};
 
-		opened_main_menu->set_window("Main Menu", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
+		opened_main_menu->set_window("Epic Card Game", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
 		game::render::quad_set_texture0(opened_main_menu->contents["panel"], game::render::create_image_from_file("./res/images/bgforest.png"));
 
-		opened_main_menu->add_button("Continue", {0.0f, -0.8f}, button_size::medium, [](auto _)
+		opened_main_menu->add_button("Continue", {0.0f, -0.7f}, button_size::medium, [](auto _)
 				{
 					ui_close_all();
 					game::load_level(game::get_level("forest"));
+					return true;
+				});
+
+		opened_main_menu->add_button("Quit", {0.0f, -0.9f}, button_size::medium, [](auto _)
+				{
+					ui_close_all();
+					tz::os::close_window();
 					return true;
 				});
 
@@ -175,6 +204,13 @@ namespace game
 				{
 					ui_close_all();
 					ui_open_deck_configure();
+					return true;
+				});
+
+		opened_main_menu->add_button("Level Select", {0.0f, 0.5f}, button_size::medium, [](auto _)
+				{
+					ui_close_all();
+					ui_open_level_select();
 					return true;
 				});
 	}
@@ -257,9 +293,10 @@ namespace game
 		});
 
 		float closey = 0.3f - (count * 0.14f);
-		opened_level_select->add_button("Close", {0.0f, closey}, button_size::medium, [](auto _)
+		opened_level_select->add_button("Back", {0.0f, closey}, button_size::medium, [](auto _)
 			{
-				ui_close_level_select();
+				ui_close_all();
+				ui_open_main_menu();
 				return true;
 			});
 	}
@@ -302,6 +339,80 @@ namespace game
 	bool ui_deck_configure_open()
 	{
 		return opened_deck_configure.has_value();
+	}
+
+	void ui_open_win_screen(card loot)
+	{
+		tz_assert(!opened_win_screen.has_value(), "win screen already open!");
+		opened_win_screen = ui_element{};
+		opened_win_screen->set_window("Victory!", {0.9f, 0.9f});
+		if(loot != card{})
+		{
+			opened_win_screen->add_text(std::format("You win: \"{}\"", game::get_prefab(loot.name).display_name), {0.0f, 0.5f});
+			auto cardsprite = game::create_card_sprite(loot, false);
+			opened_win_screen->contents["card loot"] = cardsprite;
+			game::render::quad_set_layer(cardsprite, ui_fg_layer);
+		}
+
+		opened_win_screen->add_button("Collect", {0.0f, -0.6f}, button_size::medium, [loot](auto _)
+			{
+				game::get_player_prefab("player").deck.push_back(loot.name);
+				game::save();
+				ui_close_all();
+				ui_open_main_menu();
+				return true;
+			});
+
+		unsigned int sell_price = game::get_prefab(loot.name).power * config_gold_per_power;
+		std::string sell_name = std::format("Sell ({} coins)", sell_price);
+		opened_win_screen->add_button(sell_name, {0.0f, -0.4f}, button_size::medium, [loot, sell_price](auto _)
+			{
+				game::real_player_set_gold(game::real_player_get_gold() + sell_price);
+				game::save();
+				ui_close_all();
+				ui_open_main_menu();
+				return true;
+			});
+	}
+
+	void ui_close_win_screen()
+	{
+		tz_assert(opened_win_screen.has_value(), "win screen wasn't open");
+
+		opened_win_screen->close();
+		opened_win_screen = std::nullopt;
+	}
+
+	bool ui_win_screen_open()
+	{
+		return opened_win_screen.has_value();
+	}
+
+	void ui_open_defeat_screen()
+	{
+		tz_assert(!opened_defeat_screen.has_value(), "defeat screen already open!");
+		opened_defeat_screen = ui_element{};
+		opened_defeat_screen->set_window("Defeat!", {0.9f, 0.9f});
+
+		opened_defeat_screen->add_button("Main Menu", {0.0f, -0.6f}, button_size::medium, [](auto _)
+			{
+				ui_close_all();
+				ui_open_main_menu();
+				return true;
+			});
+	}
+
+	void ui_close_defeat_screen()
+	{
+		tz_assert(opened_defeat_screen.has_value(), "defeat screen wasn't open");
+
+		opened_defeat_screen->close();
+		opened_defeat_screen = std::nullopt;
+	}
+
+	bool ui_defeat_screen_open()
+	{
+		return opened_defeat_screen.has_value();
 	}
 
 	void ui_setup()
@@ -364,6 +475,16 @@ namespace game
 			if(opened_deck_configure.has_value())
 			{
 				auto v = opened_deck_configure->update();
+				ui_mouse = ui_mouse || v;
+			}
+			if(opened_win_screen.has_value())
+			{
+				auto v = opened_win_screen->update();
+				ui_mouse = ui_mouse || v;
+			}
+			if(opened_defeat_screen.has_value())
+			{
+				auto v = opened_defeat_screen->update();
 				ui_mouse = ui_mouse || v;
 			}
 		}

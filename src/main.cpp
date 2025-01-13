@@ -35,7 +35,6 @@ int tz_main()
 	game::player_setup();
 	game::ui_setup();
 
-	//game::load_level(game::get_level("academyhall2"));
 	game::ui_open_main_menu();
 
 	game::render::flipbook_handle hourglass = game::render::create_flipbook(3, true);

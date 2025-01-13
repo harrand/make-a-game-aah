@@ -14,6 +14,8 @@ namespace game
 	{
 		card_type type;
 		std::string name;
+
+		bool operator==(const card& rhs) const = default;
 	};
 
 	void card_setup();

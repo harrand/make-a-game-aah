@@ -17,7 +17,7 @@ namespace game
 	void iterate_players(std::function<void(player_handle)> callback);
 	void iterate_players_if(std::function<void(player_handle)> callback, std::function<bool(player_handle)> predicate);
 	
-	player_handle create_player(player_type type, bool good, game::prefab prefab);
+	player_handle create_player(player_type type, bool good, game::prefab prefab, float mana_coeff = 1.0f);
 	void destroy_player(player_handle p);
 	void clear_players();
 
@@ -52,11 +52,15 @@ namespace game
 
 	bool player_try_spend_mana(player_handle p, unsigned int cost);
 
+	unsigned int real_player_get_gold();
+	void real_player_set_gold(unsigned int gold);
+
 	struct player_prefab
 	{
 		std::string name;
 		std::string avatar_prefab;
 		std::vector<std::string> deck;
+		float mana_coefficient = 1.0f;
 	};
 
 	void player_setup();

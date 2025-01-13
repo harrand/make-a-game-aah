@@ -1,5 +1,6 @@
 #ifndef GAME_UI_HPP
 #define GAME_UI_HPP
+#include "card.hpp"
 #include "render.hpp"
 
 namespace game
@@ -28,6 +29,14 @@ namespace game
 	void ui_open_deck_configure();
 	void ui_close_deck_configure();
 	bool ui_deck_configure_open();
+
+	void ui_open_win_screen(card loot);
+	void ui_close_win_screen();
+	bool ui_win_screen_open();
+
+	void ui_open_defeat_screen();
+	void ui_close_defeat_screen();
+	bool ui_defeat_screen_open();
 
 	void ui_setup();
 	void ui_advance();

@@ -18,6 +18,7 @@ namespace game
 	constexpr float config_global_leeway_dist = 0.5f;
 	constexpr float config_default_aggro_range = 1.5f;
 	
+	constexpr unsigned int config_gold_per_power = 5;
 
 	////////////////////////////////
 	///////////// FEEL /////////////

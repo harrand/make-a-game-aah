@@ -7,6 +7,7 @@ namespace game
 	struct save_data
 	{
 		player_prefab prefab;
+		unsigned int gold;
 	};
 
 	void save();

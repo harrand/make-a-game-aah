@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include "config.hpp"
 #include "save.hpp"
+#include "ui.hpp"
 #include "tz/topaz.hpp"
 #include "tz/core/lua.hpp"
 #include "tz/os/window.hpp"
@@ -74,7 +75,7 @@ namespace game
 		}
 	}
 
-	player_handle create_player(player_type type, bool good, game::prefab prefab)
+	player_handle create_player(player_type type, bool good, game::prefab prefab, float mana_coeff)
 	{
 		bool recycled = false;
 		player_handle ret = static_cast<tz::hanval>(players.size());
@@ -95,13 +96,14 @@ namespace game
 
 		if(!recycled)
 		{
-			players.push_back({.type = type, .good = good});
+			players.push_back({.type = type, .good = good, .mana_regen = config_default_mps * mana_coeff});
 		}
 		else
 		{
 			players[ret.peek()].type = type;
 			players[ret.peek()].good = good;
 			players[ret.peek()].valid = true;
+			players[ret.peek()].mana_regen = config_default_mps * mana_coeff;
 		}
 		impl_setup_player(ret, prefab);
 
@@ -322,17 +324,14 @@ namespace game
 		auto& player = players[p.peek()];
 		if(player.good)
 		{
-			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
-			game::render::create_text("kongtext", "YOU DIED :(", {-x, 0.0f}, tz::v2f::filled(0.03f), {1.0f, 0.0f, 0.0f});
+			ui_close_all();
+			ui_open_defeat_screen();
 		}
 		else
 		{
 			card c = player.card_pool[std::rand() % player.card_pool.size()];
-			float x = static_cast<float>(tz::os::window_get_width()) * 0.9f / tz::os::window_get_height();
-			std::string wintext = std::format("you have won a \"{}\"", c.name);
-			game::render::create_text("kongtext", wintext, {-x, 0.0f}, tz::v2f::filled(0.03f), {0.0f, 0.0f, 1.0f});
-			game::get_player_prefab("player").deck.push_back(c.name);
-			game::save();
+			ui_close_all();
+			ui_open_win_screen(c);
 		}
 	}
 
@@ -357,6 +356,17 @@ namespace game
 		}
 		player_set_mana(p, player.mana - cost);
 		return true;
+	}
+
+	unsigned int real_player_get_gold()
+	{
+		tz::lua_execute("_tmp = players.player.gold or 0");
+		return tz_must(tz::lua_get_int("_tmp"));
+	}
+
+	void real_player_set_gold(unsigned int gold)
+	{
+		tz::lua_execute(std::format("players.player.gold = {}", gold));
 	}
 
 	void impl_update_single_player(player_handle p, float delta_seconds)
@@ -535,6 +545,7 @@ namespace game
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = player.good, .position = tz::v2f::zero(), .parent = player.avatar});
 		game::entity_set_colour_tint(aura, player.good ? config_player_aligned_colour : config_enemy_aligned_colour);
 		game::entity_set_layer(aura, -1);
+		player_set_mana(p, 0);
 	}
 
 	bool impl_ensure_no_human_players()
@@ -794,13 +805,14 @@ namespace game
 		)", player_prefab_name));
 		data.name = player_prefab_name;
 		impl_collect_player_prefab_data(player_prefab_name, "avatar", data.avatar_prefab);
+		impl_collect_player_prefab_data(player_prefab_name, "mana_coeff", data.mana_coefficient);
 		impl_collect_prefab_deck(player_prefab_name, data.deck);
 		return 0;
 	}
 
 	player_handle load_player_prefab(const player_prefab& prefab, bool cpu, bool player_aligned)
 	{
-		player_handle ret = game::create_player(cpu ? game::player_type::cpu : game::player_type::human, player_aligned, game::get_prefab(prefab.avatar_prefab));
+		player_handle ret = game::create_player(cpu ? game::player_type::cpu : game::player_type::human, player_aligned, game::get_prefab(prefab.avatar_prefab), prefab.mana_coefficient);
 		std::vector<game::card> cards(prefab.deck.size());
 		std::transform(prefab.deck.begin(), prefab.deck.end(), cards.begin(),
 			[](const std::string& card)->game::card

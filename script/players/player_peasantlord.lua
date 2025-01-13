@@ -9,5 +9,6 @@ players.peasantlord =
 		"peasant",
 		"peasant",
 		"templar"
-	}
+	},
+	mana_coeff = 0.5
 }

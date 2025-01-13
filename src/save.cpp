@@ -1,4 +1,5 @@
 #include "save.hpp"
+#include "player.hpp"
 #include "tz/core/lua.hpp"
 #include <filesystem>
 #include <fstream>
@@ -13,6 +14,7 @@ namespace game
 	void save()
 	{
 		s.prefab = game::get_player_prefab("player");
+		s.gold = game::real_player_get_gold();
 		if(!std::filesystem::exists(save_path.parent_path()))
 		{
 			std::filesystem::create_directory(save_path.parent_path());
@@ -32,9 +34,10 @@ players.player =
 	deck =
 	{{
 {}
-	}}
+	}},
+	gold = {}
 }}
-			)", s.prefab.avatar_prefab, deck_str);
+			)", s.prefab.avatar_prefab, deck_str, s.gold);
 	}
 
 	void load_save()
