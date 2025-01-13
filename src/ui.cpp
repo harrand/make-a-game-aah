@@ -131,8 +131,66 @@ namespace game
 		}
 	};
 
+	std::optional<ui_element> opened_main_menu = std::nullopt;
 	std::optional<ui_element> opened_pause_menu = std::nullopt;
 	std::optional<ui_element> opened_level_select = std::nullopt;
+	std::optional<ui_element> opened_deck_configure = std::nullopt;
+
+	void ui_close_all()
+	{
+		if(opened_main_menu.has_value())
+		{
+			ui_close_main_menu();
+		}
+		if(opened_pause_menu.has_value())
+		{
+			ui_close_pause_menu();
+		}
+		if(opened_level_select.has_value())
+		{
+			ui_close_level_select();
+		}
+		if(opened_deck_configure.has_value())
+		{
+			ui_close_deck_configure();
+		}
+	}
+
+	void ui_open_main_menu()
+	{
+		tz_assert(!opened_main_menu.has_value(), "main menu already open!");
+		opened_main_menu = ui_element{};
+
+		opened_main_menu->set_window("Main Menu", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
+		game::render::quad_set_texture0(opened_main_menu->contents["panel"], game::render::create_image_from_file("./res/images/bgforest.png"));
+
+		opened_main_menu->add_button("Continue", {0.0f, -0.8f}, button_size::medium, [](auto _)
+				{
+					ui_close_all();
+					game::load_level(game::get_level("forest"));
+					return true;
+				});
+
+		opened_main_menu->add_button("Deck Configure", {0.0f, 0.3f}, button_size::medium, [](auto _)
+				{
+					ui_close_all();
+					ui_open_deck_configure();
+					return true;
+				});
+	}
+
+	void ui_close_main_menu()
+	{
+		tz_assert(opened_main_menu.has_value(), "main menu wasn't open");
+
+		opened_main_menu->close();
+		opened_main_menu = std::nullopt;
+	}
+
+	bool ui_main_menu_open()
+	{
+		return opened_main_menu.has_value();
+	}
 
 	void ui_open_pause_menu()
 	{
@@ -153,9 +211,9 @@ namespace game
 				});
 		opened_pause_menu->add_button("Main Menu", {0.0f, -0.1f}, button_size::medium, [](auto _)
 				{
-					ui_close_pause_menu();
 					game::clear_level();
-					ui_open_level_select();
+					ui_close_all();
+					ui_open_main_menu();
 					return true;
 				});
 		opened_pause_menu->add_button("Exit Game", {0.0f, -0.3f}, button_size::medium, [](auto _)
@@ -219,6 +277,33 @@ namespace game
 		return opened_level_select.has_value();
 	}
 
+	void ui_open_deck_configure()
+	{
+		tz_assert(!opened_deck_configure.has_value(), "deck configure already open!");
+		opened_deck_configure = ui_element{};
+		opened_deck_configure->set_window("Deck Configuration", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f});
+
+		opened_deck_configure->add_button("Confirm", {0.0f, -0.6f}, button_size::medium, [](auto _)
+			{
+				ui_close_all();
+				ui_open_main_menu();
+				return true;
+			});
+	}
+
+	void ui_close_deck_configure()
+	{
+		tz_assert(opened_deck_configure.has_value(), "deck configure wasn't open");
+
+		opened_deck_configure->close();
+		opened_deck_configure = std::nullopt;
+	}
+
+	bool ui_deck_configure_open()
+	{
+		return opened_deck_configure.has_value();
+	}
+
 	void ui_setup()
 	{
 
@@ -239,7 +324,7 @@ namespace game
 		}
 		else
 		{
-			if(escape_down)
+			if(escape_down && !ui_main_menu_open())
 			{
 				if(ui_pause_menu_opened())
 				{
@@ -261,13 +346,25 @@ namespace game
 		}
 		else
 		{
+			if(opened_main_menu.has_value())
+			{
+				auto v = opened_main_menu->update();
+				ui_mouse = ui_mouse || v;
+			}
 			if(opened_pause_menu.has_value())
 			{
-				ui_mouse = ui_mouse || opened_pause_menu->update();
+				auto v = opened_pause_menu->update();
+				ui_mouse = ui_mouse || v;
 			}
 			if(opened_level_select.has_value())
 			{
-				ui_mouse = ui_mouse || opened_level_select->update();
+				auto v = opened_level_select->update();
+				ui_mouse = ui_mouse || v;
+			}
+			if(opened_deck_configure.has_value())
+			{
+				auto v = opened_deck_configure->update();
+				ui_mouse = ui_mouse || v;
 			}
 		}
 	}

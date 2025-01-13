@@ -11,6 +11,12 @@ namespace game
 
 	using ui_handle = tz::handle<detail::ui_tag_t>;
 
+	void ui_close_all();
+
+	void ui_open_main_menu();
+	void ui_close_main_menu();
+	bool ui_main_menu_open();
+
 	void ui_close_pause_menu();
 	void ui_open_pause_menu();
 	bool ui_pause_menu_opened();
@@ -18,6 +24,10 @@ namespace game
 	void ui_open_level_select();
 	void ui_close_level_select();
 	bool ui_level_select_open();
+
+	void ui_open_deck_configure();
+	void ui_close_deck_configure();
+	bool ui_deck_configure_open();
 
 	void ui_setup();
 	void ui_advance();

@@ -8,6 +8,6 @@ players.peasantlord =
 		"knight",
 		"peasant",
 		"peasant",
-		"archer"
+		"templar"
 	}
 }
