@@ -63,6 +63,7 @@ namespace game::render
 	void destroy_text(text_handle q);
 
 	void text_set_position(text_handle q, tz::v2f position);
+	void text_set_colour(text_handle q, tz::v3f colour);
 
 	std::uint32_t create_image_from_data(tz::io::image_header hdr, std::span<const std::byte> imgdata, std::string name);
 	std::uint32_t create_image_from_file(std::filesystem::path imgfile);

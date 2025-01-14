@@ -15,6 +15,7 @@ namespace game
 	constexpr short ui_base_layer = 32;
 	constexpr short ui_fg_layer = ui_base_layer * 2;
 	constexpr tz::v3f quit_button_colour{1.0f, 0.7f, 0.6f};
+	constexpr float text_size = 0.02f;
 	bool wait_for_next_mouse_release = false;
 	bool wait_for_next_escape = false;
 
@@ -67,7 +68,6 @@ namespace game
 			this->texts["panel"] = game::render::create_text("kongtext", name, text_offset, tz::v2f::filled(big_text_size));
 		}
 
-		static constexpr float text_size = 0.02f;
 		void add_text(std::string text, tz::v2f position)
 		{
 			tz::v2f text_offset = {0.0f, 0.0f};
@@ -75,7 +75,14 @@ namespace game
 			this->texts[std::format("text_{}", text)] = game::render::create_text("kongtext", text, position + text_offset, tz::v2f::filled(text_size));
 		}
 
-		void add_button(std::string name, tz::v2f position, button_size size = button_size::medium, std::function<bool(std::string_view)> on_click = nullptr)
+		void add_image(std::string name, std::filesystem::path img, tz::v2f position, tz::v2f scale)
+		{
+			auto handle = game::render::create_quad({.position = position, .scale = scale, .layer = ui_fg_layer});
+			game::render::quad_set_texture0(handle, game::render::create_image_from_file(img));
+			this->contents[name] = handle;
+		}
+
+		void add_button(std::string name, tz::v2f position, button_size size = button_size::medium, std::function<bool(std::string_view)> on_click = nullptr, bool hide_background = false)
 		{
 			tz::v2f scale;
 			tz::v2f panel_scale = game::render::quad_get_scale(this->contents.at("panel")) * 0.9f;
@@ -102,6 +109,10 @@ namespace game
 			}
 					//scale = game::render::quad_get_scale(this->contents.at("panel")) * 0.85f;
 			auto handle = game::render::create_quad({.position = position, .scale = scale, .layer = ui_fg_layer});
+			if(hide_background)
+			{
+				game::render::quad_set_texture0(handle, game::render::create_image_from_file("./res/images/transparent1x1.png"));
+			}
 			this->contents[std::format("button_{}", name)]  = handle;
 			tz::v2f text_offset = {0.0f, 0.0f};
 			text_offset[0] = -0.5f * text_size * name.size();
@@ -127,6 +138,7 @@ namespace game
 					// its a button.
 					bool moused_over = game::render::quad_is_mouseover(handle);
 					game::render::quad_set_colour(handle, moused_over ? quit_button_colour * 1.1f : quit_button_colour);
+					game::render::text_set_colour(this->texts.at(name), moused_over ? tz::v3f::filled(1.0f) : tz::v3f::filled(0.9f));
 
 					if(moused_over && tz::os::is_mouse_clicked(tz::os::mouse_button::left))
 					{
@@ -277,19 +289,20 @@ namespace game
 	{
 		tz_assert(!opened_level_select.has_value(), "level select already open!");
 		opened_level_select = ui_element{};
-		opened_level_select->set_window("Level Select", {0.5f, 0.5f});
+		opened_level_select->set_window("Level Select", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
+		game::render::quad_set_texture0(opened_level_select->contents["panel"], game::render::create_image_from_file("./res/images/map.png"));
 
 		std::size_t count = 0;
 		iterate_levels([&count](std::string_view level_name, const level& data)
 		{
 			float y = 0.3f - (count++ * 0.14f);
 			std::string name{level_name};
-			opened_level_select->add_button(name, {0.0f, y}, button_size::smallwide, [](std::string_view name)
+			opened_level_select->add_button(name, {0.0f, y}, button_size::small, [](std::string_view name)
 				{
 					ui_close_level_select();
 					game::load_level(game::get_level(std::string{name}));
 					return true;
-				});
+				}, true);
 		});
 
 		float closey = 0.3f - (count * 0.14f);
@@ -318,14 +331,34 @@ namespace game
 	{
 		tz_assert(!opened_deck_configure.has_value(), "deck configure already open!");
 		opened_deck_configure = ui_element{};
-		opened_deck_configure->set_window("Deck Configuration", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f});
+		const float aspect_ratio = static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height();
+		opened_deck_configure->set_window("Deck Configuration", {aspect_ratio, 1.0f});
 
-		opened_deck_configure->add_button("Confirm", {0.0f, -0.6f}, button_size::medium, [](auto _)
+		opened_deck_configure->add_button("Done", {0.0f, -0.9f}, button_size::medium, [](auto _)
 			{
 				ui_close_all();
 				ui_open_main_menu();
 				return true;
 			});
+		constexpr float sell_icon_size = 0.15f;
+		std::string gold_string = std::format("Gold: {}", game::real_player_get_gold());
+		opened_deck_configure->add_text(gold_string, {-aspect_ratio + (sell_icon_size * 2) + (text_size * gold_string.size() * 0.5f), -1.0f + (text_size * 2.0f)});
+		opened_deck_configure->add_image("sell", "./res/images/goldbag.png", {-aspect_ratio + sell_icon_size, -1.0f + (sell_icon_size)}, tz::v2f::filled(sell_icon_size));
+
+		constexpr float deck_configure_cards_y_coord = -0.35f;
+		const auto& player = game::get_player_prefab("player");
+		std::size_t i = 0;
+		const auto deck_size = player.deck.size();
+		float xdist_per_card = (aspect_ratio / deck_size);
+
+		for(std::string_view card : player.deck)
+		{
+			auto sprite = game::create_card_sprite({.name = std::string{card}}, true);
+			game::render::quad_set_layer(sprite, ui_fg_layer);
+			game::render::quad_set_position(sprite, {-aspect_ratio + xdist_per_card + (2 * xdist_per_card * i), deck_configure_cards_y_coord});
+			game::render::quad_set_scale(sprite, {0.0f, xdist_per_card * 0.8f});
+			opened_deck_configure->contents[std::format("card{}", i++)] = sprite;
+		}
 	}
 
 	void ui_close_deck_configure()
@@ -474,6 +507,29 @@ namespace game
 			}
 			if(opened_deck_configure.has_value())
 			{
+				// if any of the cards are held over the "sell" region and released, then sell it.
+				auto sell_icon = opened_deck_configure->contents["sell"];
+				const bool is_mouse_over_sell = game::render::quad_is_mouseover(sell_icon);
+				for(const auto& [name, handle] : opened_deck_configure->contents)
+				{
+					if(name.starts_with("card"))
+					{
+						if(game::render::quad_is_held(handle) && is_mouse_over_sell)
+						{
+							// sell it!!!
+							std::size_t card_id = std::stoll(name.substr(std::strlen("card")));
+							auto& deck = game::get_player_prefab("player").deck;
+							unsigned int sell_price = game::get_prefab(deck[card_id]).power * config_gold_per_power;
+							deck.erase(deck.begin() + card_id);
+							game::real_player_set_gold(game::real_player_get_gold() + sell_price);
+							ui_close_deck_configure();
+							ui_open_deck_configure();
+							game::save();
+							break;
+						}
+					}
+				}
+
 				auto v = opened_deck_configure->update();
 				ui_mouse = ui_mouse || v;
 			}

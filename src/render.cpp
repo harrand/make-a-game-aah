@@ -497,6 +497,14 @@ namespace game::render
 		text.position = position;
 	}
 
+	void text_set_colour(text_handle q, tz::v3f colour)
+	{
+		for(render::handle quad : texts[q.peek()].character_quads)
+		{
+			quad_set_colour(quad, colour);
+		}
+	}
+
 	std::uint32_t create_image_from_data(tz::io::image_header imghdr, std::span<const std::byte> imgdata, std::string name)
 	{
 		texture_id ret = tz_must(tz::ren::quad_renderer_add_texture(ren,
