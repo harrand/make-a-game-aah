@@ -270,7 +270,13 @@ namespace game
 		}
 		else if(player.type == player_type::human && player.target_location.has_value())
 		{
-			game::entity_set_target_location(ent, player.target_location.value());
+			auto prefab = entity_get_prefab(ent);
+			// get leeway but ignore leeway coefficient because ranged chars shouldnt just ignore this.
+			const float leeway = config_global_speed_multiplier * config_global_leeway_dist;
+			if((player.target_location.value() - entity_get_position(ent)).length() > leeway)
+			{
+				game::entity_set_target_location(ent, player.target_location.value(), true);
+			}
 		}
 		else
 		{

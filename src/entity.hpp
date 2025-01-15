@@ -73,7 +73,7 @@ namespace game
 	void entity_set_patrol(entity_handle ent, std::span<const tz::v2f> points);
 
 	std::optional<tz::v2f> entity_get_target_location(entity_handle ent);
-	void entity_set_target_location(entity_handle ent, tz::v2f location);
+	void entity_set_target_location(entity_handle ent, tz::v2f location, bool ignore_leeway = false);
 	entity_handle entity_get_target(entity_handle ent);
 	void entity_set_target(entity_handle ent, entity_handle tar);
 

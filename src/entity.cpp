@@ -543,8 +543,22 @@ namespace game
 		return target_locations[ent.peek()];
 	}
 
-	void entity_set_target_location(entity_handle ent, tz::v2f location)
+	void entity_set_target_location(entity_handle ent, tz::v2f location, bool ignore_leeway)
 	{
+		if(ignore_leeway)
+		{
+			auto pos = entity_get_position(ent);
+			tz::v2f dir = (location - pos);
+			float dst = dir.length();
+			if(dst > 0)
+			{
+				dir /= dir.length();
+			}
+			auto prefab = game::entity_get_prefab(ent);
+			const float leeway = config_global_speed_multiplier * prefab.movement_speed * config_global_leeway_dist * prefab.leeway_coefficient;
+			location = pos + (dir * (dst + leeway));
+		}
+
 		target_locations[ent.peek()] = location;
 		targets[ent.peek()] = tz::nullhand;
 	}

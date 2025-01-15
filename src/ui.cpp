@@ -296,7 +296,7 @@ namespace game
 		{
 			opened_level_select->add_image("map_castle", "./res/images/map_castle.png", tz::v2f::zero(), whole_screen_dims);
 			game::render::quad_set_layer(opened_level_select->contents["map_castle"], ui_fg_layer - 2);
-			if(true)
+			if(game::real_player_has_completed_level("academyhall2"))
 			{
 				opened_level_select->add_image("map_castle_dungeon", "./res/images/map_castle_dungeon.png", tz::v2f::zero(), whole_screen_dims);
 				game::render::quad_set_layer(opened_level_select->contents["map_castle_dungeon"], ui_fg_layer - 1);
