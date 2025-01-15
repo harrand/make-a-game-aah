@@ -86,6 +86,7 @@ namespace game
 		impl_collect_level_data(level_name, "player_prefab", data.player_prefab);
 		impl_collect_level_data(level_name, "mapx", data.map_position[0]);
 		impl_collect_level_data(level_name, "mapy", data.map_position[1]);
+		impl_collect_level_data(level_name, "prerequisite", data.prerequisite);
 		data.background_image = render::create_image_from_file(background_image_path);
 		return 0;
 	}
@@ -111,7 +112,12 @@ namespace game
 
 	void reload_level()
 	{
-		load_level(get_level(loaded_level));
+		load_level(get_current_level());
+	}
+
+	const level& get_current_level()
+	{
+		return get_level(loaded_level);
 	}
 
 }

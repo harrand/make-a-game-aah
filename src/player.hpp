@@ -55,6 +55,10 @@ namespace game
 	unsigned int real_player_get_gold();
 	void real_player_set_gold(unsigned int gold);
 
+	void real_player_set_level_complete(std::string level_name);
+	bool real_player_has_completed_level(std::string level_name);
+	std::vector<std::string> real_player_get_completed_levels();
+
 	struct player_prefab
 	{
 		std::string name;

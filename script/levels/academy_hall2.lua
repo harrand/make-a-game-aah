@@ -6,4 +6,5 @@ levels.academyhall2 =
 	player_prefab = "menafus_corrupt",
 	mapx = 0.75,
 	mapy = -0.35,
+	prerequisite = "academyhall1"
 }

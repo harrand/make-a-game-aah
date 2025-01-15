@@ -6,4 +6,5 @@ levels.academyhall1 =
 	player_prefab = "professor_melistra",
 	mapx = 0.75,
 	mapy = -0.8,
+	prerequisite = "bridge"
 }

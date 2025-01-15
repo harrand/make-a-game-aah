@@ -8,6 +8,7 @@ namespace game
 	{
 		player_prefab prefab;
 		unsigned int gold;
+		std::vector<std::string> completed_levels;
 	};
 
 	void save();

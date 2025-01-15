@@ -292,21 +292,32 @@ namespace game
 		tz::v2f whole_screen_dims{static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f};
 		opened_level_select->set_window("Level Select", whole_screen_dims, tz::v3f::filled(1.0f));
 		game::render::quad_set_texture0(opened_level_select->contents["panel"], game::render::create_image_from_file("./res/images/map.png"));
-		if(true)
+		if(game::real_player_has_completed_level("bridgeentrance"))
 		{
 			opened_level_select->add_image("map_castle", "./res/images/map_castle.png", tz::v2f::zero(), whole_screen_dims);
+			game::render::quad_set_layer(opened_level_select->contents["map_castle"], ui_fg_layer - 2);
 			if(true)
 			{
 				opened_level_select->add_image("map_castle_dungeon", "./res/images/map_castle_dungeon.png", tz::v2f::zero(), whole_screen_dims);
+				game::render::quad_set_layer(opened_level_select->contents["map_castle_dungeon"], ui_fg_layer - 1);
 			}
 		}
 
 		iterate_levels([](std::string_view level_name, const level& data)
 		{
+			if(data.prerequisite.size())
+			{
+				if(!game::real_player_has_completed_level(data.prerequisite))
+				{
+					return;
+				}
+			}
 			std::string name{level_name};
 			const float aspect_ratio = static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height();
 			tz::v2f pos = data.map_position;
 			pos[0] *= aspect_ratio;
+			opened_level_select->add_image(name, game::real_player_has_completed_level(name) ? "./res/images/map_marker_complete.png" : "./res/images/map_marker_incomplete.png", pos, {0.05f, 0.05f});
+			pos[1] += text_size * 2.0f;
 			opened_level_select->add_button(name, pos, button_size::small, [](std::string_view name)
 				{
 					ui_close_level_select();
@@ -353,6 +364,12 @@ namespace game
 		std::string gold_string = std::format("Gold: {}", game::real_player_get_gold());
 		opened_deck_configure->add_text(gold_string, {-aspect_ratio + (sell_icon_size * 2) + (text_size * gold_string.size() * 0.5f), -1.0f + (text_size * 2.0f)});
 		opened_deck_configure->add_image("sell", "./res/images/goldbag.png", {-aspect_ratio + sell_icon_size, -1.0f + (sell_icon_size)}, tz::v2f::filled(sell_icon_size));
+
+		const auto& player_prefab = game::get_player_prefab("player");
+		auto avatar_card = game::create_card_sprite({.name = player_prefab.avatar_prefab}, true);
+		opened_deck_configure->contents["avatar"] = avatar_card;
+		game::render::quad_set_position(avatar_card, {-aspect_ratio * 0.8f, 0.8f});
+		game::render::quad_set_layer(avatar_card, ui_fg_layer);
 
 		constexpr float deck_configure_cards_y_coord = 0.4f;
 		const auto& player = game::get_player_prefab("player");
@@ -530,18 +547,30 @@ namespace game
 				// if any of the cards are held over the "sell" region and released, then sell it.
 				auto sell_icon = opened_deck_configure->contents["sell"];
 				const bool is_mouse_over_sell = game::render::quad_is_mouseover(sell_icon);
+
+				auto avatar_icon = opened_deck_configure->contents["avatar"];
+				const bool is_mouse_over_avatar = game::render::quad_is_mouseover(avatar_icon);
+
 				for(const auto& [name, handle] : opened_deck_configure->contents)
 				{
-					if(name.starts_with("card"))
+					if(name.starts_with("card") && game::render::quad_is_held(handle))
 					{
-						if(game::render::quad_is_held(handle) && is_mouse_over_sell)
+						std::size_t card_id = std::stoll(name.substr(std::strlen("card")));
+						auto& deck = game::get_player_prefab("player").deck;
+						if(is_mouse_over_sell)
 						{
 							// sell it!!!
-							std::size_t card_id = std::stoll(name.substr(std::strlen("card")));
-							auto& deck = game::get_player_prefab("player").deck;
 							unsigned int sell_price = game::get_prefab(deck[card_id]).power * config_gold_per_power;
 							deck.erase(deck.begin() + card_id);
 							game::real_player_set_gold(game::real_player_get_gold() + sell_price);
+							ui_close_deck_configure();
+							ui_open_deck_configure();
+							game::save();
+							break;
+						}
+						else if(is_mouse_over_avatar)
+						{
+							std::swap(deck[card_id], game::get_player_prefab("player").avatar_prefab);
 							ui_close_deck_configure();
 							ui_open_deck_configure();
 							game::save();

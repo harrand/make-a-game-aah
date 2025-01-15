@@ -26,6 +26,13 @@ namespace game
 		{
 			deck_str += std::format("\"{}\",\n", card);
 		}
+
+		std::string completed_levels_str;
+		for(std::string level_name : game::real_player_get_completed_levels())
+		{
+			completed_levels_str += std::format("\"{}\",\n", level_name);
+		}
+
 		file <<
 			std::format(R"(
 players.player =
@@ -35,9 +42,12 @@ players.player =
 	{{
 {}
 	}},
-	gold = {}
+	gold = {},
+	completed_levels = {{
+		{}
+	}},
 }}
-			)", s.prefab.avatar_prefab, deck_str, s.gold);
+			)", s.prefab.avatar_prefab, deck_str, s.gold, completed_levels_str);
 	}
 
 	void load_save()

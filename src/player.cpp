@@ -2,6 +2,7 @@
 #include "config.hpp"
 #include "save.hpp"
 #include "ui.hpp"
+#include "level.hpp"
 #include "tz/topaz.hpp"
 #include "tz/core/lua.hpp"
 #include "tz/os/window.hpp"
@@ -329,6 +330,8 @@ namespace game
 		}
 		else
 		{
+			real_player_set_level_complete(game::get_current_level().name);
+			game::save();
 			card c = player.card_pool[std::rand() % player.card_pool.size()];
 			ui_close_all();
 			ui_open_win_screen(c);
@@ -367,6 +370,33 @@ namespace game
 	void real_player_set_gold(unsigned int gold)
 	{
 		tz::lua_execute(std::format("players.player.gold = {}", gold));
+	}
+
+	void real_player_set_level_complete(std::string level_name)
+	{
+		tz::lua_execute(std::format("if players.player.completed_levels == nil then players.player.completed_levels = {{}} end lvls = players.player.completed_levels; table.insert(players.player.completed_levels, \"{}\")", level_name));
+	}
+
+	bool real_player_has_completed_level(std::string level_name)
+	{
+		auto levels = real_player_get_completed_levels();
+		return std::find(levels.begin(), levels.end(), level_name) != levels.end();
+	}
+
+	std::vector<std::string> real_player_get_completed_levels()
+	{
+		std::vector<std::string> ret;
+
+		tz_must(tz::lua_execute("if players.player.completed_levels == nil then players.player.completed_levels = {{}}; _tmp = 0 else _tmp = #players.player.completed_levels end"));
+		auto sz = tz_must(tz::lua_get_int("_tmp"));
+		for(std::size_t i = 0; i < sz; i++)
+		{
+			
+			tz::lua_execute(std::format("_internal_index = function(arr, idx) return arr[idx] end _tmp = _internal_index(players.player.completed_levels, {})", i + 1));
+			std::string name = tz_must(tz::lua_get_string("_tmp"));
+			ret.push_back(name);
+		}
+		return ret;
 	}
 
 	void impl_update_single_player(player_handle p, float delta_seconds)

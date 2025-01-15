@@ -14,6 +14,7 @@ namespace game
 		std::string description = "";
 		std::uint32_t background_image = -1;
 		std::string player_prefab = "";
+		std::string prerequisite = "";
 		tz::v2f map_position = tz::v2f::filled(-1.0f);
 	};
 
@@ -24,6 +25,7 @@ namespace game
 	void clear_level();
 	void load_level(const level& l);
 	void reload_level();
+	const level& get_current_level();
 }
 
 #endif // GAME_LEVEL_HPP
