@@ -354,7 +354,7 @@ namespace game
 		const float aspect_ratio = static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height();
 		opened_deck_configure->set_window("Deck Configuration", {aspect_ratio, 1.0f});
 
-		opened_deck_configure->add_button("Done", {0.0f, -0.9f}, button_size::medium, [](auto _)
+		opened_deck_configure->add_button("Done", {aspect_ratio * 0.7f, -0.9f}, button_size::medium, [](auto _)
 			{
 				ui_close_all();
 				ui_open_main_menu();
@@ -368,7 +368,7 @@ namespace game
 		const auto& player_prefab = game::get_player_prefab("player");
 		auto avatar_card = game::create_card_sprite({.name = player_prefab.avatar_prefab}, true);
 		opened_deck_configure->contents["avatar"] = avatar_card;
-		game::render::quad_set_position(avatar_card, {-aspect_ratio * 0.8f, 0.8f});
+		game::render::quad_set_position(avatar_card, {0.0f, -0.8f});
 		game::render::quad_set_layer(avatar_card, ui_fg_layer);
 
 		constexpr float deck_configure_cards_y_coord = 0.4f;
