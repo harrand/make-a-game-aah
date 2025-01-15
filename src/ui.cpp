@@ -289,8 +289,17 @@ namespace game
 	{
 		tz_assert(!opened_level_select.has_value(), "level select already open!");
 		opened_level_select = ui_element{};
-		opened_level_select->set_window("Level Select", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
+		tz::v2f whole_screen_dims{static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f};
+		opened_level_select->set_window("Level Select", whole_screen_dims, tz::v3f::filled(1.0f));
 		game::render::quad_set_texture0(opened_level_select->contents["panel"], game::render::create_image_from_file("./res/images/map.png"));
+		if(true)
+		{
+			opened_level_select->add_image("map_castle", "./res/images/map_castle.png", tz::v2f::zero(), whole_screen_dims);
+			if(true)
+			{
+				opened_level_select->add_image("map_castle_dungeon", "./res/images/map_castle_dungeon.png", tz::v2f::zero(), whole_screen_dims);
+			}
+		}
 
 		iterate_levels([](std::string_view level_name, const level& data)
 		{
@@ -345,7 +354,7 @@ namespace game
 		opened_deck_configure->add_text(gold_string, {-aspect_ratio + (sell_icon_size * 2) + (text_size * gold_string.size() * 0.5f), -1.0f + (text_size * 2.0f)});
 		opened_deck_configure->add_image("sell", "./res/images/goldbag.png", {-aspect_ratio + sell_icon_size, -1.0f + (sell_icon_size)}, tz::v2f::filled(sell_icon_size));
 
-		constexpr float deck_configure_cards_y_coord = 0.0f;
+		constexpr float deck_configure_cards_y_coord = 0.4f;
 		const auto& player = game::get_player_prefab("player");
 		std::size_t i = 0;
 		const std::size_t deck_row_limit = 10;

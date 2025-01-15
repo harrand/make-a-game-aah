@@ -2,7 +2,7 @@ prefabs.warbear =
 {
 	display_name = "War Bear",
 	description = "A ferocious, armoured brown bear.",
-	base_health = 150,
+	base_health = 100,
 	movement_speed = 0.5,
 	base_cooldown = 2.0,
 	base_damage = 3,

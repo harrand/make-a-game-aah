@@ -2,7 +2,7 @@ prefabs.bear =
 {
 	display_name = "Bear",
 	description = "A massive brown bear",
-	base_health = 50,
+	base_health = 75,
 	movement_speed = 0.5,
 	base_cooldown = 2.0,
 	base_damage = 3,
