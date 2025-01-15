@@ -292,12 +292,13 @@ namespace game
 		opened_level_select->set_window("Level Select", {static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height(), 1.0f}, tz::v3f::filled(1.0f));
 		game::render::quad_set_texture0(opened_level_select->contents["panel"], game::render::create_image_from_file("./res/images/map.png"));
 
-		std::size_t count = 0;
-		iterate_levels([&count](std::string_view level_name, const level& data)
+		iterate_levels([](std::string_view level_name, const level& data)
 		{
-			float y = 0.3f - (count++ * 0.14f);
 			std::string name{level_name};
-			opened_level_select->add_button(name, {0.0f, y}, button_size::small, [](std::string_view name)
+			const float aspect_ratio = static_cast<float>(tz::os::window_get_width()) / tz::os::window_get_height();
+			tz::v2f pos = data.map_position;
+			pos[0] *= aspect_ratio;
+			opened_level_select->add_button(name, pos, button_size::small, [](std::string_view name)
 				{
 					ui_close_level_select();
 					game::load_level(game::get_level(std::string{name}));
@@ -305,8 +306,7 @@ namespace game
 				}, true);
 		});
 
-		float closey = 0.3f - (count * 0.14f);
-		opened_level_select->add_button("Back", {0.0f, closey}, button_size::medium, [](auto _)
+		opened_level_select->add_button("Back", {0.0f, -0.8f}, button_size::medium, [](auto _)
 			{
 				ui_close_all();
 				ui_open_main_menu();
@@ -345,18 +345,29 @@ namespace game
 		opened_deck_configure->add_text(gold_string, {-aspect_ratio + (sell_icon_size * 2) + (text_size * gold_string.size() * 0.5f), -1.0f + (text_size * 2.0f)});
 		opened_deck_configure->add_image("sell", "./res/images/goldbag.png", {-aspect_ratio + sell_icon_size, -1.0f + (sell_icon_size)}, tz::v2f::filled(sell_icon_size));
 
-		constexpr float deck_configure_cards_y_coord = -0.35f;
+		constexpr float deck_configure_cards_y_coord = 0.0f;
 		const auto& player = game::get_player_prefab("player");
 		std::size_t i = 0;
-		const auto deck_size = player.deck.size();
+		const std::size_t deck_row_limit = 10;
+		const auto deck_size = std::clamp(player.deck.size(), static_cast<std::size_t>(4), deck_row_limit);
 		float xdist_per_card = (aspect_ratio / deck_size);
 
 		for(std::string_view card : player.deck)
 		{
 			auto sprite = game::create_card_sprite({.name = std::string{card}}, true);
 			game::render::quad_set_layer(sprite, ui_fg_layer);
-			game::render::quad_set_position(sprite, {-aspect_ratio + xdist_per_card + (2 * xdist_per_card * i), deck_configure_cards_y_coord});
-			game::render::quad_set_scale(sprite, {0.0f, xdist_per_card * 0.8f});
+			float scaley = xdist_per_card * 0.8f;
+			constexpr float row_spacing = 0.2f;
+			float py = deck_configure_cards_y_coord;
+			float px = -aspect_ratio + xdist_per_card;
+			auto c = i + 1;
+			while(c > deck_row_limit)
+			{
+				c -= deck_row_limit;
+				py -= scaley * (2.0f + row_spacing);
+			}
+			game::render::quad_set_position(sprite, {-aspect_ratio + xdist_per_card + (xdist_per_card * 2.0f * (c - 1)), py});
+			game::render::quad_set_scale(sprite, {0.0f, scaley});
 			opened_deck_configure->contents[std::format("card{}", i++)] = sprite;
 		}
 	}

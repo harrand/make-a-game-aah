@@ -29,7 +29,7 @@ namespace game::render
 	handle cursor;
 	std::uint32_t bgimg;
 	bool clicked_last_frame = false;
-	bool already_held = false;
+	render::handle held = tz::nullhand;
 
 	struct quad_private_data
 	{
@@ -234,12 +234,12 @@ namespace game::render
 
 			if(quadpriv.flags & quad_flag::draggable)
 			{
-				if(!already_held && !clicked_last_frame && tz::os::is_mouse_clicked(tz::os::mouse_button::left) && in_region)
+				if((held == tz::nullhand) && !clicked_last_frame && tz::os::is_mouse_clicked(tz::os::mouse_button::left) && in_region)
 				{
 					// we just started clicking this frame
 					// we're holding this now.
 					quadpriv.held = true;
-					already_held = true;
+					held = q;
 					quadpriv.held_offset = pos - mouse_world_pos;
 					quad_set_layer(q, quad_get_layer(q) + 1);
 				}
@@ -252,7 +252,7 @@ namespace game::render
 				if(!tz::os::is_mouse_clicked(tz::os::mouse_button::left))
 				{
 					quadpriv.held = false;
-					already_held = false;
+					held = tz::nullhand;
 				}
 			}
 		}
@@ -294,6 +294,10 @@ namespace game::render
 		auto& priv = quad_privates[q.peek()];
 		priv = {};
 		priv.garbage = true;
+		if(held == q)
+		{
+			held = tz::nullhand;
+		}
 		return tz_must(tz::ren::quad_renderer_destroy_quad(ren, q));
 	}
 

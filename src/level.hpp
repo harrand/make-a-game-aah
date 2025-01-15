@@ -1,5 +1,6 @@
 #ifndef GAME_LEVEL_HPP
 #define GAME_LEVEL_HPP
+#include "tz/core/vector.hpp"
 #include <string>
 #include <cstdint>
 #include <functional>
@@ -13,6 +14,7 @@ namespace game
 		std::string description = "";
 		std::uint32_t background_image = -1;
 		std::string player_prefab = "";
+		tz::v2f map_position = tz::v2f::filled(-1.0f);
 	};
 
 	void level_setup();
