@@ -286,8 +286,18 @@ namespace game
 				// todo: prioritise an enemy entity if it has recently attacked the enemy's avatar or one of their entities.
 				float min_dist = config_default_aggro_range;
 				entity_handle nearest_enemy = tz::nullhand;
-				game::iterate_entities([player, ent, &min_dist, &nearest_enemy](entity_handle other)
+				game::iterate_entities([player, ent, &min_dist, &nearest_enemy, p](entity_handle other)
 				{
+					if(entity_is_ambush(other))
+					{
+						return;
+					}
+					if(p == human_player && entity_is_ambush(ent))
+					{
+						// an entity in ambush (that is not owned by a cpu) will not attack automatically
+						// only via red reticule.
+						return;
+					}
 					float dst = (entity_get_position(other) - entity_get_position(ent)).length();
 					if(dst >= min_dist) {return;}
 					if(!entity_get_prefab(other).combat || !entity_get_prefab(other).attackable) {return;}
@@ -470,7 +480,7 @@ namespace game
 			{
 				float dist = (click_pos - game::entity_get_position(ent)).length();
 				auto prefab = entity_get_prefab(ent);
-				if(ent == reticule || !prefab.combat || !prefab.attackable)
+				if(ent == reticule || !prefab.combat || !prefab.attackable || entity_is_ambush(ent))
 				{
 					return;
 				}

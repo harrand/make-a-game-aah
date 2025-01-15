@@ -39,6 +39,7 @@ namespace game
 	std::vector<entity_handle> healthbars = {};
 	std::vector<float> healthbar_timeouts = {};
 	std::vector<bool> busys = {};
+	std::vector<bool> invisibles = {};
 
 	// meta
 	std::vector<entity_handle> entity_free_list = {};
@@ -87,6 +88,7 @@ namespace game
 			healthbars.push_back(tz::nullhand);
 			healthbar_timeouts.push_back(0.0f);
 			busys.push_back(false);
+			invisibles.push_back(false);
 		}
 
 		// set new data
@@ -114,6 +116,10 @@ namespace game
 		quads[ret.peek()] = game::render::create_quad({.position = info.position, .rotation = info.rotation, .scale = scales[ret.peek()], .colour = prefab.colour_tint},
 				prefab.emissive ? render::quad_flag::emissive : static_cast<render::quad_flag>(0));
 		game::render::quad_set_flipbook(quads[ret.peek()], prefab.idle);
+		if(prefab.ambush)
+		{
+			entity_set_ambush(ret);
+		}
 		move_dirs[ret.peek()] = tz::v2f::zero();
 		target_locations[ret.peek()] = std::nullopt;
 		targets[ret.peek()] = tz::nullhand;
@@ -439,6 +445,30 @@ namespace game
 		return creatures[ent.peek()];
 	}
 
+	bool entity_is_ambush(entity_handle ent)
+	{
+		return invisibles[ent.peek()];
+	}
+
+	void entity_set_ambush(entity_handle ent)
+	{
+		if(entity_is_ambush(ent))
+		{
+			return;
+		}
+		invisibles[ent.peek()] = true;
+		entity_set_colour_tint(ent, entity_get_colour_tint(ent) * 0.5f);
+	}
+
+	void entity_break_ambush(entity_handle ent)
+	{
+		if(invisibles[ent.peek()])
+		{
+			invisibles[ent.peek()] = false;	
+			entity_set_colour_tint(ent, entity_get_colour_tint(ent) * 2.0f);
+		}
+	}
+
 	void entity_face_left(entity_handle ent)
 	{
 		auto sc = game::render::quad_get_scale(quads[ent.peek()]);
@@ -727,6 +757,12 @@ namespace game
 				else if(dmg != 0)
 				{
 					hps[rhs.peek()] = std::clamp(victim_hp - dmg, 0u, creatures[rhs.peek()].base_health);
+					// if the attacker is ambushed it should now break.
+					if(entity_is_ambush(lhs))
+					{
+						entity_break_ambush(lhs);
+					}
+
 					// rhs got hurt
 
 					// so by default we should have the victim target the attacker.

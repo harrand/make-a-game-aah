@@ -53,6 +53,10 @@ namespace game
 
 	const game::prefab& entity_get_prefab(entity_handle ent);
 
+	bool entity_is_ambush(entity_handle ent);
+	void entity_set_ambush(entity_handle ent);
+	void entity_break_ambush(entity_handle ent);
+
 	void entity_face_left(entity_handle ent);
 	void entity_face_right(entity_handle ent);
 	void entity_start_casting(entity_handle ent);

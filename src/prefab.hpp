@@ -17,6 +17,7 @@ namespace game
 		bool combat = true;
 		bool attackable = true;
 		bool taunt = false;
+		bool ambush = false;
 		float base_cooldown = 1.0f;
 		float leeway_coefficient = 1.0f;
 		int base_damage = 1;
