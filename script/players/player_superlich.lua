@@ -16,5 +16,6 @@ players.superlich =
 		"skeletal_archer",
 		"undead_bear",
 		"lich"
-	}
+	},
+	mana_coeff = 4.0
 }
