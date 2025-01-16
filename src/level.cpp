@@ -108,7 +108,6 @@ namespace game
 		}
 
 		game::load_player_prefab(game::get_player_prefab("player"), false, true);
-		game::load_player_prefab(game::get_player_prefab("menafus"), true, true);
 	}
 
 	void reload_level()

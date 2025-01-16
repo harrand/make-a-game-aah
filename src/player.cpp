@@ -142,18 +142,20 @@ namespace game
 		if(game::entity_exists(pl.avatar))
 		{
 			game::destroy_entity(pl.avatar);
+			if(pl.good)
+			{
+				tz_assert(living_good_players > 0, "destroying an evil player but my count of living good players was already 0???");
+				living_good_players--;
+			}
+			else
+			{
+				tz_assert(living_evil_players > 0, "destroying an evil player but my count of living evil players was already 0???");
+				living_evil_players--;
+			}
 		}
 		if(pl.cpu_play_card_quad != tz::nullhand)
 		{
 			game::render::destroy_quad(pl.cpu_play_card_quad);
-		}
-		if(pl.good)
-		{
-			living_good_players--;
-		}
-		else
-		{
-			living_evil_players--;
 		}
 		pl = {};
 		pl.valid = false;
@@ -448,7 +450,7 @@ namespace game
 	{
 		std::vector<std::string> ret;
 
-		tz_must(tz::lua_execute("if players.player.completed_levels == nil then players.player.completed_levels = {{}}; _tmp = 0 else _tmp = #players.player.completed_levels end"));
+		tz_must(tz::lua_execute("if players.player.completed_levels == nil then players.player.completed_levels = {}; _tmp = 0 else _tmp = #players.player.completed_levels end"));
 		auto sz = tz_must(tz::lua_get_int("_tmp"));
 		for(std::size_t i = 0; i < sz; i++)
 		{
