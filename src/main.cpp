@@ -50,7 +50,7 @@ int tz_main()
 		float delta_seconds = (now - time) / 1000000000.0f;
 		time = now;
 
-		if(game::ui_pause_menu_opened())
+		if(game::ui_pause_menu_opened() || game::ui_win_screen_open() || game::ui_defeat_screen_open())
 		{
 			delta_seconds = 0;
 		}

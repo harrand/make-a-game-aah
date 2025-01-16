@@ -20,14 +20,8 @@ prefabs.menafus_corrupt =
 	end,
 	on_death = function(me)
 		local is_player_aligned = entity_is_player_aligned(me)
-		local cleansed = create_entity("menafus")
-		entity_set_position(cleansed, entity_get_position(me))
-		entity_set_is_player_aligned(cleansed, not is_player_aligned)
-
-		local demon = create_entity("demon")
-		entity_set_position(demon, entity_get_position(me))
-		entity_set_is_player_aligned(demon, is_player_aligned)
-		entity_set_target_location(demon, 0, 0)
+		load_player_prefab("menafus", true, not is_player_aligned)
+		load_player_prefab("demonlord", true, is_player_aligned)
 	end,
 	idle =
 	{

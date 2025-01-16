@@ -1,6 +1,7 @@
 #include "script.hpp"
 #include "entity.hpp"
 #include "config.hpp"
+#include "player.hpp"
 #include "tz/core/job.hpp"
 #include "tz/core/lua.hpp"
 #include <filesystem>
@@ -48,6 +49,12 @@ namespace game
 			auto [msg] = tz::lua_parse_args<std::string>();
 			std::string full_msg = std::format("[DEBUG] {}", msg);
 			std::printf("%s", full_msg.c_str());
+			return 0;
+		});
+		tz::lua_define_function("load_player_prefab", []()
+		{
+			auto [player_prefab_name, cpu, player_aligned] = tz::lua_parse_args<std::string, bool, bool>();
+			game::load_player_prefab(game::get_player_prefab(player_prefab_name), cpu, player_aligned);
 			return 0;
 		});
 		tz::lua_define_function("create_entity", []()

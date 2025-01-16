@@ -14,6 +14,8 @@ namespace game
 {
 	constexpr float mana_bar_margin = 0.2f;
 	entity_handle reticule = tz::nullhand;
+	std::size_t living_good_players = 0;
+	std::size_t living_evil_players = 0;
 
 	struct player_data
 	{
@@ -41,6 +43,18 @@ namespace game
 		float cpu_play_timer = 0.0f;
 		card cpu_play_card = {};
 		render::handle cpu_play_card_quad = tz::nullhand;
+
+		tz::v3f get_colour() const
+		{
+			if(this->good)
+			{
+				return this->type == player_type::human ? config_player_colour : config_ally_aligned_colour;
+			}
+			else
+			{
+				return config_enemy_aligned_colour;
+			}
+		}
 	};
 
 	std::vector<player_data> players = {};
@@ -107,6 +121,14 @@ namespace game
 			players[ret.peek()].mana_regen = config_default_mps * mana_coeff;
 		}
 		impl_setup_player(ret, prefab);
+		if(good)
+		{
+			living_good_players++;
+		}
+		else
+		{
+			living_evil_players++;
+		}
 
 		return ret;
 	}
@@ -117,7 +139,22 @@ namespace game
 		game::destroy_deck(pl.deck);
 		game::render::destroy_quad(pl.mana_bar_background);
 		game::render::destroy_quad(pl.mana_bar);
-		game::destroy_entity(pl.avatar);
+		if(game::entity_exists(pl.avatar))
+		{
+			game::destroy_entity(pl.avatar);
+		}
+		if(pl.cpu_play_card_quad != tz::nullhand)
+		{
+			game::render::destroy_quad(pl.cpu_play_card_quad);
+		}
+		if(pl.good)
+		{
+			living_good_players--;
+		}
+		else
+		{
+			living_evil_players--;
+		}
 		pl = {};
 		pl.valid = false;
 	}
@@ -341,16 +378,24 @@ namespace game
 		auto& player = players[p.peek()];
 		if(player.good)
 		{
-			ui_close_all();
-			ui_open_defeat_screen();
+			living_good_players--;
+			if(p == human_player)
+			{
+				ui_close_all();
+				ui_open_defeat_screen();
+			}
 		}
 		else
 		{
-			real_player_set_level_complete(game::get_current_level().name);
-			game::save();
-			card c = player.card_pool[std::rand() % player.card_pool.size()];
-			ui_close_all();
-			ui_open_win_screen(c);
+			living_evil_players--;
+			if(living_evil_players == 0)
+			{
+				real_player_set_level_complete(game::get_current_level().name);
+				game::save();
+				card c = player.card_pool[std::rand() % player.card_pool.size()];
+				ui_close_all();
+				ui_open_win_screen(c);
+			}
 		}
 	}
 
@@ -551,15 +596,17 @@ namespace game
 	{
 		player_data& player = players[p.peek()];
 		tz::v2f pos = player.good ? config_player_avatar_position : config_enemy_avatar_position;
+		pos[1] -= (player.good ? living_good_players : living_evil_players) * 0.1f;
 		tz::v2f deck_pos = pos; deck_pos[1] += 0.7f;
 		if(player.good){deck_pos[1] *= -1.0f;}
+
 
 		player.deck = game::create_deck({.sprite = game::deck_render_info
 		{
 			.position = deck_pos,
 			.scale = {0.7f, 0.7f},
 			.cards_face_down = !player.good,
-			.player_can_play_cards = player.good
+			.player_can_play_cards = player.type == player_type::human
 		}});
 
 		tz::v2f mana_bar_background_dimensions = player.mana_bar_dimensions;
@@ -591,7 +638,7 @@ namespace game
 		game::entity_break_ambush(player.avatar);
 
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = player.good, .position = tz::v2f::zero(), .parent = player.avatar});
-		game::entity_set_colour_tint(aura, player.good ? config_player_aligned_colour : config_enemy_aligned_colour);
+		game::entity_set_colour_tint(aura, player.get_colour());
 		game::entity_set_layer(aura, -1);
 		player_set_mana(p, 0);
 	}
@@ -723,7 +770,7 @@ namespace game
 			if(player.cpu_play_timer >= config_computer_play_card_turnaround_time_seconds)
 			{
 				// we're done. play the card.
-				entity_handle ent = game::create_entity({.prefab_name = player.cpu_play_card.name, .player_aligned = false, .position = config_enemy_play_position});
+				entity_handle ent = game::create_entity({.prefab_name = player.cpu_play_card.name, .player_aligned = player.good, .position = player.good ? config_ally_play_position : config_enemy_play_position});
 				render::destroy_quad(player.cpu_play_card_quad);
 
 				player.cpu_play_card = {};
@@ -755,8 +802,9 @@ namespace game
 			else
 			{
 				// lerp
-				pos[0] = std::lerp(pos[0], config_enemy_play_position[0], delta_seconds * config_computer_play_card_drag_speed);
-				pos[1] = std::lerp(pos[1], config_enemy_play_position[1], delta_seconds * config_computer_play_card_drag_speed);
+				tz::v2f playpos = player.good ? config_ally_play_position : config_enemy_play_position;
+				pos[0] = std::lerp(pos[0], playpos[0], delta_seconds * config_computer_play_card_drag_speed);
+				pos[1] = std::lerp(pos[1], playpos[1], delta_seconds * config_computer_play_card_drag_speed);
 				render::quad_set_position(player.cpu_play_card_quad, pos);
 			}
 		}

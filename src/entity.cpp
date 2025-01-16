@@ -677,7 +677,7 @@ namespace game
 		if(tooltips[ent.peek()] == tz::nullhand)
 		{
 			const bool is_player_aligned = player_aligneds[ent.peek()];
-			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(config_entity_tooltip_text_size), is_player_aligned ? config_player_aligned_colour : config_enemy_aligned_colour);
+			tooltips[ent.peek()] = game::render::create_text("kongtext", txt, tooltip_position, tz::v2f::filled(config_entity_tooltip_text_size), is_player_aligned ? config_player_colour : config_enemy_aligned_colour);
 		}
 		else
 		{
@@ -814,10 +814,7 @@ namespace game
 				ent_is_player = true;
 			}
 		});
-		if(!ent_is_player)
-		{
-			destroy_entity(ent);
-		}
+		destroy_entity(ent);
 	}
 
 	void impl_on_kill(entity_handle ent, entity_handle victim)

@@ -36,7 +36,8 @@ namespace game
 	// changing these will change how the game composes and displays everything, which could affect gameplay in some circumstances
 
 	// what colour aura should surround something aligned with the player
-	constexpr tz::v3f config_player_aligned_colour = {0.0f, 0.0f, 0.5f};
+	constexpr tz::v3f config_player_colour = {0.0f, 0.0f, 0.5f};
+	constexpr tz::v3f config_ally_aligned_colour = {0.0f, 0.7f, 0.0f};
 	// what colour aura should surround something aligned with the enemy
 	constexpr tz::v3f config_enemy_aligned_colour = {0.5f, 0.0f, 0.0f};
 	// what colour is mana?
@@ -49,6 +50,7 @@ namespace game
 
 	// where (exact coordinates) should the enemy move cards when it plays them? possible TODO: enemy AI will choose a play position depending on what card its playing e.g a spell.
 	constexpr tz::v2f config_enemy_play_position = {1.0f, 0.0f};
+	constexpr tz::v2f config_ally_play_position = {-1.0f, 0.0f};
 
 	// when an entity is set as either the player/enemy avatar, it ought to display slightly larger than normal - determined by this scale vector.
 	constexpr tz::v2f config_avatar_scale = {1.0f, 1.0f};
