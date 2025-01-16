@@ -587,6 +587,8 @@ namespace game
 		{
 			game::entity_face_left(player.avatar);
 		}
+		// players cannot spawn with the ambush state (assassin would be a super op avatar)
+		game::entity_break_ambush(player.avatar);
 
 		entity_handle aura = game::create_entity({.prefab_name = "aura", .player_aligned = player.good, .position = tz::v2f::zero(), .parent = player.avatar});
 		game::entity_set_colour_tint(aura, player.good ? config_player_aligned_colour : config_enemy_aligned_colour);
